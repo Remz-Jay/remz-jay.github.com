@@ -2,7 +2,7 @@
 #      Main Configs       #
 # ----------------------- #
 
-url: http://blog.rem.co
+url: http://Remz-Jay.github.com
 title: The Rem.co Blog
 subtitle: Rem.co's linux and coding adventures
 author: Remco Overdijk
@@ -89,8 +89,8 @@ delicious_user:
 delicious_count: 3
 
 # Disqus Comments
-disqus_short_name:
-disqus_show_comment_count: false
+disqus_short_name: rem-co
+disqus_show_comment_count: true
 
 # Google Analytics
 google_analytics_tracking_id: UA-15985434-10
