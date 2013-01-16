@@ -2,4 +2,14 @@
 // Add styles here to make changes without digging in too much
 header hgroup a img {
   vertical-align: text-top;
+  padding-top: 8px;
+}
+header hgroup a span {
+  display: none;
+}
+aside #so {
+  margin-top: 10px;
+}
+aside #so a {
+  white-space: normal;
 }
