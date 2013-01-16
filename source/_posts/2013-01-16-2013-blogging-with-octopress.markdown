@@ -17,7 +17,8 @@ Being a programmer, I blame the software I use to blog. In my case that's the [T
 Moreover, that site uses the ancient tt_news plugin as a blog substitute, which makes blogging a bit… troublesome to put it mildly. Especially "*advanced*" stuff like including code snippets and multiple layouts in one article.
 
 {% img left http://octopress.org/images/logo.png %}
-Then [Octopress][4] enters the stage, combining a lot of my favorite technologies to provide a somewhat nerdy approach to blogging.  
+Then [Octopress][4] enters the stage, combining a lot of my favorite technologies to provide a somewhat nerdy approach to blogging.
+<!-- more -->  
 *Why haven't I tried this before?*
 
 

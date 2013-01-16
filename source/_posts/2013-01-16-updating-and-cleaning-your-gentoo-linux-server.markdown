@@ -3,7 +3,7 @@ layout: post
 title: "Gentoo: Updating and Cleaning"
 date: 2013-01-16 23:40
 comments: true
-categories: 
+categories: [Gentoo, Linux]
 ---
 
 {% img left http://www.gentoo.org/images/gblend.png 100 100 %} Keeping your Gentoo Linux server up to date isn't as straightforward as let's say an Ubuntu box, where you would just run ``` $ apt-get update && apt-get upgrade && apt-get clean``` for example.
@@ -12,6 +12,7 @@ Gentoo is far too flexible for a *one size fits all* approach. The commands outl
 
 {% gist 2835011 %}
 
+<!-- more -->
 We start by syncing the portage tree, required to obtain the latest packages.
 After which we update the "world" group (which would entail all packages currently installed) with a couple of options:
 
