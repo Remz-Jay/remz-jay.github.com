@@ -3,7 +3,7 @@ layout: post
 title: "SELinux: Allowing SSH public key authentication"
 date: 2013-02-19 17:03
 comments: true
-categories: 
+categories: [SELinux, SSH, CentOS, Linux]
 ---
 
 ### The issue
