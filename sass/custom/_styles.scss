@@ -3,8 +3,21 @@
 
 @import "custom/font-awesome";
 
-body > nav a:hover, a:focus {
-  text-decoration: none;
+body {
+  font-size: 1.1em;
+  > nav {
+	padding: 0.2em 0.5em 0.2em 55px;
+	> a:hover, a:focus {
+	  text-decoration: none;
+	}
+	> ul {
+	  padding: 0;
+	}
+	> form .search {
+	  padding: 0.3em 0.5em 0.2em;
+	  width: 245px;
+	}
+  }
 }
 
 header hgroup a {
@@ -23,14 +36,24 @@ aside #so {
 	white-space: normal;
   }
 }
-header h1 {
-  font-size: 2em;
+
+blockquote {
+  font-size: 1.1em;
 }
 
-h1 {
-  font-size: 1.5em;
+h1, header h1, #content .blog-index article h1 {
+  font-size: 1.9em;
 }
 
 h2 {
   font-size: 1.3em;
+}
+
+h3 {
+  font-size: 1.2em;
+}
+
+html .gist .gist-file .highlight {
+  margin-bottom: 0;
+  width: 100%;
 }
