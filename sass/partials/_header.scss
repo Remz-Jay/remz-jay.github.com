@@ -1,51 +1,36 @@
 body > #top header {
   //background: $header-bg;
+  margin-top: 50px;
+  padding: 0;
   float: left;
   h1 {
+	font-family: "museo-sans",sans-serif;
+	font-style: normal;
+	font-weight: 900;
+	font-size: 61.56pt;
+	letter-spacing: -4px;
+
     display: inline-block;
     margin: 0;
 	float:left;
-	/* Safari */
-	-webkit-transform: rotate(-90deg);
 
-	/* Firefox */
-	-moz-transform: rotate(-90deg);
-
-	/* IE */
-	-ms-transform: rotate(-90deg);
-
-	/* Opera */
-	-o-transform: rotate(-90deg);
-
-	/* Internet Explorer */
-	filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
-
-	a, a:visited, a:hover {
+	a, a:visited {
       color: $title_color;
       text-decoration: none;
     }
+	a:hover {
+	  text-decoration: none;
+	  color: #e6d333;
+	}
   }
   h2 {
 	float:left;
-	/* Safari */
-	-webkit-transform: rotate(-90deg);
-
-	/* Firefox */
-	-moz-transform: rotate(-90deg);
-
-	/* IE */
-	-ms-transform: rotate(-90deg);
-
-	/* Opera */
-	-o-transform: rotate(-90deg);
-
-	/* Internet Explorer */
-	filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
-
-	margin: .2em 0 0;
-    @extend .sans;
-    font-size: 1em;
+	letter-spacing: -8px;
     color: $subtitle-color;
-    font-weight: normal;
+	font-family: "museo-sans",sans-serif;
+	font-style: normal;
+	font-weight: 900;
+	font-size: 61.56pt;
+
   }
 }

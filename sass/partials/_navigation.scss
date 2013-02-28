@@ -2,6 +2,7 @@ body > #top nav {
   position: relative;
   float: right;
 	margin-top: 50px;
+  min-width: 900px;
   background-color: $nav-bg;
   @include background($nav-bg-back);
   //padding-top: .35em;
@@ -58,12 +59,15 @@ body > #top nav {
     }
     a {
       @include link-colors($nav-color, $nav-color-hover, $visited: $nav-color);
-      font-family: $sans;
+	  font-family: "museo-sans",sans-serif;
+	  font-style: normal;
+	  font-weight: 500;
+	  font-size: 1.1em;
+	  letter-spacing: -1.5px;
       //text-shadow: lighten($nav-bg, 12) 0 1px;
 	  text-transform: uppercase;
       float: left;
       text-decoration: none;
-      font-size: 1.1em;
       padding: 10px .1em 0;
       line-height: 1.5em;
 	  width: 100%;
