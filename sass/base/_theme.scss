@@ -1,3 +1,7 @@
+$rem-co-red: #b40000 !default;
+$rem-co-yellow: #e6d333 !default;
+$rem-co-grey: #444444 !default;
+
 $noise-bg: image-url('noise.png') top left !default;
 $img-border: inline-image('dotted-border.png');
 
@@ -47,7 +51,7 @@ $sidebar-link-color-subdued: lighten($sidebar-color, 20) !default;
 $sidebar-link-color-subdued-hover: $sidebar-link-color-hover !default;
 $twitter-status-link: lighten($sidebar-link-color-subdued, 15) !default;
 
-$footer-color: #888 !default;
+$footer-color: #ffffff !default;
 $footer-bg: #ccc !default;
 $footer-bg-front: image-url('bgfooter.png') bottom center no-repeat !default;
 $footer-bg-back: linear-gradient(lighten($footer-bg, 8), $footer-bg, darken($footer-bg, 11)) !default;

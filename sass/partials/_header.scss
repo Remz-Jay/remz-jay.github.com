@@ -4,33 +4,33 @@ body > #top header {
   padding: 0;
   float: left;
   h1 {
-	font-family: "museo-sans",sans-serif;
+	font-family: "museo-sans", sans-serif;
 	font-style: normal;
 	font-weight: 900;
 	font-size: 61.56pt;
 	letter-spacing: -4px;
 
-    display: inline-block;
-    margin: 0;
-	float:left;
+	display: inline-block;
+	margin: 0;
+	float: left;
 
 	a, a:visited {
-      color: $title_color;
-      text-decoration: none;
-    }
-	a:hover {
+	  color: $title_color;
 	  text-decoration: none;
-	  color: #e6d333;
+	  &:hover {
+		text-decoration: none;
+		color: $rem-co-yellow;
+	  }
 	}
   }
-  h2 {
-	float:left;
-	letter-spacing: -8px;
-    color: $subtitle-color;
-	font-family: "museo-sans",sans-serif;
-	font-style: normal;
-	font-weight: 900;
-	font-size: 61.56pt;
+	h2 {
+	  float: left;
+	  letter-spacing: -8px;
+	  color: $subtitle-color;
+	  font-family: "museo-sans", sans-serif;
+	  font-style: normal;
+	  font-weight: 900;
+	  font-size: 61.56pt;
 
+	}
   }
-}

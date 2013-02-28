@@ -1,1 +1,29 @@
+
+<p id="copyright">
+	Copyright &copy; {{ site.time | date: "%Y" }} - {{ site.author }} -
+	<span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+<div id="fcontent">
+	<div id="fmenu">
+		<ul class="footer-navigation">
+			<li{% if page.url == '/index.html'%} class="active"{% endif %}><a href="{{ root_url }}/"><i class="icon-pencil"></i>Blog</a></li>
+			<li{% if page.url == '/blog/archives/index.html'%} class="active"{% endif %}><a href="{{ root_url }}/blog/archives"><i class="icon-book"></i>Archives</a></li>
+		</ul>
+		<ul>
+			<li>Blub</li>
+			<li>Blab</li>
+			<li>Blob</li>
+		</ul>
+		<ul>
+			<li>Blub</li>
+			<li>Blab</li>
+			<li>Blob</li>
+		</ul>
+		<ul>
+			<li>Blub</li>
+			<li>Blab</li>
+			<li>Blob</li>
+		</ul>
+	</div>
+</div>
 {% include custom/footer.html %}
