@@ -5,13 +5,14 @@ body > footer {
   text-shadow: lighten($footer-bg, 5) 0 1px;
   background-color: $footer-bg;
   @include background($footer-bg-front, $footer-bg-back);
-  border-top: 1px solid $footer-border-top;
-  position: absolute;
-bottom: 0;
+  //border-top: 1px solid $footer-border-top;
+
+  width: 100%;
   @include border-bottom-radius(.4em);
+  height: 485px;
   z-index: 1;
   a {
-    @include link-colors($footer-link-color, $footer-link-color-hover, $visited: $footer-link-color);
+	@include link-colors($footer-link-color, $footer-link-color-hover, $visited: $footer-link-color);
   }
   p:last-child { margin-bottom: 0; }
 }
