@@ -1,12 +1,12 @@
 body > nav {
   position: relative;
+
   background-color: $nav-bg;
-  @include background($nav-bg-front, $nav-bg-back);
-  border: {
-    top: 1px solid $nav-border-top;
-    bottom: 1px solid $nav-border-bottom; }
-  padding-top: .35em;
-  padding-bottom: .35em;
+  @include background($nav-bg-back);
+  //padding-top: .35em;
+  //padding-bottom: .35em;
+  margin-bottom: 50px;
+  padding: 0 0 24px 0;
   form {
     @include background-clip(padding-box);
     margin: 0; padding: 0;
@@ -42,7 +42,8 @@ body > nav {
       @include horizontal-list(0);
       float: left;
       display: block;
-      padding-top: .15em;
+      //padding-top: .15em;
+	  height: 66px;
     }
     ul.subscription {
       margin-left: .8em;
@@ -51,25 +52,40 @@ body > nav {
     }
     ul li {
       margin: 0;
+	  height: 63px;
+	  min-width: 150px;
+	  text-align: center;
     }
     a {
       @include link-colors($nav-color, $nav-color-hover, $visited: $nav-color);
       font-family: $sans;
-      text-shadow: lighten($nav-bg, 12) 0 1px;
+      //text-shadow: lighten($nav-bg, 12) 0 1px;
+	  text-transform: uppercase;
       float: left;
       text-decoration: none;
       font-size: 1.1em;
-      padding: .1em 0;
+      padding: 10px .1em 0;
       line-height: 1.5em;
+	  width: 100%;
+	  text-align: center;
+	  position: relative;
+	  height: 33px;
     }
-    li + li {
-      border-left: 1px solid $nav-border-left;
-      margin-left: .8em;
-      a {
-        padding-left: .8em;
-        border-left: 1px solid $nav-border-right;
-      }
-    }
+	li.active a {
+	  background-color: #b40000;
+	  position: relative;
+
+	}
+	li.active a:after {
+	  background: $nav-bg-tab no-repeat;
+	  position: absolute;
+	  bottom: -24px;
+	  content: "";
+	  width:24px;
+	  height:24px;
+	  display:block;
+	  right: 0;
+	}
     form {
       float: right;
       text-align: left;
