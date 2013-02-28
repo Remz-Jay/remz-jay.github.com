@@ -36,7 +36,8 @@ html .gist .gist-file {
   border: none;
   padding-top: image-height("code_bg.png") !important;
   .highlight {
-    margin-bottom: 0;
+	margin-bottom: 0;
+	width: 100%;
   }
   .gist-syntax {
     border-bottom: 0 !important;

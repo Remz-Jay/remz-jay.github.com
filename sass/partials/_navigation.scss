@@ -1,11 +1,11 @@
-body > nav {
+body > #top nav {
   position: relative;
-
+  float: right;
+	margin-top: 50px;
   background-color: $nav-bg;
   @include background($nav-bg-back);
   //padding-top: .35em;
   //padding-bottom: .35em;
-  margin-bottom: 50px;
   padding: 0 0 24px 0;
   form {
     @include background-clip(padding-box);
@@ -134,7 +134,7 @@ body > nav {
   &:hover:after { background-color: lighten($nav-color, 20); }
 }
 .maskImage {
-  body > nav {
+  body > #top nav {
     @media only screen and (min-width: 550px) {
       ul[data-subscription$=email] + form {
         width: $sidebar-width-medium - $pad-medium*2 - $sidebar-pad-medium - 32px;

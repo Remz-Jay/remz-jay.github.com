@@ -1,15 +1,48 @@
-body > header {
-  background: $header-bg;
+body > #top header {
+  //background: $header-bg;
+  float: left;
   h1 {
     display: inline-block;
     margin: 0;
-    a, a:visited, a:hover {
+	float:left;
+	/* Safari */
+	-webkit-transform: rotate(-90deg);
+
+	/* Firefox */
+	-moz-transform: rotate(-90deg);
+
+	/* IE */
+	-ms-transform: rotate(-90deg);
+
+	/* Opera */
+	-o-transform: rotate(-90deg);
+
+	/* Internet Explorer */
+	filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+
+	a, a:visited, a:hover {
       color: $title_color;
       text-decoration: none;
     }
   }
   h2 {
-    margin: .2em 0 0;
+	float:left;
+	/* Safari */
+	-webkit-transform: rotate(-90deg);
+
+	/* Firefox */
+	-moz-transform: rotate(-90deg);
+
+	/* IE */
+	-ms-transform: rotate(-90deg);
+
+	/* Opera */
+	-o-transform: rotate(-90deg);
+
+	/* Internet Explorer */
+	filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+
+	margin: .2em 0 0;
     @extend .sans;
     font-size: 1em;
     color: $subtitle-color;

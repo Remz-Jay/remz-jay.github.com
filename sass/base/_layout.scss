@@ -48,7 +48,13 @@ body {
   //max-width: $max-width;
   position: relative;
   margin: 0 auto;
-  > #main, > header, > nav, > #content > article, #content > div > article, #content > div > section {
+  > #main {
+	clear: both;
+  }
+  > #top {
+	background: none;
+  }
+  > #top, > #main, > #top header, > #top nav, > #content > article, #content > div > article, #content > div > section {
 	@extend .group;
 
 	-webkit-text-size-adjust: none;
@@ -57,7 +63,7 @@ body {
 	margin: 0 auto;
 	max-width: $max-width;
   }
-  > header, > nav, > #content > article, #content > div > article, #content > div > section {
+  > #top, > #top header, > #top nav, > #content > article, #content > div > article, #content > div > section {
     padding-left: $pad-min;
     padding-right: $pad-min;
     @media only screen and (min-width: 480px) {
@@ -90,7 +96,7 @@ body {
       margin-right: $pad-wide;
     }
   }
-  > header {
+  > #top header {
     font-size: $header-font-size;
     padding-top: $header-padding-top;
     padding-bottom: $header-padding-bottom;
@@ -130,7 +136,7 @@ body.sidebar-footer {
 }
 
 @media only screen and (min-width: 550px) {
-  body > header { font-size: $header-font-size; }
+  body > #top header { font-size: $header-font-size; }
 }
 @media only screen and (min-width: 750px) {
   aside.sidebar { @include collapse-sidebar; }
@@ -140,7 +146,7 @@ body.sidebar-footer {
 }
 @media only screen and (min-width: 768px) {
   body { -webkit-text-size-adjust: auto; }
-  body > header { font-size: $header-font-size * 1.2; }
+  body > #top header { font-size: $header-font-size * 1.2; }
   #main {
     padding: 0;
     margin: 0 auto;
@@ -175,7 +181,7 @@ body.sidebar-footer {
 }
 
 @media only screen and (min-width: 992px) {
-  body > header { font-size: $header-font-size * 1.3; }
+  body > #top header { font-size: $header-font-size * 1.3; }
   #content { margin-right: $sidebar-width-wide; }
   #content {
     > div, > article {
