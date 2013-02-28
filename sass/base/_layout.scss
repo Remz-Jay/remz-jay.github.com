@@ -48,17 +48,16 @@ body {
   //max-width: $max-width;
   position: relative;
   margin: 0 auto;
-
-  > header, > nav, > #content > article, > #main, #content > div > article, #content > div > section {
-
-    @extend .group;
+  > #main, > header, > nav, > #content > article, #content > div > article, #content > div > section {
+	@extend .group;
 
 	-webkit-text-size-adjust: none;
 	//max-width: $max-width;
 	position: relative;
 	margin: 0 auto;
 	max-width: $max-width;
-
+  }
+  > header, > nav, > #content > article, #content > div > article, #content > div > section {
     padding-left: $pad-min;
     padding-right: $pad-min;
     @media only screen and (min-width: 480px) {
