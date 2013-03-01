@@ -49,7 +49,13 @@ body > #top nav {
     ul.subscription {
       margin-left: .8em;
       float: right;
-      li:last-child a { padding-right: 0; }
+      li:last-child a {
+		padding-right: 0;
+		min-width: 0;
+	  }
+	  > li a {
+		min-width: 0;
+	  }
     }
     ul li {
       margin: 0;
@@ -57,6 +63,7 @@ body > #top nav {
 	  min-width: 150px;
 	  text-align: center;
     }
+
     a {
       @include link-colors($nav-color, $nav-color-hover, $visited: $nav-color);
 	  font-family: "museo-sans",sans-serif;
@@ -150,7 +157,14 @@ body > #top nav {
       }
     }
   }
-  ul.subscription { position: relative; top: .2em; li, a { border: 0; padding: 0; }}
+  ul.subscription {
+	position: relative;
+	top: .2em;
+	li, a {
+	  border: 0;
+	  padding: 0;
+	}
+  }
   a[rel=subscribe-rss]{ @include mask-subscription-nav('rss.png'); }
   a[rel=subscribe-email]{ @include mask-subscription-nav('email.png'); }
 }
