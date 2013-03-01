@@ -18,6 +18,8 @@ According to the [OnApp Helpdesk][3] you can use these calls to get the required
 	GET /virtual_machines/:virtual_machine_id/console.json
 As I'm lazy I didn't want to do this manually every time, so I devised a little PHP script that can aid in finding the right information:
 
+<!-- more -->  
+
 ``` php OnApp VNC Initiator
 <?php
 /**
