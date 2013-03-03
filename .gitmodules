@@ -1,3 +1,6 @@
 [submodule "source/assets/bootstrap"]
 	path = source/assets/bootstrap
 	url = https://github.com/twitter/bootstrap.git
+[submodule "source/assets/jquery-flickr"]
+	path = source/assets/jquery-flickr
+	url = git://github.com/rpheath/jquery-flickr.git
