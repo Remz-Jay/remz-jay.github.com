@@ -16,4 +16,4 @@ group :development do
   gem 'flickraw', '~> 0.1'
 end
 
-gem 'sinatra', '~> 1.3.3'
+gem 'sinatra', '~> 1.3.5'
