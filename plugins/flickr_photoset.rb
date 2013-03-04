@@ -24,7 +24,7 @@ class FlickrSet < Liquid::Tag
       page_url = FlickRaw.url_photopage(info)
       img_tag = "<img src=\"#{src}\" class=\"aside-flickr\" title=\"#{info.title}\"/>"
       output << "<li>"
-      output << "<a href=\"#{page_url}\">#{img_tag}</a>"
+      output << "<a href=\"#{page_url}\" target=\"_blank\">#{img_tag}</a>"
       output << "<h2><a href=\"#{page_url}\">#{item.title}</a></h2>"
       output << "<p>#{item.description}</p>"
       output << "</li>"
