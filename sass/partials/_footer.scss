@@ -1,19 +1,63 @@
 body > footer {
   @extend .sans;
+  font:  "museo-sans", sans-serif;
   font-size: .8em;
   color: $footer-color;
-  text-shadow: lighten($footer-bg, 5) 0 1px;
+  //text-shadow: lighten($footer-bg, 5) 0 1px;
   background-color: $footer-bg;
   @include background($footer-bg-front, $footer-bg-back);
-  border-top: 1px solid $footer-border-top;
-  position: relative;
-  padding-top: 1em;
-  padding-bottom: 1em;
-  margin-bottom: 3em;
-  @include border-bottom-radius(.4em);
+  //border-top: 1px solid $footer-border-top;
+  margin-top: -130px;
+  width: 100%;
+  //@include border-bottom-radius(.4em);
+  height: 485px;
   z-index: 1;
   a {
-    @include link-colors($footer-link-color, $footer-link-color-hover, $visited: $footer-link-color);
+	color: #ffffff;
+    text-decoration: none;
+    @include transition($rem-co-yellow .3s);
+    &:visited {
+      color:  #ffffff;
+    }
+    &:hover, &:active {
+      color: $rem-co-yellow;
+    }
+    &.active {
+      color: $rem-co-red;
+    }
+  }
+  ul {
+    list-style: none;
   }
   p:last-child { margin-bottom: 0; }
+  > #copyright {
+	position: absolute;
+	bottom: 0;
+	margin: 0;
+    padding: 5px;
+  }
+  > #fcontent {
+	position: absolute;
+	bottom: 20px;
+	width: 100%;
+
+	> #fmenu {
+	  position: relative;
+	  bottom: 0px;
+	  width: 900px;
+	  margin:0px auto;
+	  text-align:left;
+	  display: block;
+
+	  > .fcol {
+		display: block;
+		float: left;
+		width: 300px;
+        > h3 {
+          text-transform: uppercase;
+          color:  $rem-co-yellow;
+        }
+	  }
+	}
+  }
 }

@@ -25,6 +25,12 @@ aside.sidebar {
     @extend .flex-content;
     @extend .basic-alignment;
     @include shadow-box($border: #fff .3em solid);
+    &.aside-flickr {
+      border: 0;
+      width: 260px;
+      margin-left: -20px;
+      margin-right: -20px;
+    }
   }
   ul {
     margin-bottom: 0.5em;
