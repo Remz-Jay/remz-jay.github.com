@@ -9,5 +9,3 @@ footer: true
 
 {% flickr_image 6879923512 b n y %}
 
-{% flickr_setlist 93556621@N05 %}
-

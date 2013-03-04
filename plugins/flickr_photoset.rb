@@ -14,18 +14,20 @@ class FlickrSet < Liquid::Tag
     FlickRaw.shared_secret = ENV["FLICKR_SECRET"]
 
     output = []
-    output << @user_id
-    output << @markup
     set = flickr.photosets.getList(user_id: @user_id)
 
     set.each do |item|
-      setinfo = flickr.photosets.getInfo(photoset_id:item.id)
-      output << "<p>#{item.title}(#{setinfo.primary})</p>"
-      info = flickr.photos.getInfo(photo_id:setinfo.primary)
-      src  = FlickRaw.send("url_t", info)
+      #setinfo = flickr.photosets.getInfo(photoset_id:item.id)
+      #output << "<p>#{item.title}(#{item.primary})</p>"
+      info = flickr.photos.getInfo(photo_id:item.primary)
+      src  = FlickRaw.send("url_n", info)
       page_url = FlickRaw.url_photopage(info)
-      img_tag       = "<img src=\"#{src}\" title=\"#{info.title}\"/>"
+      img_tag = "<img src=\"#{src}\" class=\"aside-flickr\" title=\"#{info.title}\"/>"
+      output << "<li>"
       output << "<a href=\"#{page_url}\">#{img_tag}</a>"
+      output << "<h2><a href=\"#{page_url}\">#{item.title}</a></h2>"
+      output << "<p>#{item.description}</p>"
+      output << "</li>"
     end
 
     output.join
