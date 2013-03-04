@@ -1,43 +1,36 @@
-
 <p id="copyright">
-	Copyright &copy; {{ site.time | date: "%Y" }} - {{ site.author }} -
-	<span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+    Copyright &copy; {{ site.time | date: "%Y" }} - {{ site.author }} -
+    <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 <div id="fcontent">
-	<div id="fmenu">
-		<div class="fcol">
-			<h3>Navigation</h3>
-			<ul class="footer-navigation">
-				<li{% if page.url == '/index.html'%} class="active"{% endif %}><a href="{{ root_url }}/"><i class="icon-pencil"></i>Blog</a></li>
-				<li{% if page.url == '/blog/archives/index.html'%} class="active"{% endif %}><a href="{{ root_url }}/blog/archives"><i class="icon-book"></i>Archives</a></li>
-			</ul>
-		</div>
-		<div class="fcol">
-			<h3>Websites</h3>
-			<ul>
-				<li><a href="https://rem.co">Rem.co</a></li>
-				<li><a href="https://www.remz-jay.org">Remz-Jay.org</a></li>
-				<li><a href="https://www.remz.nl">Remz.nl</a></li>
-				<li><a href="https://www.twitupdate.com">Twitupdate</a></li>
-				<li><a href="https://www.socialmediascanner.com">SocialMediaScanner</a></li>
-			</ul>
-		</div>
-		<div class="fcol">
-			<h3>Blub list</h3>
-			<ul>
-				<li>Blub</li>
-				<li>Blab</li>
-				<li>Blob</li>
-			</ul>
-		</div>
-		<div class="fcol">
-			<h3>Blub list</h3>
-			<ul>
-				<li>Blub</li>
-				<li>Blab</li>
-				<li>Blob</li>
-			</ul>
-		</div>
-	</div>
+    <div id="fmenu">
+        <div class="fcol">
+            <h3>Navigation</h3>
+            <ul class="footer-navigation">
+                {% include custom/navitems.html %}
+            </ul>
+        </div>
+        <div class="fcol">
+            <h3>Websites</h3>
+            <ul>
+                <li><a href="https://rem.co"><i class="icon-globe"></i>&nbsp;Rem.co</a></li>
+                <li><a href="http://www.remz-jay.org"><i class="icon-globe"></i>&nbsp;Remz-Jay.org</a></li>
+                <li><a href="http://www.remz.nl"><i class="icon-globe"></i>&nbsp;Remz.nl</a></li>
+                <li><a href="http://www.twitupdate.com"><i class="icon-globe"></i>&nbsp;Twitupdate</a></li>
+                <li><a href="http://www.socialmediascanner.com"><i class="icon-globe"></i>&nbsp;SocialMediaScanner</a></li>
+            </ul>
+        </div>
+        <div class="fcol">
+            <h3>Social Media</h3>
+            <ul>
+                <li><a href="http://twitter.com/remzjay"><i class="icon-twitter"></i>&nbsp;RemzJay on Twitter</a></li>
+                <li><a href="http://facebook.com/remco-overdijk"><i class="icon-facebook"></i>&nbsp;Remco-Overdijk on Facebook</a></li>
+                <li><a href="http://www.linkedin.com/in/remcooverdijk"><i class="icon-linkedin"></i>&nbsp;Remco Overdijk on LinkedIn</a></li>
+                <li><a href="https://foursquare.com/remzjay"><i class="icon-sign-blank"></i>&nbsp;RemzJay on FourSquare</a></li>
+                <li><a href="https://github.com/Remz-Jay"><i class="icon-github-alt"></i>&nbsp;Remz-Jay on GitHub</a></li>
+                <li><a href="http://open.spotify.com/user/remzjay"><i class="icon-music"></i>&nbsp;RemzJay on Spotify</a></li>
+            </ul>
+        </div>
+    </div>
 </div>
 {% include custom/footer.html %}
