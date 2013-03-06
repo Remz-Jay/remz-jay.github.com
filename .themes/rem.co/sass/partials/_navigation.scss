@@ -1,24 +1,26 @@
-body > nav {
+body > #top nav {
   position: relative;
+  float: right;
+	margin-top: 50px;
+  min-width: 900px;
   background-color: $nav-bg;
-  @include background($nav-bg-front, $nav-bg-back);
-  border: {
-    top: 1px solid $nav-border-top;
-    bottom: 1px solid $nav-border-bottom; }
-  padding-top: .35em;
-  padding-bottom: .35em;
+  @include background($nav-bg-back);
+  //padding-top: .35em;
+  //padding-bottom: .35em;
+  padding: 0 0 24px 0;
   form {
-    @include background-clip(padding-box);
+    //@include background-clip(padding-box);
     margin: 0; padding: 0;
     .search {
-      padding: .3em .5em 0;
+      padding: 5px;
+      margin:  5px 0 5px 0;
       font-size: .85em;
       font-family: $sans;
       line-height: 1.1em;
       width: 95%;
-      @include border-radius(.5em);
-      @include background-clip(padding-box);
-      @include box-shadow(lighten($nav-bg, 2) 0 1px);
+      //@include border-radius(.5em);
+      //@include background-clip(padding-box);
+      //@include box-shadow(lighten($nav-bg, 2) 0 1px);
       background-color: lighten($nav-bg, 15);
       border: 1px solid $nav-border;
       color: #888;
@@ -42,34 +44,75 @@ body > nav {
       @include horizontal-list(0);
       float: left;
       display: block;
-      padding-top: .15em;
+      //padding-top: .15em;
+	  height: 66px;
     }
     ul.subscription {
       margin-left: .8em;
       float: right;
-      li:last-child a { padding-right: 0; }
+      li:last-child a {
+		padding-right: 0;
+		min-width: 0;
+	  }
+	  > li a {
+		min-width: 0;
+	  }
+      li {
+        min-width: 50px;
+        margin-right: 10px;
+        > a {
+          @include transition(#ffffff .5s);
+          &:hover {
+            color:  $rem-co-yellow;
+          }
+        }
+      }
     }
     ul li {
       margin: 0;
+	  height: 63px;
+	  min-width: 150px;
+	  text-align: center;
     }
+
     a {
       @include link-colors($nav-color, $nav-color-hover, $visited: $nav-color);
-      font-family: $sans;
-      text-shadow: lighten($nav-bg, 12) 0 1px;
+      @include transition(#ffffff 2s);
+
+	  font-family: "museo-sans",sans-serif;
+	  font-style: normal;
+	  font-weight: 500;
+	  font-size: 1.1em;
+	  letter-spacing: -1.5px;
+      //text-shadow: lighten($nav-bg, 12) 0 1px;
+	  text-transform: uppercase;
       float: left;
       text-decoration: none;
-      font-size: 1.1em;
-      padding: .1em 0;
+      padding: 10px .1em 0;
       line-height: 1.5em;
-    }
-    li + li {
-      border-left: 1px solid $nav-border-left;
-      margin-left: .8em;
-      a {
-        padding-left: .8em;
-        border-left: 1px solid $nav-border-right;
+	  width: 100%;
+	  text-align: center;
+	  position: relative;
+	  height: 33px;
+      &:hover {
+        color:  $rem-co-yellow;
       }
     }
+	li.active a {
+	  background-color: $rem-co-red;
+	  position: relative;
+
+	}
+	li.active a:after {
+	  background: $nav-bg-tab no-repeat;
+	  position: absolute;
+	  bottom: -24px;
+	  content: "";
+	  width:24px;
+	  height:24px;
+	  display:block;
+	  right: 0;
+	}
     form {
       float: right;
       text-align: left;
@@ -118,7 +161,7 @@ body > nav {
   &:hover:after { background-color: lighten($nav-color, 20); }
 }
 .maskImage {
-  body > nav {
+  body > #top nav {
     @media only screen and (min-width: 550px) {
       ul[data-subscription$=email] + form {
         width: $sidebar-width-medium - $pad-medium*2 - $sidebar-pad-medium - 32px;
@@ -130,8 +173,15 @@ body > nav {
       }
     }
   }
-  ul.subscription { position: relative; top: .2em; li, a { border: 0; padding: 0; }}
-  a[rel=subscribe-rss]{ @include mask-subscription-nav('rss.png'); }
-  a[rel=subscribe-email]{ @include mask-subscription-nav('email.png'); }
+  ul.subscription {
+	position: relative;
+	top: .2em;
+	li, a {
+	  border: 0;
+	  padding: 0;
+	}
+  }
+ //a[rel=subscribe-rss]{ @include mask-subscription-nav('rss.png'); }
+  //a[rel=subscribe-email]{ @include mask-subscription-nav('email.png'); }
 }
 
