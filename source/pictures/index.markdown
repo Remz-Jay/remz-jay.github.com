@@ -6,6 +6,7 @@ comments: true
 sharing: true
 footer: true
 ---
+{% flickr_setlist 93556621@N05 %}
 
 {% flickr_image 6879923512 b n y %}
 

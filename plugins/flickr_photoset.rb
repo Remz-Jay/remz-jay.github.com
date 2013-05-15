@@ -6,7 +6,7 @@ class FlickrSet < Liquid::Tag
     super
     @markup = markup
     @user_id = markup.split(" ")[0]
-
+    @maxitems = markup.split(" ")[1]
   end
 
   def render(context)
@@ -14,7 +14,11 @@ class FlickrSet < Liquid::Tag
     FlickRaw.shared_secret = ENV["FLICKR_SECRET"]
 
     output = []
-    set = flickr.photosets.getList(user_id: @user_id)
+    if @maxitems.nil?
+      set = flickr.photosets.getList(user_id: @user_id)
+    else
+    	set = flickr.photosets.getList(user_id: @user_id, per_page: @maxitems, page: 1)
+    end
 
     set.each do |item|
       #setinfo = flickr.photosets.getInfo(photoset_id:item.id)
