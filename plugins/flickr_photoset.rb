@@ -1,4 +1,5 @@
 require "flickraw"
+require "active_support/memoizable"
 #require "debugger"
 
 class FlickrSet < Liquid::Tag
@@ -36,6 +37,11 @@ class FlickrSet < Liquid::Tag
 
     output.join
   end
+end
+
+class CachedFlickrSet < FlickrSet
+	extend ActiveSupport::Memoizable
+	memoize :render
 end
 
 # This example was crafted by @mklnz
@@ -117,3 +123,4 @@ end
 
 Liquid::Template.register_tag("flickr_image", FlickrImage)
 Liquid::Template.register_tag("flickr_setlist", FlickrSet)
+Liquid::Template.register_tag("flickr_cached_setlist", CachedFlickrSet)
