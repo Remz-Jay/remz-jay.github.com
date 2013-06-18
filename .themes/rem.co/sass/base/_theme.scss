@@ -4,7 +4,7 @@ $rem-co-grey: #444444 !default;
 $rem-co-darkgrey: #363636 !default;
 
 $noise-bg: image-url('noise.png') top left !default;
-$img-border: inline-image('dotted-border.png');
+$img-border: inline-image('dotted-border.png') !default;
 
 // Main Link Colors
 $link-color: lighten(#165b94, 3) !default;
