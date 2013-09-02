@@ -15,6 +15,7 @@ group :development do
   gem 'stringex', '~> 1.4.0'
   gem 'liquid', '~> 2.3.0'
   gem 'flickraw', '~> 0.1'
+  gem 'directory_watcher', '1.4.1'
   gem 'active_support', '~> 3.0'
 end
 
