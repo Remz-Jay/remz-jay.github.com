@@ -59,6 +59,7 @@ DEPENDENCIES
   active_support (~> 3.0)
   compass (~> 0.12.2)
   flickraw (~> 0.1)
+  directory_watcher (= 1.4.1)
   haml (~> 3.1.7)
   jekyll (~> 0.12)
   liquid (~> 2.3.0)
