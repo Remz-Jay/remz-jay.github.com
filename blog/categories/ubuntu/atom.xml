@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Ubuntu | The Rem.co Blog]]></title>
+  <link href="http://blog.rem.co/blog/categories/ubuntu/atom.xml" rel="self"/>
+  <link href="http://blog.rem.co/"/>
+  <updated>2013-12-16T14:44:23+01:00</updated>
+  <id>http://blog.rem.co/</id>
+  <author>
+    <name><![CDATA[Remco Overdijk]]></name>
+    <email><![CDATA[remco@rem.co]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Ubuntu: Automatically selecting a fast mirror]]></title>
+    <link href="http://blog.rem.co/blog/2013/01/22/ubuntu-automatically-selecting-a-fast-mirror/"/>
+    <updated>2013-01-22T12:04:00+01:00</updated>
+    <id>http://blog.rem.co/blog/2013/01/22/ubuntu-automatically-selecting-a-fast-mirror</id>
+    <content type="html"><![CDATA[<p>Letting Ubuntu pick the <code>apt-get</code> mirror closest to you is pretty easy.</p>
+
+<p>Just add these mirror directives to the top of <code>/etc/apt/sources.list</code> and you&rsquo;re good to go:</p>
+
+<p><code>
+deb mirror://mirrors.ubuntu.com/mirrors.txt precise main restricted universe multiverse
+deb mirror://mirrors.ubuntu.com/mirrors.txt precise-updates main restricted universe multiverse
+deb mirror://mirrors.ubuntu.com/mirrors.txt precise-backports main restricted universe multiverse
+deb mirror://mirrors.ubuntu.com/mirrors.txt precise-security main restricted universe multiverse
+</code></p>
+]]></content>
+  </entry>
+  
+</feed>
