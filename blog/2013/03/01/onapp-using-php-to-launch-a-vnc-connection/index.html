@@ -1,0 +1,509 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>OnApp: Using PHP to launch a VNC connection - The Rem.co Blog</title>
+  <meta name="author" content="Remco Overdijk">
+
+  
+  <meta name="description" content="If you&rsquo;re an OnApp user you probably know you can make a VNC connection to your VM&rsquo;s using the Control Panel.
+This uses a java applet in &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://blog.rem.co/blog/2013/03/01/onapp-using-php-to-launch-a-vnc-connection">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="The Rem.co Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <script type="text/javascript" src="//use.typekit.net/bey2gds.js"></script>
+<script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-15985434-12']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+		 <div id="top">
+		    <header role="banner"><hgroup>
+  <h1><a href="/">rem</a></h1>
+    <h2>.co</h2>
+
+</hgroup>
+
+</header>
+		    <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS<i class="icon-rss"></i></a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:blog.rem.co" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+    <li><a href="/"><i class="icon-pencil"></i>&nbsp;Blog</a></li>
+<li><a href="/blog/archives"><i class="icon-book"></i>&nbsp;Archives</a></li>
+<li><a href="/pictures"><i class="icon-camera"></i>&nbsp;Pictures</a></li>
+</ul>
+
+</nav>
+		 </div>
+		  <div id="main">
+		    <div id="content">
+		      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">OnApp: Using PHP to Launch a VNC Connection</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-03-01T12:48:00+01:00" pubdate data-updated="true">Mar 1<span>st</span>, 2013</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>If you&rsquo;re an <a href="http://onapp.com/">OnApp</a> user you probably know you can make a VNC connection to your VM&rsquo;s using the Control Panel.
+This uses a java applet in your browser as the VNC client.</p>
+
+<p>Wouldn&rsquo;t it be nice to use your own VNC client (like <a href="http://www.nulana.com/remotix-mac">Remotix</a>) instead?</p>
+
+<p>In fact, you can, but OnApp spawns a VNC server on a (somewhat) random port and a new random VNC password for each sessions which you&rsquo;ll have to figure out before setting up your connection.</p>
+
+<p>According to the <a href="https://onapp.zendesk.com/entries/22068371-use-own-vnc-client-instead-of-the-onapp-console">OnApp Helpdesk</a> you can use these calls to get the required information:</p>
+
+<pre><code>GET /virtual_machines/:virtual_machine_id/console.xml
+GET /virtual_machines/:virtual_machine_id/console.json
+</code></pre>
+
+<p>As I&rsquo;m lazy I didn&rsquo;t want to do this manually every time, so I devised a little PHP script that can aid in finding the right information:</p>
+
+<!-- more -->
+
+
+<p></p>
+
+<figure class='code'><figcaption><span>OnApp VNC Initiator</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span class='line'><span class="sd">/**</span>
+</span><span class='line'><span class="sd"> * GET /virtual_machines/:virtual_machine_id/console.xml</span>
+</span><span class='line'><span class="sd"> * GET /virtual_machines/:id.xml</span>
+</span><span class='line'><span class="sd"> *</span>
+</span><span class='line'><span class="sd"> * The first will start the console session and give you the port number to connect to.</span>
+</span><span class='line'><span class="sd"> *</span>
+</span><span class='line'><span class="sd"> * The second call, you are looking for remote_access_password.</span>
+</span><span class='line'><span class="sd"> */</span>
+</span><span class='line'><span class="nv">$CPURL</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">;</span> <span class="c1">// Insert the IP/hostname for your OnApp CP here</span>
+</span><span class='line'><span class="nv">$VMID</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">;</span> <span class="c1">// Insert the VM&#39;s unique ID here</span>
+</span><span class='line'><span class="nv">$username</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">;</span> <span class="c1">// Insert your own username here</span>
+</span><span class='line'><span class="nv">$password</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">;</span> <span class="c1">// Insert the password for your account here</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$ch</span> <span class="o">=</span> <span class="nb">curl_init</span><span class="p">(</span><span class="s2">&quot;http://</span><span class="si">{</span><span class="nv">$CPURL</span><span class="si">}</span><span class="s2">/virtual_machines/</span><span class="si">{</span><span class="nv">$VMID</span><span class="si">}</span><span class="s2">/console.json&quot;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">curl_setopt</span><span class="p">(</span><span class="nv">$ch</span><span class="p">,</span> <span class="nx">CURLOPT_USERPWD</span><span class="p">,</span> <span class="nv">$username</span> <span class="o">.</span> <span class="s2">&quot;:&quot;</span> <span class="o">.</span> <span class="nv">$password</span><span class="p">);</span>
+</span><span class='line'><span class="nb">curl_setopt</span><span class="p">(</span><span class="nv">$ch</span><span class="p">,</span> <span class="nx">CURLOPT_RETURNTRANSFER</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$result</span> <span class="o">=</span> <span class="nb">curl_exec</span><span class="p">(</span><span class="nv">$ch</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$set_one</span> <span class="o">=</span> <span class="nb">json_decode</span><span class="p">(</span><span class="nv">$result</span><span class="p">);</span>
+</span><span class='line'><span class="nb">curl_setopt</span><span class="p">(</span><span class="nv">$ch</span><span class="p">,</span> <span class="nx">CURLOPT_URL</span><span class="p">,</span> <span class="s2">&quot;http://</span><span class="si">{</span><span class="nv">$CPURL</span><span class="si">}</span><span class="s2">/virtual_machines/</span><span class="si">{</span><span class="nv">$VMID</span><span class="si">}</span><span class="s2">.json&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$result</span> <span class="o">=</span> <span class="nb">curl_exec</span><span class="p">(</span><span class="nv">$ch</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$set_two</span> <span class="o">=</span> <span class="nb">json_decode</span><span class="p">(</span><span class="nv">$result</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$port</span> <span class="o">=</span> <span class="nv">$set_one</span><span class="o">-&gt;</span><span class="na">remote_access_session</span><span class="o">-&gt;</span><span class="na">port</span><span class="p">;</span>
+</span><span class='line'><span class="k">echo</span> <span class="s2">&quot;PORT:</span><span class="se">\t</span><span class="s2">&quot;</span> <span class="o">.</span> <span class="nv">$set_one</span><span class="o">-&gt;</span><span class="na">remote_access_session</span><span class="o">-&gt;</span><span class="na">port</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
+</span><span class='line'><span class="k">echo</span> <span class="s2">&quot;REMOTE_KEY:</span><span class="se">\t</span><span class="s2">&quot;</span> <span class="o">.</span> <span class="nv">$set_one</span><span class="o">-&gt;</span><span class="na">remote_access_session</span><span class="o">-&gt;</span><span class="na">remote_key</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$rap</span> <span class="o">=</span> <span class="nv">$set_two</span><span class="o">-&gt;</span><span class="na">virtual_machine</span><span class="o">-&gt;</span><span class="na">remote_access_password</span><span class="p">;</span>
+</span><span class='line'><span class="k">echo</span> <span class="s2">&quot;REMOTE_ACCESS_PASSWORD:</span><span class="se">\t</span><span class="s2">&quot;</span> <span class="o">.</span> <span class="nv">$rap</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$un</span> <span class="o">=</span> <span class="s2">&quot;root&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$pw</span> <span class="o">=</span> <span class="nv">$set_two</span><span class="o">-&gt;</span><span class="na">virtual_machine</span><span class="o">-&gt;</span><span class="na">initial_root_password</span><span class="p">;</span>
+</span><span class='line'><span class="k">echo</span> <span class="s2">&quot;ROOTPASS:</span><span class="se">\t</span><span class="s2">&quot;</span> <span class="o">.</span> <span class="nv">$pw</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
+</span><span class='line'><span class="nb">curl_close</span><span class="p">(</span><span class="nv">$ch</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$constructedURL</span> <span class="o">=</span> <span class="s2">&quot;vnc://</span><span class="si">{</span><span class="nv">$CPURL</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="nv">$port</span><span class="si">}</span><span class="s2">/?vncPassword=&quot;</span> <span class="o">.</span> <span class="nb">urlencode</span><span class="p">(</span><span class="nv">$rap</span><span class="p">);</span>
+</span><span class='line'><span class="k">echo</span> <span class="nv">$constructedURL</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
+</span><span class='line'><span class="nb">shell_exec</span><span class="p">(</span><span class="s2">&quot;open &quot;</span> <span class="o">.</span> <span class="nv">$constructedURL</span><span class="p">);</span>
+</span><span class='line'><span class="cp">?&gt;</span><span class="x"></span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Usage</h3>
+
+<ul>
+<li>Using the PHP CLI: Run <code>$ php OnAppInitiator.php</code></li>
+<li>The script will display all the information required and open up your default VNC client.</li>
+</ul>
+
+
+<h3>Caveats</h3>
+
+<ul>
+<li>This script assumes that you have the <a href="http://php.net/manual/en/book.curl.php">PHP cURL extension</a> installed and enabled.</li>
+<li>The script is currently HTTP only as it&rsquo;s hard coded. With a little modification you can get HTTPS if your setup uses/requires that.</li>
+<li>You can get the VM&rsquo;s unique ID in the OnApp CP. If you go to the VM&rsquo;s detail page the URL for that page will look like <code>http://cloud.setup/virtual_machines/dfa2bcguwd9mbi</code>. The ID is evertyhing after the last <code>/</code>.</li>
+<li>The <code>open</code> call on the last line might not work on your OS; This script was developed/tested on Mac OSX.</li>
+<li>In order to <code>open</code> a <code>VNC://</code> link you&rsquo;ll have to specify a link handler on the OS. I used <a href="http://www.rubicode.com/Software/RCDefaultApp/">RCDefaultApp</a> on OSX to set Remotix as the default link handler for VNC links.</li>
+</ul>
+
+
+<h3>Future / TODO</h3>
+
+<p>The script is pretty crude in it&rsquo;s current state but it gets the job done for my day to day needs.</p>
+
+<p>I might fix a couple of things in the near future:</p>
+
+<ul>
+<li>Grabbing the required variables such as VMID from the run parameters</li>
+<li>Make the script ask for these required variables</li>
+<li>Fix the script for use with HTTPS</li>
+<li>Integrate this script with the OnApp CP so you can start your VNC client right from the CP</li>
+</ul>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Remco Overdijk</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-03-01T12:48:00+01:00" pubdate data-updated="true">Mar 1<span>st</span>, 2013</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/onapp/'>OnApp</a>, <a class='category' href='/blog/categories/php/'>PHP</a>, <a class='category' href='/blog/categories/vnc/'>VNC</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://blog.rem.co/blog/2013/03/01/onapp-using-php-to-launch-a-vnc-connection/" data-via="RemzJay" data-counturl="http://blog.rem.co/blog/2013/03/01/onapp-using-php-to-launch-a-vnc-connection/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2013/02/19/selinux-allowing-ssh-public-key-authentication/" title="Previous Post: SELinux: Allowing SSH public key authentication">&laquo; SELinux: Allowing SSH public key authentication</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2013/06/06/fixing-error-opening-terminal-screen-256color-dot/" title="Next Post: Fixing 'Error opening terminal: screen-256color.'">Fixing 'Error opening terminal: screen-256color.' &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1><i class="icon-user icon-large"></i>&nbsp;About Me</h1>
+	<div id="so">
+	<a href="http://stackoverflow.com/users/813718/remco-overdijk">
+		<img src="http://stackoverflow.com/users/flair/813718.png" width="208" height="58" alt="profile for Remco Overdijk at Stack Overflow, Q&amp;A for professional and enthusiast programmers" title="profile for Remco Overdijk at Stack Overflow, Q&amp;A for professional and enthusiast programmers">
+	</a>
+	</div>
+</section>
+<section>
+  <h1><i class="icon-pencil icon-large"></i>&nbsp;Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/06/06/fixing-error-opening-terminal-screen-256color-dot/">Fixing 'Error Opening Terminal: Screen-256color.'</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/03/01/onapp-using-php-to-launch-a-vnc-connection/">OnApp: Using PHP to Launch a VNC Connection</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/02/19/selinux-allowing-ssh-public-key-authentication/">SELinux: Allowing SSH Public Key Authentication</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/01/22/ubuntu-automatically-selecting-a-fast-mirror/">Ubuntu: Automatically Selecting a Fast Mirror</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/01/21/munin-failing-with-storable-error/">Munin: Failing With Storable Error</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1><i class="icon-github-alt icon-large"></i>&nbsp;GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/Remz-Jay">@Remz-Jay</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'Remz-Jay',
+            count: 10,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+<section class="flickr">
+    <h1><i class="icon-camera icon-large"></i>&nbsp;Flickr Albums</h1>
+		<ul id="flickrsets">
+          <li><a href="http://www.flickr.com/photos/93556621@N05/8511289485" target="_blank"><img src="http://farm9.staticflickr.com/8249/8511289485_c85a979a77_n.jpg" class="aside-flickr" title="IMG_5348.jpg"/></a><h2><a href="http://www.flickr.com/photos/93556621@N05/8511289485">Scandinavia 2012</a></h2><p>Roadtrip through Denmark, Sweden and Norway in the summer of 2012.</p></li><li><a href="http://www.flickr.com/photos/93556621@N05/8519041005" target="_blank"><img src="http://farm9.staticflickr.com/8085/8519041005_d09c9c4cf6_n.jpg" class="aside-flickr" title="IMG_7581.jpg"/></a><h2><a href="http://www.flickr.com/photos/93556621@N05/8519041005">Vietnam 2011</a></h2><p>Backpacking trip through Thailand and Vietnam (North to South) by train and bus. </p></li><li><a href="http://www.flickr.com/photos/93556621@N05/8732615064" target="_blank"><img src="http://farm8.staticflickr.com/7286/8732615064_4958df38db_n.jpg" class="aside-flickr" title="IMG_1597"/></a><h2><a href="http://www.flickr.com/photos/93556621@N05/8732615064">Custom MBP</a></h2><p></p></li><li><a href="http://www.flickr.com/photos/93556621@N05/8732632330" target="_blank"><img src="http://farm8.staticflickr.com/7286/8732632330_7768877114_n.jpg" class="aside-flickr" title="IMG_1430"/></a><h2><a href="http://www.flickr.com/photos/93556621@N05/8732632330">DCB</a></h2><p></p></li><li><a href="http://www.flickr.com/photos/93556621@N05/8668300067" target="_blank"><img src="http://farm9.staticflickr.com/8393/8668300067_4597304c85_n.jpg" class="aside-flickr" title="Handig die MagSafe stekker... En de..."/></a><h2><a href="http://www.flickr.com/photos/93556621@N05/8668300067">Instagram Photos</a></h2><p>Photos imported from Instagram via <a href="http://flickstagram.org" rel="nofollow">Flickstagram</a></p></li>
+    </ul>
+</section>
+
+
+<section>
+  <h1><i class="icon-twitter icon-large"></i>&nbsp;Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("RemzJay", , );
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <p>Follow <a href="http://twitter.com/RemzJay">@RemzJay</a></p>
+  
+</section>
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/113503214668709877047?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+		    </div>
+		  </div>
+
+  <footer role="contentinfo"><p id="copyright">
+    Copyright &copy; 2014 - Remco Overdijk -
+    <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+<div id="fcontent">
+    <div id="fmenu">
+        <div class="fcol">
+            <h3>Navigation</h3>
+            <ul class="footer-navigation">
+                <li><a href="/"><i class="icon-pencil"></i>&nbsp;Blog</a></li>
+<li><a href="/blog/archives"><i class="icon-book"></i>&nbsp;Archives</a></li>
+<li><a href="/pictures"><i class="icon-camera"></i>&nbsp;Pictures</a></li>
+            </ul>
+        </div>
+        <div class="fcol">
+            <h3>Websites</h3>
+            <ul>
+                <li><a href="https://rem.co"><i class="icon-globe"></i>&nbsp;Rem.co</a></li>
+                <li><a href="http://www.remz-jay.org"><i class="icon-globe"></i>&nbsp;Remz-Jay.org</a></li>
+                <li><a href="http://www.remz.nl"><i class="icon-globe"></i>&nbsp;Remz.nl</a></li>
+                <li><a href="http://www.twitupdate.com"><i class="icon-globe"></i>&nbsp;Twitupdate</a></li>
+                <li><a href="http://www.socialmediascanner.com"><i class="icon-globe"></i>&nbsp;SocialMediaScanner</a></li>
+            </ul>
+        </div>
+        <div class="fcol">
+            <h3>Social Media</h3>
+            <ul>
+                <li><a href="http://twitter.com/remzjay"><i class="icon-twitter"></i>&nbsp;RemzJay on Twitter</a></li>
+                <li><a href="http://facebook.com/remco-overdijk"><i class="icon-facebook"></i>&nbsp;Remco-Overdijk on Facebook</a></li>
+                <li><a href="http://www.linkedin.com/in/remcooverdijk"><i class="icon-linkedin"></i>&nbsp;Remco Overdijk on LinkedIn</a></li>
+                <li><a href="https://foursquare.com/remzjay"><i class="icon-sign-blank"></i>&nbsp;RemzJay on FourSquare</a></li>
+                <li><a href="https://github.com/Remz-Jay"><i class="icon-github-alt"></i>&nbsp;Remz-Jay on GitHub</a></li>
+                <li><a href="http://open.spotify.com/user/remzjay"><i class="icon-music"></i>&nbsp;RemzJay on Spotify</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'rem-co';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://blog.rem.co/blog/2013/03/01/onapp-using-php-to-launch-a-vnc-connection/';
+        var disqus_url = 'http://blog.rem.co/blog/2013/03/01/onapp-using-php-to-launch-a-vnc-connection/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Munin | The Rem.co Blog]]></title>
+  <link href="http://blog.rem.co/blog/categories/munin/atom.xml" rel="self"/>
+  <link href="http://blog.rem.co/"/>
+  <updated>2014-01-28T10:31:40+01:00</updated>
+  <id>http://blog.rem.co/</id>
+  <author>
+    <name><![CDATA[Remco Overdijk]]></name>
+    <email><![CDATA[remco@rem.co]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Munin: failing with Storable error]]></title>
+    <link href="http://blog.rem.co/blog/2013/01/21/munin-failing-with-storable-error/"/>
+    <updated>2013-01-21T17:29:00+01:00</updated>
+    <id>http://blog.rem.co/blog/2013/01/21/munin-failing-with-storable-error</id>
+    <content type="html"><![CDATA[<p>I suffered from a Munin version 2.0.10 installation that refused to update the majority of the graphs. Only the first two of a long list were being updated, the rest all &lsquo;hung&rsquo; at the same moment.</p>
+
+<p>After a little investigating, the problem surfaced:</p>
+
+<p><code>bash
+$ su - munin --shell=/bin/bash munin-cron
+File is not a perl storable at blib/lib/Storable.pm (autosplit into blib/lib/auto/Storable/fd_retrieve.al) line 398, at /usr/lib64/perl5/vendor_perl/5.12.4/Munin/Master/Utils.pm line 362
+File is not a perl storable at blib/lib/Storable.pm (autosplit into blib/lib/auto/Storable/fd_retrieve.al) line 398, at /usr/lib64/perl5/vendor_perl/5.12.4/Munin/Master/Utils.pm line 362
+</code></p>
+
+<!-- more -->
+
+
+<p>I started out by fixing all items the <code>munin-check</code> script suggested, which is always a good starting point.
+Execute the script in a similar fashion as you would do with <code>munin-cron</code>:</p>
+
+<p><code>bash
+$ su - munin --shell=/bin/bash munin-check
+</code>
+Correct all reported errors and check your cron again.</p>
+
+<p>In this particular case this didn&rsquo;t solve the issue however. There appeared to be some <code>.storable</code> files in the munin directory, which sounded like viable suspects according to the error messages:</p>
+
+<p><code>bash
+$ find /var/lib/munin/ -type f | grep storable
+/var/lib/munin/datafile.storable
+/var/lib/munin/htmlconf.storable
+/var/lib/munin/limits.storable
+/var/lib/munin/state-server-server.storable
+</code></p>
+
+<p>Turns out one of these was the culprit, as moving/deleting them fixed the issue; cron has resumed normal operation.
+<code>bash
+$ cd /var/lib/munin/ &amp;&amp; mv *.storable ~
+$ su - munin --shell=/bin/bash munin-cron
+$
+</code></p>
+
+<p>Best part of it is that the data collection doesn&rsquo;t seem to have been interrupted in the meantime; All graphs are up2date and have a complete history. Problem solved!</p>
+]]></content>
+  </entry>
+  
+</feed>

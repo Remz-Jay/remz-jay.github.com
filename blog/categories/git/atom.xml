@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Git | The Rem.co Blog]]></title>
+  <link href="http://blog.rem.co/blog/categories/git/atom.xml" rel="self"/>
+  <link href="http://blog.rem.co/"/>
+  <updated>2014-01-28T10:31:40+01:00</updated>
+  <id>http://blog.rem.co/</id>
+  <author>
+    <name><![CDATA[Remco Overdijk]]></name>
+    <email><![CDATA[remco@rem.co]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[2013: Blogging with Octopress]]></title>
+    <link href="http://blog.rem.co/blog/2013/01/16/2013-blogging-with-octopress/"/>
+    <updated>2013-01-16T20:06:00+01:00</updated>
+    <id>http://blog.rem.co/blog/2013/01/16/2013-blogging-with-octopress</id>
+    <content type="html"><![CDATA[<p>Well. Here we are!</p>
+
+<p>New year, new approach to blogging.</p>
+
+<p>In the past year I haven&rsquo;t managed to push out a lot of blog articles though I&rsquo;ve been working with loads of new, interesting technologies and approaches.</p>
+
+<p>Being a programmer, I blame the software I use to blog. In my case that&rsquo;s the <a href="http://www.typo3.org">TYPO3</a> installation at <a href="https://rem.co">rem.co</a>. It&rsquo;s recently been updated to TYPO3 6.0, and I haven&rsquo;t gotten around to fixing all the bugs that appeared after such a major upgrade.</p>
+
+<p>Moreover, that site uses the ancient tt_news plugin as a blog substitute, which makes blogging a bit… troublesome to put it mildly. Especially &ldquo;<em>advanced</em>&rdquo; stuff like including code snippets and multiple layouts in one article.</p>
+
+<p><img class="left <a" src="href="http://octopress.org/images/logo.png">http://octopress.org/images/logo.png</a>">
+Then <a href="http://octopress.org">Octopress</a> enters the stage, combining a lot of my favorite technologies to provide a somewhat nerdy approach to blogging.</p>
+
+<!-- more -->
+
+
+<p>
+<em>Why haven&rsquo;t I tried this before?</em></p>
+
+<p>It uses <a href="http://git-scm.com/">Git</a> as VCS <strong>and</strong> distribution system, publishes to <a href="https://github.com/Remz-Jay">Github</a> and <a href="http://pages.github.com/">Github Pages</a> and uses <a href="http://daringfireball.net/projects/markdown/syntax">markdown</a> to render my blog post ramblings, which in turn enables me to use the Mac OSX app <a href="http://www.markdownpro.com/">Markdown Pro</a> to quickly type up an article about a brilliant code snippet that I just came up with in an off-line fashion.<br/>
+<em>What can go wrong, right?</em></p>
+
+<p>Oh, yeah, and then there&rsquo;s one last thing. Traditionally, my website has always been hosted on my own bare metal server. Most stuff on that machine is highly unstable and/or experimental, so <a href="https://rem.co">rem.co</a>&rsquo;s uptime hasn&rsquo;t been exemplary over the past few years, and probably never will be. Well, blog.rem.co is actually hosted by Github, so my gentoo, shorewall, nginx, varnish and apache experiments should no longer prevent you from reading the blog!</p>
+
+<p>Well, let&rsquo;s see how long I can keep this up and if ye olde TYPO3 blog can be retired in favor of this one..</p>
+]]></content>
+  </entry>
+  
+</feed>
