@@ -13,7 +13,8 @@ class FlickrSet < Liquid::Tag
   def render(context)
     FlickRaw.api_key = ENV["FLICKR_KEY"]
     FlickRaw.shared_secret = ENV["FLICKR_SECRET"]
-
+	  FlickRaw.secure = true
+	  
     output = []
     if @maxitems.nil?
       set = flickr.photosets.getList(user_id: @user_id)
@@ -26,6 +27,7 @@ class FlickrSet < Liquid::Tag
       #output << "<p>#{item.title}(#{item.primary})</p>"
       info = flickr.photos.getInfo(photo_id:item.primary)
       src  = FlickRaw.send("url_n", info)
+      src.gsub! 'http', 'https'
       page_url = FlickRaw.url_photopage(info)
       img_tag = "<img src=\"#{src}\" class=\"aside-flickr\" title=\"#{info.title}\"/>"
       output << "<li>"
@@ -69,6 +71,7 @@ class FlickrImage < Liquid::Tag
     description   = info["description"]
 
     src           = FlickRaw.send("url_#{@size}", info)
+    src.gsub! 'http', 'https'
     page_url      = FlickRaw.url_photopage(info)
 
     img_tag       = "<img src=\"#{src}\" title=\"#{title}\"/>"
