@@ -23,4 +23,19 @@
   <link href="{{ site.subscribe_rss }}" rel="alternate" title="{{site.title}}" type="application/atom+xml">
   {% include custom/head.html %}
   {% include google_analytics.html %}
+	{% include custom/lunr-search/search-results-template.html %}
+
+{% javascript_asset_tag global %}
+- /_assets/javascripts/jquery.min.js
+- /_assets/javascripts/lib/lunr.min.js
+- /_assets/javascripts/lib/handlebars.js
+- /_assets/javascripts/lib/jXHR.js
+- /_assets/javascripts/lib/URI.min.js
+- /_assets/javascripts/lunr_search.coffee
+- /_assets/javascripts/lib/swfobject-dynamic.js
+- /_assets/javascripts/modernizr-2.0.js
+- /_assets/javascripts/octopress.js
+- /_assets/javascripts/github.js
+- /_assets/javascripts/app.js.coffee
+{% endjavascript_asset_tag %}
 </head>

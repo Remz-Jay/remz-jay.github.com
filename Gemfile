@@ -23,7 +23,9 @@ group :development do
   gem "json"
   gem "multi_json"
   gem 'yajl-ruby'
-
+  gem "coffee-script"
+  gem "jekyll-asset-pipeline"
+  gem 'sprockets'
 end
 
 gem 'sinatra', '~> 1.4.2'
