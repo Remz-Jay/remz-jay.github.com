@@ -109,3 +109,10 @@ p code, li code {
 
 }
 
+.wf-loading {
+  font-family: sans-serif;
+  visibility: hidden;
+}
+.wf-active {
+  visibility: visible;
+}
