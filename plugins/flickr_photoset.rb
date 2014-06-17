@@ -1,6 +1,9 @@
 require "flickraw"
-require "active_support/memoizable"
-#require "debugger"
+require "redis"
+require "json"
+require 'yajl/json_gem'
+
+Photo = Struct.new(:info,:src,:page_url)
 
 class FlickrSet < Liquid::Tag
   def initialize(tag_name, markup, tokens)
@@ -11,39 +14,50 @@ class FlickrSet < Liquid::Tag
   end
 
   def render(context)
+    redis = Redis.new
     FlickRaw.api_key = ENV["FLICKR_KEY"]
     FlickRaw.shared_secret = ENV["FLICKR_SECRET"]
 	  FlickRaw.secure = true
-	  
+    flickr = FlickRaw::Flickr.new
     output = []
     if @maxitems.nil?
-      set = flickr.photosets.getList(user_id: @user_id)
+      max = 999
     else
-    	set = flickr.photosets.getList(user_id: @user_id, per_page: @maxitems, page: 1)
+      max = @maxitems
     end
+    id = @user_id + max.to_s
+    if redis.hexists 'flickrset', id
+      set = Marshal.load redis.hget('flickrset', id)
+    else
+      set = flickr.photosets.getList(user_id: @user_id, per_page: max, page: 1)
+      redis.hset 'flickrset', id, Marshal.dump(set)
+    end
+    #if (set = redis.get("flickrset-#{@user_id}-#{max}")).nil?
+    #    redis.set("flickrset-#{@user_id}-#{max}", (set = (flickr.photosets.getList(user_id: @user_id, per_page: @maxitems, page: 1).to_json)))
+    #end
 
-    set.each do |item|
+   #set = JSON.parse(set)
+   set.each do |item|
       #setinfo = flickr.photosets.getInfo(photoset_id:item.id)
-      #output << "<p>#{item.title}(#{item.primary})</p>"
-      info = flickr.photos.getInfo(photo_id:item.primary)
-      src  = FlickRaw.send("url_n", info)
-      src.gsub! 'http', 'https'
-      page_url = FlickRaw.url_photopage(info)
-      img_tag = "<img src=\"#{src}\" class=\"aside-flickr\" title=\"#{info.title}\"/>"
+      #output << "<p>#{item.title}(#{item.primary})</p>
+     if redis.hexists 'flickrphoto', item.primary
+       photo = Marshal.load redis.hget('flickrphoto', item.primary)
+     else
+       info = flickr.photos.getInfo(photo_id:item.primary)
+       src =  FlickRaw.send("url_n", info)
+       src.gsub! 'http', 'https'
+       photo = Photo.new(info, src, FlickRaw.url_photopage(info))
+       redis.hset 'flickrphoto', item.primary, Marshal.dump(photo)
+     end
+      img_tag = "<img src=\"#{photo.src}\" class=\"aside-flickr\" title=\"#{photo.info.title}\"/>"
       output << "<li>"
-      output << "<a href=\"#{page_url}\" target=\"_blank\">#{img_tag}</a>"
-      output << "<h2><a href=\"#{page_url}\">#{item.title}</a></h2>"
+      output << "<a href=\"#{photo.page_url}\" target=\"_blank\">#{img_tag}</a>"
+      output << "<h2><a href=\"#{photo.page_url}\">#{item.title}</a></h2>"
       output << "<p>#{item.description}</p>"
       output << "</li>"
     end
-
     output.join
   end
-end
-
-class CachedFlickrSet < FlickrSet
-	extend ActiveSupport::Memoizable
-	memoize :render
 end
 
 # This example was crafted by @mklnz
@@ -61,6 +75,8 @@ class FlickrImage < Liquid::Tag
   def render(context)
     FlickRaw.api_key        = ENV["FLICKR_KEY"]
     FlickRaw.shared_secret  = ENV["FLICKR_SECRET"]
+    FlickRaw.secure = true
+    flickr = FlickRaw::Flickr.new
 
     output = []
 
@@ -126,4 +142,3 @@ end
 
 Liquid::Template.register_tag("flickr_image", FlickrImage)
 Liquid::Template.register_tag("flickr_setlist", FlickrSet)
-Liquid::Template.register_tag("flickr_cached_setlist", CachedFlickrSet)

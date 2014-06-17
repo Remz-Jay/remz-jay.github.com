@@ -17,6 +17,13 @@ group :development do
   gem 'flickraw', '~> 0.1'
   gem 'directory_watcher', '1.4.1'
   gem 'active_support', '~> 3.0'
+  gem "redis", "~> 3.0.1"
+  gem "hiredis", "~> 0.4.5"
+  gem "em-synchrony"
+  gem "json"
+  gem "multi_json"
+  gem 'yajl-ruby'
+
 end
 
 gem 'sinatra', '~> 1.4.2'
