@@ -6,7 +6,7 @@ comments: true
 categories: [Gentoo, Linux]
 ---
 
-{% img left images/gblend.png 100 100 %} Keeping your Gentoo Linux server up to date isn't as straightforward as let's say an Ubuntu box, where you would just run ``` $ apt-get update && apt-get upgrade && apt-get clean``` for example.
+{% img left /images/gblend.png 100 100 %} Keeping your Gentoo Linux server up to date isn't as straightforward as let's say an Ubuntu box, where you would just run ``` $ apt-get update && apt-get upgrade && apt-get clean``` for example.
 
 Gentoo is far too flexible for a *one size fits all* approach. The commands outlined below come pretty close for daily use though:
 
