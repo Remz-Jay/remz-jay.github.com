@@ -10,7 +10,7 @@ In an effort to help a colleague with `FULLTEXT` search troubles today, I tried 
 My short research resulted in this checklist. Failure to comply with these checks will result in *catastrophic* failure :P 
  
 1. Make sure the table you're trying to `FULLTEXT` on has `MyISAM` type! Currently, `FULLTEXT` searches do **NOT** work on InnoDB types. 
-If you are bound to using `InnoDB` for various reasons, you could create a duplicate table in `MyISAM` to perform your searches on. 
+If you are bound to using `InnoDB` for various reasons, you could create a duplicate table in `MyISAM` to perform your searches on. <!-- more --> 
 
 2. Ensure that your tables have `Indexes` with the `FULLTEXT` type for all columns you're trying to perform `FULLTEXT` searches on. If you don't have such an index, you can easily add it by using: 
 

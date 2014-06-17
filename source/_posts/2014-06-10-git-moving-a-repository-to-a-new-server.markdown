@@ -15,9 +15,9 @@ The quick, easy and complete way:
 
 2. Make sure your repo has all the latest news from its current `origin`:
 
-		git fetch --all
+		git fetch --all 
 
-3. Add the new `origin` as a temporary remote whilst keeping the old one for now:
+3. Add the new `origin` as a temporary remote whilst keeping the old one for now:<!-- more -->
 
 		git remote add newrepo ssh://git@newreposerver:newrepo/newname
 
