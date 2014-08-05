@@ -14,4 +14,5 @@ node_modules
 .idea
 atlassian-ide-plugin.xml
 .preview-mode
+Gemfile.lock
 npm-debug.log
