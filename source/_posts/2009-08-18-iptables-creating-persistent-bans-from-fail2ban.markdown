@@ -32,7 +32,7 @@ echo <ip> >> /etc/shitlist
 After that I created a PHP script that updates Iptables with the ip's contained in the shitlist:
 
 
-```
+``` php shitlist.php
 <?php 
 /** script that loads a shitlist file into iptables */ 
 //CONFIG 
