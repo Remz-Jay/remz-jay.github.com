@@ -33,12 +33,19 @@ destination: public
 plugins: plugins
 code_dir: downloads/code
 category_dir: blog/categories
+
+# markdown is either kramdown or rdiscount
 markdown: rdiscount
 rdiscount:
   extensions:
     - autolink
     - footnotes
     - smart
+kramdown:
+  use_coderay: true
+  coderay:
+    coderay_line_numbers: table
+    coderay_css: class
 highlighter: pygments # default python pygments have been replaced by pygments.rb
 
 paginate: 6          # Posts per page on the blog index
@@ -103,3 +110,7 @@ google_analytics_tracking_id: UA-15985434-12
 
 # Facebook Like
 facebook_like: true
+
+# Enable LSI in Jekyll, see:
+# http://gotofritz.net/blog/geekery/adding-related-post-to-octopress/
+lsi: true

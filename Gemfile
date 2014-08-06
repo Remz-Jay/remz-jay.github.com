@@ -27,7 +27,8 @@ group :development do
   gem "multi_json"
   gem 'yajl-ruby'
   gem 'rb-gsl'
-
+	gem 'kramdown'
+	gem 'coderay'
 end
 
 gem 'sinatra', '~> 1.4.2'
