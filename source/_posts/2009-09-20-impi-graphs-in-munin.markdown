@@ -1,0 +1,132 @@
+---
+layout: post
+title: "IPMI graphs in Munin"
+date: 2009-09-20 17:22:59 +0200
+comments: true
+categories: [cacti, munin, ipmi, php] 
+---
+
+It is possible to monitor fan speeds and temperatures on Dell Poweredge servers under Linux. You can achieve this by reading out the IPMI data that is available on the system.
+
+I used the steps on [this website](https://hep.pa.msu.edu/twiki/bin/view/AGLT2/DellCactiSetup) to buffer the data gathered by IPMI to use in Cacti.
+
+However, in addition to Cacti I also use Munin to monitor various system parameters. Wouldn't it be nice to incorporate graphs for fan speeds and temperatures in Munin? I thought so, so I developed a way to do this.
+
+In this case the solution consists out of 2 munin plugins and a PHP script that formats the IPMI values for graphing use. This could also be done directly in the plugins, but since I'm not such an `awk` and `sed` expert I chose to let a PHP script handle the transformation, so I'd be done sooner (time is money my friends!).
+
+ First up, the PHP script:
+
+``` php /usr/bin/ipmi.php
+#!/usr/bin/php
+ <?php
+ $handle = fopen('/dev/shm/dell.ipmi','r');
+ while(!feof($handle)) {
+ $line = fgets($handle);
+ if(preg_match('/AmbientTemp/',$line)) echo 'tambi.value '.fgets($handle);
+ if(preg_match('/CPU1Temp/',$line)) echo 'tcpu1.value '.fgets($handle);
+ if(preg_match('/CPU2Temp/',$line)) echo 'tcpu2.value '.fgets($handle);
+ if(preg_match('/Fan1/',$line)) echo 'fan1.value '.fgets($handle);
+ if(preg_match('/Fan2/',$line)) echo 'fan2.value '.fgets($handle);
+ if(preg_match('/Fan3/',$line)) echo 'fan3.value '.fgets($handle);
+ if(preg_match('/Fan4/',$line)) echo 'fan4.value '.fgets($handle);
+ if(preg_match('/Fan5/',$line)) echo 'fan5.value '.fgets($handle);
+ if(preg_match('/Fan6/',$line)) echo 'fan6.value '.fgets($handle);
+ if(preg_match('/PlanarTemp/',$line)) echo 'tplan.value '.fgets($handle);
+ if(preg_match('/RiserTemp/',$line)) echo 'trise.value '.fgets($handle);
+ }
+ fclose($handle);
+ ?>
+```
+
+ With the SHM values now being prefixed with matching Munin values, we can graph them in 2 plugins:
+
+``` bash /etc/munin/plugins/ipmitemps
+#!/bin/sh
+ if [ '$1' = 'autoconf' ]; then
+ if [ -r /dev/shm/dell.ipmi ]; then
+ echo yes
+ exit 0
+ else
+ echo no
+ exit 1
+ fi 
+ fi 
+
+ if [ '$1' = 'config' ]; then
+ echo 'graph_title Dell 2850 IPMI Temperatures'
+ echo 'graph_order tcpu1 tcpu2 tambi tplan trise'
+ echo 'graph_vlabel Temperature (Deg C)'
+ echo 'graph_scale yes'
+ echo 'graph_info This graph shows sensor temperatures'
+ echo 'graph_category system'
+ echo 'tcpu1.label CPU1'
+ echo 'tcpu1.warning 80'
+ echo 'tcpu1.critical 90'
+ echo 'tcpu1.info XEON CPU 1 Temperature'
+ echo 'tcpu2.label CPU2'
+ echo 'tcpu2.warning 80'
+ echo 'tcpu2.critical 90'
+ echo 'tcpu2.info XEON CPU 2 Temperature'
+ echo 'tambi.label Ambient'
+ echo 'tambi.warning 80'
+ echo 'tambi.critical 90'
+ echo 'tambi.info Ambient Temperature'
+ echo 'tplan.label Planar'
+ echo 'tplan.warning 80'
+ echo 'tplan.critical 90'
+ echo 'tplan.info Planar Temperature'
+ echo 'trise.label Riser'
+ echo 'trise.warning 80'
+ echo 'trise.critical 90'
+ echo 'trise.info Riser Temperature'
+ exit 0
+ fi
+ /usr/bin/ipmi.php
+```
+
+ and
+
+``` bash /etc/munin/plugins/ipmifans
+ #!/bin/sh
+
+ if [ '$1' = 'autoconf' ]; then
+ if [ -r /dev/shm/dell.ipmi ]; then
+ echo yes
+ exit 0
+ else
+ echo no
+ exit 1
+ fi
+ fi
+
+ if [ '$1' = 'config' ]; then
+
+ echo 'graph_title Dell 2850 IPMI Fanspeeds'
+ echo 'graph_order fan1 fan2 fan3 fan4 fan5 fan6'
+ echo 'graph_vlabel Fanspeed (RPM)'
+ echo 'graph_scale yes'
+ echo 'graph_info This graph shows fanspeeds'
+ echo 'graph_category system'
+ echo 'fan1.label Fan1'
+ echo 'fan1.info Fan1 speed'
+ echo 'fan2.label Fan2'
+ echo 'fan2.info Fan2 speed'
+ echo 'fan3.label Fan3'
+ echo 'fan3.info Fan3 speed'
+ echo 'fan4.label Fan4'
+ echo 'fan4.info Fan4 speed'
+ echo 'fan5.label Fan5'
+ echo 'fan5.info Fan5 speed'
+ echo 'fan6.label Fan6'
+ echo 'fan6.info Fan6 speed'
+ exit 0
+ fi
+ /usr/bin/ipmi.php
+```
+
+Restart your `munin-node`, run the munin crons, and voila, graphs!
+ With these settings they will look like this:
+
+*insert image*
+
+You can modify the params to change the graphs ofcourse.
