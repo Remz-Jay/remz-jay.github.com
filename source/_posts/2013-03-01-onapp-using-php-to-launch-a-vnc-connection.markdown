@@ -14,9 +14,13 @@ Wouldn't it be nice to use your own VNC client (like [Remotix][2]) instead?
 In fact, you can, but OnApp spawns a VNC server on a (somewhat) random port and a new random VNC password for each sessions which you'll have to figure out before setting up your connection. 
 
 According to the [OnApp Helpdesk][3] you can use these calls to get the required information:
-	GET /virtual_machines/:virtual_machine_id/console.xml
-	GET /virtual_machines/:virtual_machine_id/console.json
-As I'm lazy I didn't want to do this manually every time, so I devised a little PHP script that can aid in finding the right information:
+
+```
+GET /virtual_machines/:virtual_machine_id/console.xml
+GET /virtual_machines/:virtual_machine_id/console.json
+```
+
+As I'm lazy I didn't want to do this manually every time, so I devised a little PHP script that can aid in finding the right information:
 
 <!-- more -->  
 
