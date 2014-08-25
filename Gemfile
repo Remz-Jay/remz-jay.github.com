@@ -3,10 +3,10 @@ source "https://rubygems.org"
 group :development do
   gem 'rake', '~> 10.0'
   gem 'jekyll', '~> 2.0'
-  gem 'jekyll-page-hooks', '~> 1.2'
-  gem 'jekyll-date-format', '~> 1.0'
-  # gem 'octopress-date-format'
-  # gem 'octopress-hooks'
+  gem 'octopress-hooks', '~> 2.2'
+  gem 'octopress-date-format', '~> 2.0'
+  # gem 'jekyll-page-hooks', '~> 1.2'
+  # gem 'jekyll-date-format', '~> 1.0'
   gem 'jekyll-sitemap'
   gem 'rdiscount', '~> 2.0'
   gem 'RedCloth', '~> 4.2.9'
@@ -16,7 +16,7 @@ group :development do
   gem 'rubypants', '~> 0.2.0'
   gem 'rb-fsevent', '~> 0.9'
   gem 'stringex', '~> 1.4.0'
-#  gem 'liquid', '~> 2.3.0'
+  # gem 'liquid', '~> 2.3.0'
   gem 'flickraw', '~> 0.1'
   gem 'directory_watcher', '1.4.1'
   gem 'active_support', '~> 3.0'
@@ -27,8 +27,8 @@ group :development do
   gem "multi_json"
   gem 'yajl-ruby'
   gem 'rb-gsl'
-	gem 'kramdown'
-	gem 'coderay'
+  gem 'kramdown'
+  gem 'coderay'
 end
 
 gem 'sinatra', '~> 1.4.2'
