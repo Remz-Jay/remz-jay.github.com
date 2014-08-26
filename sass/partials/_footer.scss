@@ -6,6 +6,7 @@ body > footer {
   //text-shadow: lighten($footer-bg, 5) 0 1px;
   background-color: $footer-bg;
   @include background($footer-bg-front, $footer-bg-back);
+  background-size: 165%;
   //border-top: 1px solid $footer-border-top;
   margin-top: -130px;
   width: 100%;
