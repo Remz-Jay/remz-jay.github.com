@@ -45,7 +45,9 @@ class FlickrSet < Liquid::Tag
      else
        info = flickr.photos.getInfo(photo_id:item.primary)
        src =  FlickRaw.send("url_n", info)
-       src.gsub! 'http', 'https'
+       if !src.include? "https" 
+	       src.gsub! 'http', 'https'
+	     end
        photo = Photo.new(info, src, FlickRaw.url_photopage(info))
        redis.hset 'flickrphoto', item.primary, Marshal.dump(photo)
      end
