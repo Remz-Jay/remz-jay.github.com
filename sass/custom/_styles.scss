@@ -44,7 +44,7 @@ p code, li code {
     color: #FFFFFF;
   }
   .btn {
-    -moz-user-select: none;
+     -moz-user-select: none;
     background-image: none;
     cursor: pointer;
     display: inline-block;
@@ -115,4 +115,80 @@ p code, li code {
 }
 .wf-active {
   visibility: visible;
+}
+body#cv {
+	table {
+		margin-bottom: 15px;
+		width: 100%;	
+		thead tr th, tbody tr td {
+			font-weight: normal;
+			margin: 10px;
+			padding: 10px;
+		}
+		thead tr th {
+			//background: #AAA;
+			//color: #EEE;
+			font-weight: bold;
+			font-family: "myriad-pro",sans-serif;
+			background-color: #b40000;
+	    color: #ffffff;
+      font-size: 1.3em;
+      letter-spacing: -1px;
+      line-height: 1.3em;
+      //margin-left: -55px;
+      //padding-left: 55px;
+		}
+		thead tr:after {
+	    background: url("/images/menutab.png?1390898751") no-repeat scroll right bottom rgba(0, 0, 0, 0);
+    	bottom: -24px;
+    	content: "";
+    	display: block;
+    	height: 24px;
+    	position: absolute;
+    	right: 0;
+    	width: 24px;
+		}
+		thead tr:after {
+	    border-bottom: 10px solid #b40000;
+	    border-left: 10px solid transparent;
+	    border-right: 10px solid transparent;
+	    content: "";
+	    display: block;
+	    height: 0;
+	    margin-left: 20px;
+	    margin-top: -14px;
+	    position: absolute;
+    	width: 0;
+		}
+		tbody tr {
+			background: #E5E6E7;
+			font-family: "museo-sans",sans-serif;
+			transition: color 2.0s ease 1s;
+		}
+		tbody tr:hover {
+			background: #e6d333;	
+		}
+	}
+	li {
+		margin-bottom: 10px;
+	}
+}
+#content article #picturepage 
+{
+	img.aside-flickr {
+		width: 350px;
+		clip: rect(0, 350px, 200px, 0);
+		position: absolute;
+	}
+
+	li {
+		float: left;
+		width: 45%;
+		list-style-type: none;
+		padding-right: 10px;
+		position: relative;
+	}
+	h2 {
+		margin-top: 200px;
+	}
 }
