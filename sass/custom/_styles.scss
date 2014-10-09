@@ -106,7 +106,6 @@ p code, li code {
     color: #999999;
     opacity: 1;
   }
-
 }
 
 .wf-loading {
@@ -171,6 +170,13 @@ body#cv {
 	}
 	li {
 		margin-bottom: 10px;
+	}
+	footer {
+		background: none;
+		> div#fcontent {
+			background-color: #000;
+			padding-top: 25px;	
+		}
 	}
 }
 #content article #picturepage 

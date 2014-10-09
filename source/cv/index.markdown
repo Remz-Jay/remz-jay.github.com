@@ -6,6 +6,8 @@ comments: false
 sharing: false
 footer: false
 body_id: cv
+sitemap: false
+noindex: true
 ---
 # Remco Overdijk
 *Senior Software & Systems Engineer*
