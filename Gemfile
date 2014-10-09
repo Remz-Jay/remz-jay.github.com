@@ -19,7 +19,7 @@ group :development do
   # gem 'liquid', '~> 2.3.0'
   gem 'flickraw', '~> 0.1'
   gem 'directory_watcher', '1.4.1'
-  gem 'active_support', '~> 3.0'
+  # gem 'active_support', '~> 3.0'
   gem "redis", "~> 3.0.1"
   gem "hiredis", "~> 0.4.5"
   gem "em-synchrony"
