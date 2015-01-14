@@ -1,0 +1,9 @@
+BACKUPDIR=/mnt/backups/minecraft
+RAMDISK=/mnt/ramdisk
+PERSISTDIR=/home/remco/minecraft
+PREFIX="mc-backup_"
+RUNAS="remco"
+SCREENNAME="minecraft"
+#JARFILE="minecraft_server.1.8.1.jar"
+#JARFILE="spigot1649.jar"
+JARFILE="spigot-1.8.jar"
