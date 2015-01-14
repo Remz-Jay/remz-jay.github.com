@@ -1,6 +1,7 @@
 ---
-layout: nil
+layout: null
 ---
 User-agent: *
-Disallow: /cv/*
+Disallow: 
+
 Sitemap: {{ site.url }}/sitemap.xml 
