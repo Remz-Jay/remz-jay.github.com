@@ -26,7 +26,7 @@ group :development do
   gem "json"
   gem "multi_json"
   gem 'yajl-ruby'
-  gem 'rb-gsl'
+#  gem 'rb-gsl'
   gem 'kramdown'
   gem 'coderay'
 end
