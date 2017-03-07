@@ -1,6 +1,6 @@
 body > footer {
   @extend .sans;
-  font:  "museo-sans", sans-serif;
+  font:  "Raleway", sans-serif;
   font-size: .8em;
   color: $footer-color;
   //text-shadow: lighten($footer-bg, 5) 0 1px;
@@ -39,7 +39,7 @@ body > footer {
     padding: 10px;
     font-size: 12pt;
     text-align: right;
-    font-family: "reklame-script",sans-serif;
+	font-family: 'Gloria Hallelujah', cursive;
     font-style: normal;
     font-weight: 400;
     letter-spacing: 0.5px;
