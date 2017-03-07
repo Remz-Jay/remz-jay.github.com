@@ -6,7 +6,7 @@ url: https://rem.co
 title: "Rem.co: Remco Overdijk"
 subtitle: "Rem.co's linux and coding adventures"
 author: Remco Overdijk
-simple_search: http://google.com/search
+simple_search: https://google.com/search
 description: "Random code snippets, observations, ramblings and solutions as I encounter them during my daily IT adventures. Includes mainly PHP, JavaScript, Java, Node.js, Git, Linux, MySQL, Varnish, Nginx, Apache, TYPO3, AWS, Cisco, Solr, OSX, and Bash encouters, but your mileage may vary."
 
 # Default date format is "ordinal" (resulting in "July 22nd 2007")
@@ -115,4 +115,4 @@ facebook_like: true
 
 # Enable LSI in Jekyll, see:
 # http://gotofritz.net/blog/geekery/adding-related-post-to-octopress/
-lsi: true
+lsi: false

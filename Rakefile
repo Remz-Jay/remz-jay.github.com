@@ -27,6 +27,13 @@ new_post_ext    = "markdown"  # default new post file extension when using the n
 new_page_ext    = "markdown"  # default new page file extension when using the new_page task
 server_port     = "4000"      # port for preview server eg. localhost:4000
 
+deploy_default = "s3" # before migrating to S3 it was set to "rsync" for instance
+s3_bucket       = "rem.co"
+aws_cli_path    = "/usr/local/bin/aws" # path to your installed aws CLI
+aws_region      = "eu-west-1" # the bucket is set to US
+aws_profile     = "remco"
+aws_read_mode   = "uri=http://acs.amazonaws.com/groups/global/AllUsers" # needed to set upload rights so that everybody will have access to the content
+
 if (/cygwin|mswin|mingw|bccwin|wince|emx/ =~ RUBY_PLATFORM) != nil
   puts '## Set the codepage to 65001 for Windows machines'
   `chcp 65001`
@@ -403,4 +410,10 @@ desc "list tasks"
 task :list do
   puts "Tasks: #{(Rake::Task.tasks - [Rake::Task[:list]]).join(', ')}"
   puts "(type rake -T for more detail)\n\n"
+end
+
+desc "Deploy website via aws s3 sync"
+task :s3 do
+  puts "## Deploying website via aws s3 sync"
+  ok_failed system("#{aws_cli_path} s3 sync public/ s3://#{s3_bucket}/ --region #{aws_region} --grants read=#{aws_read_mode} --profile #{aws_profile}")
 end
