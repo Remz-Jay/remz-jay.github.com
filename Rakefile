@@ -9,7 +9,6 @@ ssh_port       = "22222"
 document_root  = "/var/www/localhost/htdocs/"
 rsync_delete   = true
 rsync_args     = ""  # Any extra arguments to pass to rsync
-deploy_default = "rsync"
 
 # This will be configured for you when you run config_deploy
 deploy_branch  = "master"
@@ -27,12 +26,14 @@ new_post_ext    = "markdown"  # default new post file extension when using the n
 new_page_ext    = "markdown"  # default new page file extension when using the new_page task
 server_port     = "4000"      # port for preview server eg. localhost:4000
 
-deploy_default = "s3" # before migrating to S3 it was set to "rsync" for instance
+deploy_default = "gs" # before migrating to S3 it was set to "rsync" for instance
 s3_bucket       = "rem.co"
 aws_cli_path    = "/usr/local/bin/aws" # path to your installed aws CLI
 aws_region      = "eu-west-1" # the bucket is set to US
 aws_profile     = "remco"
 aws_read_mode   = "uri=http://acs.amazonaws.com/groups/global/AllUsers" # needed to set upload rights so that everybody will have access to the content
+
+gs_bucket				= "rem-co"
 
 if (/cygwin|mswin|mingw|bccwin|wince|emx/ =~ RUBY_PLATFORM) != nil
   puts '## Set the codepage to 65001 for Windows machines'
@@ -417,3 +418,12 @@ task :s3 do
   puts "## Deploying website via aws s3 sync"
   ok_failed system("#{aws_cli_path} s3 sync public/ s3://#{s3_bucket}/ --region #{aws_region} --grants read=#{aws_read_mode} --profile #{aws_profile}")
 end
+
+desc "Deploy website on Google Cloud Storage"
+task :gs do
+	puts "## Empty bucket first.."
+	ok_failed system("gsutil -m rm gs://#{gs_bucket}/**")
+	puts "## Deploying website on Google Cloud Storage using gsutil rsync"
+	ok_failed system("gsutil -m cp -r -z html,xml,js,css,txt public/** gs://#{gs_bucket}/")
+end
+
