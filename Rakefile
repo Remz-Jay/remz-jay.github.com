@@ -424,6 +424,8 @@ task :gs do
 	puts "## Empty bucket first.."
 	ok_failed system("gsutil -m rm gs://#{gs_bucket}/**")
 	puts "## Deploying website on Google Cloud Storage using gsutil rsync"
-	ok_failed system("gsutil -m cp -r -z html,xml,js,css,txt public/** gs://#{gs_bucket}/")
+	ok_failed system("gsutil -m -h \"Cache-Control:public,max-age=86400\" cp -r -z html,xml,js,css,txt public/** gs://#{gs_bucket}/")
+	puts "## Updating Twitter timeline"
+	ok_failed system("./twitter-timeline/update-timeline.sh")
 end
 

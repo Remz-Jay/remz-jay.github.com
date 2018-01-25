@@ -70,18 +70,16 @@ function showTwitterFeed(tweets, twitter_user) {
 function getTwitterFeed(user, count, replies) {
   count = parseInt(count, 10);
   $.ajax({
-     url: '/timeline.json'
-    , type: 'GET'
-    , dataType: 'jsonp'
-    , jsonp: false 
-    , jsonpCallback: 'processTweeter'
-  })
-  .fail(function(err,textStatus,errorThrown) { 
-  	console.log(err); 
-	console.log(textStatus);
-	console.log(errorThrown);
-	$('#tweets li.loading').addClass('error').text("Twitter's busted: " + err.statusText);
-	//showTwitterFeed(err.responseText.processTweeter, user);
-   })
-  .done(function(data) { showTwitterFeed(data.slice(0, count), user); });
+     url: '/timeline.json',
+     type: 'GET',
+     dataType: 'json',
+     jsonp: false
+  }).fail(function(err,textStatus,errorThrown) { 
+    console.log(err); 
+    console.log(textStatus);
+    console.log(errorThrown);
+    $('#tweets li.loading').addClass('error').text("Twitter's busted: " + err.statusText);
+  }).done(function(data) {
+    showTwitterFeed(data.slice(0, count), user);
+  });
 }
