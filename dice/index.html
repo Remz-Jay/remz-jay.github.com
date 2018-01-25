@@ -1,0 +1,432 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Diceware Password Generator - Rem.co: Remco Overdijk</title>
+  <meta name="author" content="Remco Overdijk">
+
+  
+  <meta name="description" content="Diceware Password Generator Jun 14th, 2014 8:59 pm Select a language: English Dutch Japanese Polish Swedish Rolls: Add number Clear Words: What is &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+
+  
+  <link rel="canonical" href="https://rem.co/dice">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Rem.co: Remco Overdijk" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/libs/jquery-3.3.1.min.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="https://fonts.googleapis.com/css?family=Bitter:400,400i,700|Gloria+Hallelujah|PT+Sans:400,400i,700|Raleway:400,900" rel="stylesheet">
+<script src="/javascripts/modernizr-2.0.js" type="text/javascript"></script>
+<script src="/javascripts/libs/jquery-3.3.1.min.js" type="text/javascript"></script>
+<script src="/javascripts/octopress.js" type="text/javascript"></script>
+
+  
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-15985434-12"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-15985434-12');
+  </script>
+
+
+</head>
+
+<body   >
+		 <div id="top">
+  <header role="banner"><hgroup>
+  <h1><a href="/">rem</a></h1>
+    <h2>.co</h2>
+
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS<i class="icon-rss"></i></a></li>
+  
+</ul>
+  
+<form action="https://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:rem.co" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+    <li><a href="/"><i class="icon-pencil"></i>&nbsp;Blog</a></li>
+<li><a href="/blog/archives"><i class="icon-book"></i>&nbsp;Archives</a></li>
+<li><a href="/pictures"><i class="icon-camera"></i>&nbsp;Pictures</a></li>
+<li class="active"><a href="/dice"><i class="icon-lock"></i>&nbsp;Diceware</a></li>
+
+</ul>
+
+</nav>
+		 </div>
+  <div id="main">
+    <div id="content">
+      <div>
+<article role="article">
+  
+  <header>
+    <h1 class="entry-title">Diceware Password Generator</h1>
+    <p class="meta">
+
+
+
+
+<time class='entry-date' datetime='2014-06-14T20:59:51+02:00'><span class='date'><span class='date-month'>Jun</span> <span class='date-day'>14</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>8:59 pm</span></time></p>
+  </header>
+  
+  <div class="jumbotron">
+    <h3>Select a language:</h3>
+    <p class="lead">
+        <select id="lang">
+            <option value="English">English</option>
+            <option value="Dutch" selected="selected">Dutch</option>
+            <option value="Japanese">Japanese</option>
+            <option value="Polish">Polish</option>
+            <option value="Swedish">Swedish</option>
+         </select>
+    <h3>Rolls:</h3>
+    <p class="lead">
+        <input class="form-control" type="text" required="" placeholder="Generated numbers" id="numbers">
+    </p>
+    <p>
+        <a class="btn btn-lg btn-success" role="button" id="prng">Add number</a>
+        <a class="btn btn-lg btn-warning" role="button" id="clear">Clear</a>
+    </p>
+    <h3>Words:</h3>
+    <p class="lead">
+        <input class="form-control" type="text" required="" placeholder="Generated password" id="output">
+    </p>
+</div>
+
+
+
+
+<script src="/javascripts/uheprng.js"></script>
+
+
+<script type="text/javascript">
+    $( document ).ready(function() {
+        var prng = uheprng(), wordlist = null;
+        function loadLang(lang) {
+            $.get( "/dice/lib/Diceware"+lang+".txt", function( data ) {
+                wordlist = data.split("\n");
+                checkRolls();
+            });
+        }
+        function checkRolls() {
+            var x = $('#numbers').val();
+            if(x.length > 0) {
+                var b = x.match(/(.{1,5})/g);
+                //$('#output').val(b);
+                var d = "";
+                b.forEach(function(search){
+                    if(search.length == 5) {
+                        wordlist.forEach(function(word){
+                            if(word.indexOf(search)!=-1) {
+                                d += word.replace(/\t/g, ',').replace(/ /g, ',').split(',')[1] + " ";
+                            }
+                        });
+                    }
+                });
+                d = $.trim(d);
+                $('#output').val(d);
+            }
+        }
+        loadLang('Dutch');
+        $('#lang').change(function() {
+            loadLang($(this).val());
+        });
+        $('#numbers').bind('keypress', function (event) {
+            var regex = new RegExp("^[1-6\b]+$");
+            var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+            if (!regex.test(key)) {
+                event.preventDefault();
+                return false;
+            }
+        });
+        $('#numbers').keyup(function(){
+            checkRolls();
+        });
+        $( "#prng" ).click(function() {
+           $("#numbers").val($('#numbers').val() + (prng(6)+1));
+            checkRolls();
+        });
+        $( "#clear" ).click(function() {
+            $("#numbers").val("");
+            $("#output").val("");
+        });
+    });
+</script>
+
+
+<h3>What is this?</h3>
+
+<p>This is a diceware password generator. Read about diceware</p>
+
+<ul>
+<li><a href="http://world.std.com/~reinhold/diceware.html">here</a></li>
+<li><a href="http://blog.agilebits.com/2011/06/21/toward-better-master-passwords/">here</a></li>
+<li>and <a href="http://blog.agilebits.com/2011/08/10/better-master-passwords-the-geek-edition/">here</a></li>
+</ul>
+
+
+<h3>Is this safe?</h3>
+
+<p>Probably not, but I&rsquo;ve taken some precautions to make sure this is as safe as a browser-based generator can be:</p>
+
+<ul>
+<li>This generator is implemented in javascript. It runs in your browser, and doesn&rsquo;t send your rolls and/or words to me or anyone else. All the code (except for the PRNG) is on the bottom of the source of this page, and there&rsquo;s not much to see either.</li>
+<li>If you don&rsquo;t use actual dice, but the &ldquo;Add roll&rdquo; button instead, you&rsquo;re getting an as-random-as-random-can-possibly-be-in-your-browser number. This page uses a PRNG with exceptionally high entropy. Is it truely random? Of course not; It&rsquo;s still a PSEUDO random number generator after all. You better roll those dice buddy.</li>
+</ul>
+
+
+<h3>How do I use it?</h3>
+
+<p>Easy:</p>
+
+<ul>
+<li>Roll a real dice, or if you haven&rsquo;t happen to have one on you, use the &ldquo;Add roll&rdquo; button instead, which will generate a pseudo random roll for you.</li>
+<li>As soon as you have 5 rolls, a corresponding word will be selected from the diceware word list for you.</li>
+<li>Repeat this as often as you want/need words</li>
+<li>Presto, your new diceware password is ready. Save it to your favorite password manager and off you go.</li>
+</ul>
+
+
+<h3>Credits</h3>
+
+<ul>
+<li><a href="https://www.grc.com/otg/uheprng.htm">GRC for their Ultra-High Entropy Pseudo-Random Number Generator</a>.</li>
+<li><a href="http://world.std.com/~reinhold/diceware.html#languages">Diceware for the multi language word lists</a>.</li>
+<li>You, for actually considering a safe password for once, thus making the internet a better place. Good for you!</li>
+</ul>
+
+
+  
+    <footer>
+      <p class="meta">
+        
+        
+
+
+
+
+<time class='entry-date' datetime='2014-06-14T20:59:51+02:00'><span class='date'><span class='date-month'>Jun</span> <span class='date-day'>14</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>8:59 pm</span></time>
+        
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/tools/'>tools</a>
+  
+</span>
+
+
+      </p>
+      
+        <div class="sharing">
+  
+  
+  
+</div>
+
+      
+    </footer>
+  
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1><i class="icon-user icon-large"></i>&nbsp;About Me</h1>
+	<div id="so">
+	<a href="https://stackoverflow.com/users/813718/remco-overdijk">
+		<img src="https://stackoverflow.com/users/flair/813718.png" width="208" height="58" alt="profile for Remco Overdijk at Stack Overflow, Q&amp;A for professional and enthusiast programmers" title="profile for Remco Overdijk at Stack Overflow, Q&amp;A for professional and enthusiast programmers">
+	</a>
+	</div>
+</section>
+<section>
+  <h1><i class="icon-pencil icon-large"></i>&nbsp;Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/03/09/puppet-calculating-average-catalog-compilation-times/">Puppet: Calculating Average Catalog Compilation Times</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/02/12/git-the-difference-between-lightweight-and-annotated-tags/">Git: The Difference Between Lightweight and Annotated Tags</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/02/09/bacula-cancelling-all-jobs-that-are-currently-writing/">Bacula: Cancelling All Jobs That Are Currently Writing</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/01/15/bacula-purging-and-deleting-old-volumes/">Bacula: Purging and Deleting Old Volumes</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/01/14/music-end-of-the-year-mix-2014/">Music: End of the Year Mix 2014</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1><i class="icon-twitter icon-large"></i>&nbsp;Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  <script type="text/javascript">
+     $(document).ready(function(){
+      getTwitterFeed("RemzJay", 5, 0);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <p>Follow <a href="http://twitter.com/RemzJay">@RemzJay</a></p>
+  
+</section>
+
+
+<section>
+  <h1><i class="icon-github-alt icon-large"></i>&nbsp;GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/Remz-Jay">@Remz-Jay</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'Remz-Jay',
+            count: 10,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+<section class="flickr">
+    <h1><i class="icon-camera icon-large"></i>&nbsp;Flickr Albums</h1>
+		<ul id="flickrsets">
+          <li><a href="https://www.flickr.com/photos/93556621@N05/21961762008" target="_blank"><img src="https://farm6.staticflickr.com/5634/21961762008_7d225b59ba_n.jpg" class="aside-flickr" title="The bus"/></a><h2><a href="https://www.flickr.com/photos/93556621@N05/21961762008">NYC in B/W</a></h2><p></p></li><li><a href="https://www.flickr.com/photos/93556621@N05/21738387919" target="_blank"><img src="https://farm6.staticflickr.com/5627/21738387919_2f513ec807_n.jpg" class="aside-flickr" title="IMG_4732.jpg"/></a><h2><a href="https://www.flickr.com/photos/93556621@N05/21738387919">USA 2015</a></h2><p></p></li><li><a href="https://www.flickr.com/photos/93556621@N05/8519041005" target="_blank"><img src="https://farm9.staticflickr.com/8085/8519041005_d09c9c4cf6_n.jpg" class="aside-flickr" title="IMG_7581.jpg"/></a><h2><a href="https://www.flickr.com/photos/93556621@N05/8519041005">Vietnam 2011</a></h2><p>Backpacking trip through Thailand and Vietnam (North to South) by train and bus. </p></li>
+    </ul>
+</section>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p id="copyright">
+    &copy; 2018 - <a href="https://rem.co">Remco Overdijk</a><br/>
+    <span class="credit">Powered by <a href="http://octopress.org">Octopress</a>.</span>
+</p>
+<div id="fcontent">
+    <div id="fmenu">
+        <div class="fcol">
+            <h3>Navigation</h3>
+            <ul class="footer-navigation">
+                <li><a href="/"><i class="icon-pencil"></i>&nbsp;Blog</a></li>
+<li><a href="/blog/archives"><i class="icon-book"></i>&nbsp;Archives</a></li>
+<li><a href="/pictures"><i class="icon-camera"></i>&nbsp;Pictures</a></li>
+<li class="active"><a href="/dice"><i class="icon-lock"></i>&nbsp;Diceware</a></li>
+
+            </ul>
+        </div>
+        <div class="fcol">
+            <h3>Websites</h3>
+            <ul>
+                <li><a href="https://rem.co"><i class="icon-globe"></i>&nbsp;Rem.co</a></li>
+                <li><a href="http://overdijk.io"><i class="icon-globe"></i>&nbsp;Overdijk.io</a></li>
+                <li><a href="http://www.remz-jay.org"><i class="icon-globe"></i>&nbsp;Remz-Jay.org</a></li>
+                <li><a href="http://www.remz.nl"><i class="icon-globe"></i>&nbsp;Remz.nl</a></li>
+                <li><a href="http://remc.onl"><i class="icon-globe"></i>&nbsp;Remc.onl</a></li>
+                <li><a href="http://www.twitupdate.com"><i class="icon-globe"></i>&nbsp;Twitupdate</a></li>
+                <li><a href="http://www.socialmediascanner.com"><i class="icon-globe"></i>&nbsp;SocialMediaScanner</a></li>
+            </ul>
+        </div>
+        <div class="fcol">
+            <h3>Social Media</h3>
+            <ul>
+                <li><a href="http://twitter.com/remzjay"><i class="icon-twitter"></i>&nbsp;RemzJay on Twitter</a></li>
+                <li><a href="http://facebook.com/remco-overdijk"><i class="icon-facebook"></i>&nbsp;Remco-Overdijk on Facebook</a></li>
+                <li><a href="http://www.linkedin.com/in/remcooverdijk"><i class="icon-linkedin"></i>&nbsp;Remco Overdijk on LinkedIn</a></li>
+                <li><a href="https://github.com/Remz-Jay"><i class="icon-github-alt"></i>&nbsp;Remz-Jay on GitHub</a></li>
+                <li><a href="http://open.spotify.com/user/remzjay"><i class="icon-music"></i>&nbsp;RemzJay on Spotify</a></li>
+                <li><a href="https://keybase.io/remz"><i class="icon-globe"></i>&nbsp;Remz on Keybase.io</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'rem-co';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'https://rem.co/dice/index.html';
+        var disqus_url = 'https://rem.co/dice/index.html';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

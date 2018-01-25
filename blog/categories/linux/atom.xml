@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: Linux | The Rem.co Blog]]></title>
-  <link href="http://blog.rem.co/blog/categories/linux/atom.xml" rel="self"/>
-  <link href="http://blog.rem.co/"/>
-  <updated>2014-03-10T10:39:35+01:00</updated>
-  <id>http://blog.rem.co/</id>
+  <title><![CDATA[Category: linux | Rem.co: Remco Overdijk]]></title>
+  <link href="https://rem.co/blog/categories/linux/atom.xml" rel="self"/>
+  <link href="https://rem.co/"/>
+  <updated>2018-01-25T14:17:37+01:00</updated>
+  <id>https://rem.co/</id>
   <author>
     <name><![CDATA[Remco Overdijk]]></name>
     <email><![CDATA[remco@rem.co]]></email>
@@ -14,10 +14,668 @@
 
   
   <entry>
+    <title type="html"><![CDATA[Puppet: Calculating average catalog compilation times]]></title>
+    <link href="https://rem.co/blog/2015/03/09/puppet-calculating-average-catalog-compilation-times/"/>
+    <updated>2015-03-09T18:25:18+01:00</updated>
+    <id>https://rem.co/blog/2015/03/09/puppet-calculating-average-catalog-compilation-times</id>
+    <content type="html"><![CDATA[<p><em>Just a quick post with the oneliner of the day.</em></p>
+
+<p>When you are debugging catalog compilation issues or other puppet performance issues in general, it is good to know exactly which catalogs are slow to compile. Knowing which catalogs are substantially slower than others allows you to focus on those catalogs and the modules they contain.</p>
+
+<p>I devised this bash oneliner, <a href="http://www.unixcl.com/2008/09/group-by-clause-functionality-in-awk.html">which is almost a direct copy of this example by Jadu Saikia</a>, so full credits go to him!</p>
+
+<pre><code class="bash Calculating Average Catalog Compilation Times in Puppet">cat /var/log/puppet/master.log | grep -i "compiled catalog for" | awk '{printf "%s\t%s\r\n",$9,$14}' | sort | awk 'BEGIN{FS="\t"; printf("%-35s\t\t%s\t\t%s\t\t%s\n", "Node","Count","Total","Average")} NR!=1 {a[$1]++;b[$1]=b[$1]+$2}END{for (i in a) printf("%-35s\t%10.0f\t%10.0f\t%10.2f\n", i, a[i], b[i], b[i]/a[i])}' | sort -n -k4
+</code></pre>
+
+<!-- more -->
+
+
+<p>This will yield a result similar to:</p>
+
+<pre><code class="bash Results">Node                                            Count         Total         Average
+node02.customer.nl                            71              44            0.62
+srv08.customer.net                              71              50            0.70
+solr.company.net                                71              64            0.90
+data07.customer.io                              71             599            8.44
+web21.customer.org                              73             932           12.77
+node01.test.company.net                         79            1894           23.98
+crm.company.net                                 70            2325           33.22
+solr.website.com                                72            2607           36.21
+customer.vps.company.net                        69            2762           40.03
+p1.customer.company.net                         72            3058           42.47
+customer1.dev.company.net                       70            3115           44.51
+customer2.dev.company.net                       71            3325           46.83
+solr.dev.company.net                            71            3348           47.15
+customer3.dev.company.net                       71            3496           49.24
+customer4.dev.company.net                       71            3554           50.06
+customer5.dev.company.net                       71            3558           50.11
+customer6.dev.company.net                       70            3542           50.60
+customer7.dev.company.net                       70            3683           52.62
+agent01.isp.bamboo.company.net                  71            3761           52.98
+solr.customer.nl                                71            3798           53.50
+customer8.dev.company.net                       72            3896           54.11
+v2.isp.dev.company.net                          71            3928           55.32
+net-loc-isp08.company.net                       71            4108           57.86
+puppet.company.net                              70            4092           58.45
+customer9.dev.company.net                       70            4112           58.75
+customer10.dev.company.net                      71            4188           58.98
+customer11.dev.company.net                      70            4139           59.13
+zabbix.vps.company.net                          70            4148           59.26
+</code></pre>
+
+<p>Obviously I&rsquo;ve randomized the node names to protect company and customer specific details, but the averages are real.</p>
+
+<p>Looks like I have my work cut out for me to reduce those times, ~60 seconds is just way too long.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Bacula: Cancelling all jobs that are currently writing]]></title>
+    <link href="https://rem.co/blog/2015/02/09/bacula-cancelling-all-jobs-that-are-currently-writing/"/>
+    <updated>2015-02-09T14:08:07+01:00</updated>
+    <id>https://rem.co/blog/2015/02/09/bacula-cancelling-all-jobs-that-are-currently-writing</id>
+    <content type="html"><![CDATA[<p><em>Just a quick post with the oneliner of the day.</em></p>
+
+<p><strong>Scenario</strong>: after a bacula director restart a couple of jobs were stuck on the FD with message:</p>
+
+<pre><code class="bash Bacula File Director Error">Running Jobs:
+Writing: Incremental Backup job node.cluster.company.com JobId=8702 Volume=""
+    pool="bacula.director.company.com:pool:default.incremental" device="DefaultFileStorage" (/mnt/bacula/default)
+    spooling=0 despooling=0 despool_wait=0
+    Files=0 Bytes=0 AveBytes/sec=0 LastBytes/sec=0
+FDSocket closed
+</code></pre>
+
+<!-- more -->
+
+
+<p>There were a couple of these jobs that were stuck, preventing all other jobs from running, because those were waiting for a free slot on the FD.</p>
+
+<p><strong>Solution?</strong> Well, I <em>could</em> have resumed or fixed those jobs, but I&rsquo;m in a hurry, so I just cancelled them so the rest of the schedule could be processed. And I&rsquo;m lazy too, so I just cancelled all currently writing jobs in one go:</p>
+
+<pre><code class="bash Bacula Oneliner: Cancel all currently writing jobs">for j in `echo "s storage" | bconsole | grep -i writing | awk '{print $6}'`; do echo "cancel $j" | bconsole; done
+</code></pre>
+
+<p>After that, the schedule started processing right away. Next issue.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Bacula: Purging and deleting old volumes]]></title>
+    <link href="https://rem.co/blog/2015/01/15/bacula-purging-and-deleting-old-volumes/"/>
+    <updated>2015-01-15T14:08:02+01:00</updated>
+    <id>https://rem.co/blog/2015/01/15/bacula-purging-and-deleting-old-volumes</id>
+    <content type="html"><![CDATA[<p>I&rsquo;ve been using bacula for a couple of months now in conjunction with puppet to
+make automated backups of all servers that are managed by puppet.
+My bacula setup labels a volume for every job it runs with a unique name:</p>
+
+<pre><code class="ini Bacula Label Format">Label Format = "${Job}.${Year}${Month:p/2/0/r}${Day:p/2/0/r}.${Hour:p/2/0/r}${Minute:p/2/0/r}"
+</code></pre>
+
+<p>These volumes are automatically purged once the retention of all files contained on the volume expires (which is
+        configured per-pool). Due to the unique names however, the volumes cannot
+be recycled. The result of this is that the volumes that have been marked as
+purged in the catalog remain as-is on the disk. After some time this ultimately
+resulted in a full disk, thus halting all backups performed on that pool. Not
+good. Not good at all.</p>
+
+<!-- more -->
+
+
+<p>I thought volumes would be truncated at the time they are marked as purged, but
+I probably made some configuration error somewhere along the road or I don&rsquo;t
+quite understand how the truncating process works, because all of my purged
+disks are using their original disk space.</p>
+
+<p>Because I&rsquo;m pressed for time and can&rsquo;t be bothered with old backups anyway,
+                I&rsquo;ve decided to just delete all purged volumes (which were beyond their
+                        retention date anyway). Perhaps the steps I took to delete these
+                volumes can help others (Or others can recommend me a better way to
+                        deal with old volumes), so here goes:</p>
+
+<h2>Pruning all clients</h2>
+
+<p>Before you start cleaning old volumes, it might be wise to ensure that all
+volumes are pruned before cleaning, so you maximize the number of volumes you
+are going to delete.</p>
+
+<pre><code class="bash Pruning all clients">#!/bin/bash
+clients=`mysql -e'select Name from Client ORDER BY Name ASC;' bacula | tail -n+2`
+
+for client in `echo $clients`
+do
+  echo "prune files client=${client} yes" | bconsole
+done
+</code></pre>
+
+<h2>Checking the number of volumes to be purged</h2>
+
+<p>Using <code>list volumes</code> in <code>bconsole</code> you can check the status of all volumes known to bacula.
+I&rsquo;m merely interested in the number of volumes that are currently marked as purged:</p>
+
+<pre><code class="bash Listing the number of Purged Volumes">echo "list volumes" | bconsole | grep "Purged" | awk {'print $4'} | wc -l
+</code></pre>
+
+<p>This resulted in a list of <em>thousands</em> of volumes. (We&rsquo;re running, full, incremental and diff backups, so the numbers stack up). Time to get rid of them.</p>
+
+<h2>Removing purged volumes from the catalog and deleting them</h2>
+
+<p>Using this script I&rsquo;ve removed all purged volumes from the catalog, after which they were physically deleted from the disk, freeing up precious space for more recent backups.
+<figure class='code'><figcaption><span>Deleting all Purged Volumes</p></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>&lt;h1&gt;!/bin/bash&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;for f in &lt;code&gt;echo <span class="s2">&quot;list volume&quot;</span> <span class="p">|</span> bconsole <span class="p">|</span> grep Purged <span class="p">|</span> cut -d <span class="s1">&#39; &#39;</span> -f6&lt;/code&gt;<span class="p">;</span> <span class="k">do</span>
+</span><span class='line'>    <span class="nb">echo</span> <span class="p">&amp;</span>ldquo<span class="p">;</span>delete <span class="nv">volume</span><span class="o">=</span><span class="nv">$f</span> yes<span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="p">|</span> bconsole<span class="p">;</span>
+</span><span class='line'>    rm -rf /mnt/bacula/default/<span class="nv">$f</span><span class="p">;</span>
+</span><span class='line'><span class="k">done</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<h2>Removing volumes that are missing from the catalog</h2>
+
+<p>Somehow I also ended up with some volumes on the disk that were not present in the bacula catalog at all. In my opinion these could be cleaned up as well, hence:</p>
+
+<pre><code class="bash Deleting volumes that are not present in the catalog">#!/bin/bash
+
+cd /mnt/bacula/default
+for i in `find . -maxdepth 1 -type f -printf "%f\n"`; do
+  echo "list volume=$i" | bconsole | if grep --quiet "No results to list"; then
+        echo "$i is ready to be deleted"
+        rm -f /mnt/bacula/default/$i
+  fi
+done
+</code></pre>
+
+<h2>Finishing up</h2>
+
+<p>To prevent full disks these tasks should be scheduled using <code>cron</code> and run daily (or at least weekly) to keep your disks and catalog lean &amp; clean.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Gentoo: Running a Minecraft 1.8 server]]></title>
+    <link href="https://rem.co/blog/2014/11/28/gentoo-running-a-minecraft-1-dot-8-server/"/>
+    <updated>2014-11-28T13:36:57+01:00</updated>
+    <id>https://rem.co/blog/2014/11/28/gentoo-running-a-minecraft-1-dot-8-server</id>
+    <content type="html"><![CDATA[<p>Running a dedicated Minecraft server can be a challenging job. You have to find a balance between performance and usability using &ldquo;server software&rdquo; that doesn&rsquo;t seem to be designed to provide for long running, resilient services.</p>
+
+<p>Being a first-time Minecraft server operator I had to tackle various challenges in order to come up with a way to provide a stable and reliable service to my players. The following article is a recollection of the things I implemented and scripts I wrote in order to run a Minecraft 1.8 server. The scripts mentioned are specific to Gentoo Linux, but could also be used on most other Linux flavours, albeit with some modifications to match that platform&rsquo;s <code>init.d</code> scripts.</p>
+
+<!-- more --> 
+
+
+<h2>Preparations</h2>
+
+<h3>Screen</h3>
+
+<p>In the scripts we&rsquo;re going to use we use <code>screen</code> as the means to deamonize the Minecraft process. I&rsquo;ve given this a lot of thought, because using <code>screen</code> as a deamonizer feels very wrong  to me when there are dedicated tools (such as the <code>start-stop-daemon</code>) for that particular job. Furthermore, I&rsquo;m more of a <code>tmux</code> guy myself when it comes to terminal multiplexing.</p>
+
+<p>However, after searching the internet, <code>screen</code> seems to be the most popular way of daemonizing Minecraft by far. I don&rsquo;t dare to speculate on wether this is caused by a lack of knowledge in the Minecraft server scene or based on a sound choice.</p>
+
+<p>I have my own reasons for using <code>screen</code> instead of <code>start-stop-deamon</code> or <code>tmux</code>:
+-  <code>screen</code> (and/or <code>tmux</code>) allows me to interact with the game&rsquo;s console. If I use <code>start-stop-daemon</code> instead, the process will be truly deamonized, and there is no way to bring it to the foreground anymore to allow for interaction. Why do we <em>need</em> console interaction you might ask? Because we do backups for example. In order to have reliable backups, we have to tell the Minecraft server to flush any changes to the disk and stop saving while the backup is running. This is all done using console commands.
+- <code>screen</code> has an awesome command, <code>stuff</code>, that allows us to send commands to a detached (deamonized)  instance. This provides us with the possibility of interacting with a running instance using scripts/services <em>outside</em> of that screen instance.</p>
+
+<p>So, before we continue, make sure <code>screen</code> is installed on your box:</p>
+
+<pre><code># emerge -av app-misc/screen
+</code></pre>
+
+<h3>Java SE 8</h3>
+
+<p>My first attempts on running Minecraft 1.8 used the JDK that was present on my box at that time, being <code>IcedTea JDK 6.1.13.3 [icedtea-bin-6]</code>. You <em>can</em> actually use that JDK (or any other Java SE 6 JDK/JRE for that matter), but my installation was haunted by substantial, noticeable lag while the server process was using 100% CPU non-stop (on one core, the  main Minecraft server process being single-threaded) and the console and logs were spammed with these warnings:</p>
+
+<pre><code>[23:52:10] [Server thread/WARN]: Can't keep up! Did the system time change, or is the server overloaded? Running 19381ms behind, skipping 387 tick(s)
+</code></pre>
+
+<p>Despite all optimisations that you will read about in this article that were already in effect at that time, the lag remained, and would at times get so bad that Minecraft&rsquo;s  internal watchdog would mark the server as crashed:</p>
+
+<pre><code>[21:21:15] [Server Watchdog/FATAL]: A single server tick took 60.00 seconds (should be max 0.05)
+[21:21:15] [Server Watchdog/FATAL]: Considering it to be crashed, server will forcibly shutdown.
+[21:21:15] [Server Watchdog/ERROR]: This crash report has been saved to: /mnt/ramdisk/./crash-reports/crash-2014-11-27_21.21.15-server.txt
+[21:21:15] [Server Shutdown Thread/INFO]: Stopping server
+</code></pre>
+
+<p>After some research on the internet some posts mentioned that upgrading to Java 8 could make all the difference, so I did. And it worked! While CPU usage is still reasonably high (around 70~80% at most times), the lag and warnings are gone, and subsequently, so are the crashes. So, I&rsquo;ll advise to use the same JDK as I did in this article. To install:</p>
+
+<pre><code># emerge -av dev-java/oracle-jdk-bin
+</code></pre>
+
+<p><strong>Read</strong> the error you receive from running that command, resolve the fetch restriction by following the instructions in that error message and continue installing. Afterwards:</p>
+
+<pre><code># java-config --list-available-vms
+The following VMs are available for generation-2:
+1)      IcedTea JDK 6.1.13.3 [icedtea-bin-6]
+*)      Oracle JDK 1.8.0.25 [oracle-jdk-bin-1.8] 
+
+# java-config --set-system-vm 2
+Now using oracle-jdk-bin-1.8 as your generation-2 system JVM
+</code></pre>
+
+<p>The command above marks the newly installed JDK as your system JVM. This might not be a possibility for you if you have other software on your system that is incompatible with Java 8 (or the Oracle JDK). In that case, you can set the installed JDK as the User VM for the user you are using to run Minecraft. To do so:</p>
+
+<pre><code># su &lt;minecraftuser&gt;
+$ java-config --set-user-vm 2
+Now using oracle-jdk-bin-1.8 as your user JVM
+</code></pre>
+
+<h3>RAMDisk</h3>
+
+<p>Being haunted by performance issues, I&rsquo;ve read quite a lot on Minecraft server performance and optimisation. There is one article that stands out from the crowd and is a <em>must</em> read for everyone running Minecraft servers. I encourage you to go and read <a href="http://www.sk89q.com/2013/03/improving-your-minecraft-servers-performance/">sk89q&rsquo;s Improving your Minecraft server’s performance</a> first before continuing this article.</p>
+
+<p>Among other minor optimisations, such as the Java flags that are used in my setup, one of the biggest influences is the use of a RAMDisk to host your Minecraft setup on. This eliminates any delays caused by <code>iowait</code> due to slow disks and speeds up various tasks, such as loading the map. I use a Dell PowerEdge 1950 III Blade server as the hardware platform for my Minecraft server, and although beefy as it may be for this purpose, it is not equipped with SSD&rsquo;s which is a potential cause for performance degradation. The installation/use of a RAMDisk is quite easy, but there are some drawbacks you have to keep in mind, such as that RAMDisks are not permanent storage. In case you suffer a power outage or kernel panic, the data on your RAMDisk is gone. To counter this issue, you&rsquo;ll have to implement some way to synchronise the RAMDisk from/to persistant storage.</p>
+
+<p>The <code>init.d</code> script we&rsquo;ll later discuss takes care of all this hassle, but in order for it to work, we first have to create the RAMDisk.</p>
+
+<p>Edit your <code>/etc/fstab</code> and add a RAMDisk at a mountpoint of your choise:</p>
+
+<pre><code># vim /etc/fstab
+tmpfs                   /mnt/ramdisk    tmpfs           rw,nodev,nosuid,size=2G,uid=1000,gid=1000,mode=1700     0 0
+</code></pre>
+
+<p>Adjust the <code>size=</code> parameter to match the amount of spare (unused) RAM you have available and the size of your actual Minecraft installation. (My installation is only 300MB actually, but I have 36GB RAM in this machine which is mostly vacant so I picked a comfortably large disk size). Adjust the <code>uid=</code> and <code>gid=</code> parameters to the id&rsquo;s of the dedicated user you are using to run your Minecraft server with. (Never run trivial services such as this as <code>root</code>!).</p>
+
+<p>Next, create the mountpoint:</p>
+
+<pre><code># mkdir /mnt/ramdisk
+</code></pre>
+
+<p>And try to mount the RAMDisk and see if it works:</p>
+
+<pre><code># mount /mnt/ramdisk
+# df -h
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sda3        63G   48G   13G  80% /
+udev             10M  4.0K   10M   1% /dev
+tmpfs           7.9G  628K  7.9G   1% /run
+shm             7.9G     0  7.9G   0% /dev/shm
+cgroup_root      10M     0   10M   0% /sys/fs/cgroup
+tmpfs           7.9G   72K  7.9G   1% /tmp
+/dev/sdb1       200G  192G  8.2G  96% /mnt/backups
+tmpfs           2.0G  297M  1.8G  15% /mnt/ramdisk 
+</code></pre>
+
+<h3>Install Minecraft as you normally would</h3>
+
+<p>If you haven&rsquo;t done so already, install a Minecraft like you normally would. For me, that is a directory <code>/home/remco/minecraft</code>  which contains the server <code>.jar</code>, the world and all settings.</p>
+
+<h2>The Scripts</h2>
+
+<p>The <code>init.d</code> script is what makes this setup tick. It does all the heavy lifting. The location for this script is <code>/etc/init.d/minecraft</code>
+<figure class='code'><figcaption><span> (minecraft-init.d.sh)</span> <a href='/downloads/code/minecraft-init.d.sh'>download</a></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+<span class='line-number'>88</span>
+<span class='line-number'>89</span>
+<span class='line-number'>90</span>
+<span class='line-number'>91</span>
+<span class='line-number'>92</span>
+<span class='line-number'>93</span>
+<span class='line-number'>94</span>
+<span class='line-number'>95</span>
+<span class='line-number'>96</span>
+<span class='line-number'>97</span>
+<span class='line-number'>98</span>
+<span class='line-number'>99</span>
+<span class='line-number'>100</span>
+<span class='line-number'>101</span>
+<span class='line-number'>102</span>
+<span class='line-number'>103</span>
+<span class='line-number'>104</span>
+<span class='line-number'>105</span>
+<span class='line-number'>106</span>
+<span class='line-number'>107</span>
+<span class='line-number'>108</span>
+<span class='line-number'>109</span>
+<span class='line-number'>110</span>
+<span class='line-number'>111</span>
+<span class='line-number'>112</span>
+<span class='line-number'>113</span>
+<span class='line-number'>114</span>
+<span class='line-number'>115</span>
+<span class='line-number'>116</span>
+<span class='line-number'>117</span>
+<span class='line-number'>118</span>
+<span class='line-number'>119</span>
+<span class='line-number'>120</span>
+<span class='line-number'>121</span>
+<span class='line-number'>122</span>
+<span class='line-number'>123</span>
+<span class='line-number'>124</span>
+<span class='line-number'>125</span>
+<span class='line-number'>126</span>
+<span class='line-number'>127</span>
+<span class='line-number'>128</span>
+<span class='line-number'>129</span>
+<span class='line-number'>130</span>
+<span class='line-number'>131</span>
+<span class='line-number'>132</span>
+<span class='line-number'>133</span>
+<span class='line-number'>134</span>
+<span class='line-number'>135</span>
+<span class='line-number'>136</span>
+<span class='line-number'>137</span>
+<span class='line-number'>138</span>
+<span class='line-number'>139</span>
+<span class='line-number'>140</span>
+<span class='line-number'>141</span>
+<span class='line-number'>142</span>
+<span class='line-number'>143</span>
+<span class='line-number'>144</span>
+<span class='line-number'>145</span>
+<span class='line-number'>146</span>
+<span class='line-number'>147</span>
+<span class='line-number'>148</span>
+<span class='line-number'>149</span>
+<span class='line-number'>150</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#!/sbin/runscript</span>
+</span><span class='line'><span class="c"># Copyright 2014 Rem.co Linux Solutions</span>
+</span><span class='line'><span class="c"># Distributed under the terms of the GNU General Public License v2</span>
+</span><span class='line'><span class="c"># $Header: $</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">extra_commands</span><span class="o">=</span><span class="s2">&quot;syncup syncdown backup rotate emptyrestart watch&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">description</span><span class="o">=</span><span class="s2">&quot;Manages a Minecraft installation running under a dedicated user inside a daemonized screen session&quot;</span>
+</span><span class='line'><span class="nv">description_syncdown</span><span class="o">=</span><span class="s2">&quot;Synchronizes the RAMdisk back to the persistant storage&quot;</span>
+</span><span class='line'><span class="nv">description_syncup</span><span class="o">=</span><span class="s2">&quot;Synchronizes the persistant storage to the RAMdisk&quot;</span>
+</span><span class='line'><span class="nv">description_backup</span><span class="o">=</span><span class="s2">&quot;Takes a full backup of the minecraft installation and rotates old backups&quot;</span>
+</span><span class='line'><span class="nv">description_rotate</span><span class="o">=</span><span class="s2">&quot;Rotates old backups&quot;</span>
+</span><span class='line'><span class="nv">description_emptyrestart</span><span class="o">=</span><span class="s2">&quot;Checks if any users are online in minecraft. If not, restarting the service&quot;</span>
+</span><span class='line'><span class="nv">description_watch</span><span class="o">=</span><span class="s2">&quot;Checks if minecraft is still running if it resides in the &#39;started&#39; state. Restarts the service if not.&quot;</span>
+</span><span class='line'>
+</span><span class='line'>depend<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>	need net localmount
+</span><span class='line'>	after bootmisc
+</span><span class='line'>	use logger
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>start<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>	ebegin <span class="s2">&quot;Starting Minecraft&quot;</span>
+</span><span class='line'>	<span class="k">if</span> ! sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -list <span class="p">|</span> grep -q <span class="s2">&quot;${SCREENNAME}&quot;</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>		launch <span class="o">||</span> <span class="k">return</span> 1
+</span><span class='line'>	<span class="k">else</span>
+</span><span class='line'>		eerror <span class="s2">&quot;Minecraft screen session is already present, not launching new one.&quot;</span>
+</span><span class='line'>	<span class="k">fi</span>
+</span><span class='line'>	eend <span class="nv">$?</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>stop<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>	ebegin <span class="s2">&quot;Stopping Minecraft&quot;</span>
+</span><span class='line'>	<span class="k">if</span> ! sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -list <span class="p">|</span> grep -q <span class="s2">&quot;${SCREENNAME}&quot;</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>		eerror <span class="s2">&quot;The Minecraft screen session cannot be found so we can&#39;t stop it&quot;</span>
+</span><span class='line'>	<span class="k">else</span>
+</span><span class='line'>		sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -S <span class="k">${</span><span class="nv">SCREENNAME</span><span class="k">}</span> -p <span class="m">0</span> -X stuff <span class="s2">&quot;stop$(printf \\r)&quot;</span>
+</span><span class='line'>		sleep 5
+</span><span class='line'>		<span class="c">#Check if the screen session closed cleanly, otherwise kill it with fire.</span>
+</span><span class='line'>		<span class="k">if</span> sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -list <span class="p">|</span> grep -q <span class="s2">&quot;${SCREENNAME}&quot;</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>			sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -S <span class="k">${</span><span class="nv">SCREENNAME</span><span class="k">}</span> -X <span class="nb">kill</span>
+</span><span class='line'><span class="nb">		</span><span class="k">fi</span>
+</span><span class='line'>	<span class="k">fi</span>
+</span><span class='line'>	eend <span class="nv">$?</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>reload<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>	ebegin <span class="s2">&quot;Reload Minecraft&quot;</span>
+</span><span class='line'>	stop
+</span><span class='line'>	sleep 3
+</span><span class='line'>	start
+</span><span class='line'>	eend <span class="nv">$?</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>launch<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'> 	<span class="k">if</span> ! mountpoint -q <span class="k">${</span><span class="nv">RAMDISK</span><span class="k">}</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>		mount <span class="k">${</span><span class="nv">RAMDISK</span><span class="k">}</span>
+</span><span class='line'>	<span class="k">fi</span>
+</span><span class='line'>	sup <span class="o">||</span> <span class="k">return</span> 1
+</span><span class='line'>	sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -dmS <span class="k">${</span><span class="nv">SCREENNAME</span><span class="k">}</span> bash -c <span class="s2">&quot;cd ${RAMDISK}; java -server -XX:+UseConcMarkSweepGC -Xms2G -Xmx4G -jar ${JARFILE} nogui&quot;</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>sdown<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>	rsync --quiet --archive --delete --recursive --force <span class="k">${</span><span class="nv">RAMDISK</span><span class="k">}</span>/ <span class="k">${</span><span class="nv">PERSISTDIR</span><span class="k">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>syncdown<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>	ebegin <span class="s2">&quot;Syncing RAMdisk to Persistant Storage&quot;</span>
+</span><span class='line'>	sdown <span class="o">||</span> <span class="k">return</span> 1
+</span><span class='line'>	eend <span class="nv">$?</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>sup<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>	rsync --quiet --archive <span class="k">${</span><span class="nv">PERSISTDIR</span><span class="k">}</span>/ <span class="k">${</span><span class="nv">RAMDISK</span><span class="k">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>syncup<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>	ebegin <span class="s2">&quot;Syncing Persistant Storage to RAMdisk&quot;</span>
+</span><span class='line'>	sup <span class="o">||</span> <span class="k">return</span> 1
+</span><span class='line'>	eend <span class="nv">$?</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>backup<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>	ebegin <span class="s2">&quot;Taking a backup&quot;</span>
+</span><span class='line'>	<span class="k">if</span> ! sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -list <span class="p">|</span> grep -q <span class="s2">&quot;${SCREENNAME}&quot;</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>		eerror <span class="s2">&quot;Minecraft is not running, not taking a live backup&quot;</span>
+</span><span class='line'>	<span class="k">fi</span>
+</span><span class='line'>	<span class="nv">H</span><span class="o">=</span><span class="k">$(</span>date +<span class="s2">&quot;%H&quot;</span><span class="k">)</span>
+</span><span class='line'>	<span class="nv">NOW</span><span class="o">=</span><span class="k">$(</span>date +<span class="s2">&quot;%H:%M&quot;</span><span class="k">)</span>
+</span><span class='line'>	sdown <span class="o">||</span> <span class="k">return</span> 1
+</span><span class='line'>	sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -S <span class="k">${</span><span class="nv">SCREENNAME</span><span class="k">}</span> -p <span class="m">0</span> -X stuff <span class="s2">&quot;say Hourly backup for $NOW is starting. The World is no longer saving...$(printf \\r)&quot;</span>
+</span><span class='line'>	sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -S <span class="k">${</span><span class="nv">SCREENNAME</span><span class="k">}</span> -p <span class="m">0</span> -X stuff <span class="s2">&quot;save-off$(printf \\r)&quot;</span>
+</span><span class='line'>	sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -S <span class="k">${</span><span class="nv">SCREENNAME</span><span class="k">}</span> -p <span class="m">0</span> -X stuff <span class="s2">&quot;save-all$(printf \\r)&quot;</span>
+</span><span class='line'>	sleep 5
+</span><span class='line'>	sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> /usr/bin/time -f <span class="s2">&quot;%e sec at %P CPU&quot;</span> -o /tmp/mctime sh -c <span class="s2">&quot;sync; sleep 5; sudo -u ${RUNAS} nice tar czf ${BACKUPDIR}/${PREFIX}$(date +&quot;</span>%d-%m-%Y-%H<span class="s2">&quot;).tar.gz -C ${RAMDISK} .&quot;</span>
+</span><span class='line'>	sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -S <span class="k">${</span><span class="nv">SCREENNAME</span><span class="k">}</span> -p <span class="m">0</span> -X stuff <span class="s2">&quot;save-on$(printf \\r)&quot;</span>
+</span><span class='line'>	sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -S <span class="k">${</span><span class="nv">SCREENNAME</span><span class="k">}</span> -p <span class="m">0</span> -X stuff <span class="s2">&quot;say Hourly backup for $NOW is complete and ran for $(cat /tmp/mctime). The World is saving once more.$(printf \\r)&quot;</span>
+</span><span class='line'>	rm /tmp/mctime
+</span><span class='line'>	<span class="k">if</span> <span class="o">((</span> <span class="m">19</span> &lt;<span class="o">=</span> 10#<span class="nv">$H</span> <span class="o">&amp;&amp;</span> 10#<span class="nv">$H</span> &lt; <span class="m">23</span> <span class="o">))</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>		rot <span class="o">||</span> <span class="k">return</span> 1
+</span><span class='line'>	<span class="k">fi</span>
+</span><span class='line'>	eend <span class="nv">$?</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>rot<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>	<span class="o">[</span> -d <span class="k">${</span><span class="nv">BACKUPDIR</span><span class="k">}</span>/daily-saves <span class="o">]</span> <span class="o">||</span> mkdir -p <span class="k">${</span><span class="nv">BACKUPDIR</span><span class="k">}</span>/daily-saves
+</span><span class='line'>	find <span class="k">${</span><span class="nv">BACKUPDIR</span><span class="k">}</span> -maxdepth <span class="m">1</span> -type f -name <span class="s2">&quot;${PREFIX}$(date -d &quot;</span>yesterday 20:00 <span class="s2">&quot; &#39;+%d-%m-%Y-%H&#39;).tar.gz&quot;</span> <span class="se">\</span>
+</span><span class='line'>		-exec cp <span class="o">{}</span> <span class="k">${</span><span class="nv">BACKUPDIR</span><span class="k">}</span>/daily-saves/daily_<span class="k">$(</span>date -d <span class="s2">&quot;yesterday 20:00 &quot;</span> <span class="s1">&#39;+%d-%m-%Y&#39;</span><span class="k">)</span>.tar.gz <span class="se">\;</span>
+</span><span class='line'>	<span class="k">if</span> <span class="o">[</span> -f <span class="k">${</span><span class="nv">BACKUPDIR</span><span class="k">}</span>/daily-saves/daily_<span class="k">$(</span>date -d <span class="s2">&quot;yesterday 20:00 &quot;</span> <span class="s1">&#39;+%d-%m-%Y&#39;</span><span class="k">)</span>.tar.gz <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>		find <span class="k">${</span><span class="nv">BACKUPDIR</span><span class="k">}</span> -maxdepth <span class="m">1</span> -type f -name <span class="s2">&quot;${PREFIX}$(date -d &quot;</span>yesterday 20:00 <span class="s2">&quot; &#39;+%d-%m-%Y&#39;)-*.tar.gz&quot;</span> -exec rm <span class="o">{}</span> <span class="se">\;</span>
+</span><span class='line'>	<span class="k">else</span>
+</span><span class='line'>		ewarn <span class="s2">&quot;Could not locate yesterday&#39;s daily save. Not rotating yesterday&#39;s hourly saves.&quot;</span>
+</span><span class='line'>	<span class="k">fi</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>rotate<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>	ebegin <span class="s2">&quot;Starting daily backup rotation&quot;</span>
+</span><span class='line'>	rot <span class="o">||</span> <span class="k">return</span> 1
+</span><span class='line'>	eend <span class="nv">$?</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>emptyrestart<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>	sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -S <span class="k">${</span><span class="nv">SCREENNAME</span><span class="k">}</span> -p <span class="m">0</span> -X hardcopy /tmp/<span class="k">${</span><span class="nv">SCREENNAME</span><span class="k">}</span>.dump.1
+</span><span class='line'>	sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -S <span class="k">${</span><span class="nv">SCREENNAME</span><span class="k">}</span> -p <span class="m">0</span> -X stuff <span class="s2">&quot;list$(printf \\r)&quot;</span>
+</span><span class='line'>	<span class="c"># We need to wait for the command to complete, or the diff will we unreliable</span>
+</span><span class='line'>	sleep 1
+</span><span class='line'>	sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -S <span class="k">${</span><span class="nv">SCREENNAME</span><span class="k">}</span> -p <span class="m">0</span> -X hardcopy /tmp/<span class="k">${</span><span class="nv">SCREENNAME</span><span class="k">}</span>.dump.2
+</span><span class='line'>	<span class="nv">NUMP</span><span class="o">=</span><span class="k">$(</span>diff -u /tmp/<span class="k">${</span><span class="nv">SCREENNAME</span><span class="k">}</span>.dump.<span class="o">{</span>1,2<span class="o">}</span> <span class="p">|</span> grep -E <span class="s2">&quot;^\+&quot;</span> <span class="p">|</span> grep -Po <span class="s1">&#39;\d+/\d+&#39;</span> <span class="p">|</span> cut -d<span class="s1">&#39;/&#39;</span> -f1<span class="k">)</span>
+</span><span class='line'>	rm /tmp/<span class="k">${</span><span class="nv">SCREENNAME</span><span class="k">}</span>.dump.<span class="o">{</span>1,2<span class="o">}</span>
+</span><span class='line'>	<span class="k">if</span> <span class="o">[</span> <span class="k">${</span><span class="nv">NUMP</span><span class="k">}</span> -eq <span class="m">0</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>		reload <span class="o">||</span> <span class="k">return</span> 1
+</span><span class='line'>	<span class="k">else</span>
+</span><span class='line'>		ewarn <span class="s2">&quot;There are ${NUMP} player(s) online. Not restarting.&quot;</span>
+</span><span class='line'>	<span class="k">fi</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>watch<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>	<span class="k">if</span> <span class="o">[</span> <span class="k">$(</span>rc-service minecraft status <span class="p">|</span> grep -i <span class="s2">&quot;started&quot;</span> <span class="p">|</span> wc -l<span class="k">)</span> -eq <span class="m">1</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>		einfo <span class="s2">&quot;MC should be running&quot;</span>
+</span><span class='line'>		<span class="k">if</span> ! sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -list <span class="p">|</span> grep -q <span class="s2">&quot;${SCREENNAME}&quot;</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>                	ewarn <span class="s2">&quot;But it is not! Restarting service&quot;</span>
+</span><span class='line'>			sdown <span class="o">||</span> <span class="k">return</span> 1
+</span><span class='line'>			launch <span class="o">||</span> <span class="k">return</span> 1
+</span><span class='line'>		<span class="k">else</span>
+</span><span class='line'>			einfo <span class="s2">&quot;And it is. Good.&quot;</span>
+</span><span class='line'>		<span class="k">fi</span>
+</span><span class='line'>
+</span><span class='line'>	<span class="k">else</span>
+</span><span class='line'>		einfo <span class="s2">&quot;MC is in stopped state. Not doing anything.&quot;</span>
+</span><span class='line'>	<span class="k">fi</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>The <code>init.d</code> script loads settings from a <code>conf.d</code> script. The location for
+this script is <code>/etc/conf.d/minecraft</code>
+<figure class='code'><figcaption><span> (minecraft-conf.d.sh)</span> <a href='/downloads/code/minecraft-conf.d.sh'>download</a></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">BACKUPDIR</span><span class="o">=</span>/mnt/backups/minecraft
+</span><span class='line'><span class="nv">RAMDISK</span><span class="o">=</span>/mnt/ramdisk
+</span><span class='line'><span class="nv">PERSISTDIR</span><span class="o">=</span>/home/remco/minecraft
+</span><span class='line'><span class="nv">PREFIX</span><span class="o">=</span><span class="s2">&quot;mc-backup_&quot;</span>
+</span><span class='line'><span class="nv">RUNAS</span><span class="o">=</span><span class="s2">&quot;remco&quot;</span>
+</span><span class='line'><span class="nv">SCREENNAME</span><span class="o">=</span><span class="s2">&quot;minecraft&quot;</span>
+</span><span class='line'><span class="c">#JARFILE=&quot;minecraft_server.1.8.1.jar&quot;</span>
+</span><span class='line'><span class="c">#JARFILE=&quot;spigot1649.jar&quot;</span>
+</span><span class='line'><span class="nv">JARFILE</span><span class="o">=</span><span class="s2">&quot;spigot-1.8.jar&quot;</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<h2>Finishing up</h2>
+
+<ul>
+<li>Install cronjobs as <code>root</code>:</li>
+</ul>
+
+
+<pre><code># crontab -e
+</code></pre>
+
+<ul>
+<li>Add these lines:
+&#8220;`
+0 * * * *       /etc/init.d/minecraft backup 1> /dev/null</li>
+<li><ul>
+<li><ul>
+<li><ul>
+<li><ul>
+<li><pre><code>/sbin/rc-service minecraft watch 1&gt; /dev/null
+</code></pre>
+
+<p>&#8220;`</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>Set service to start automatically:</p></li>
+</ul>
+
+
+<pre><code>rc-update add minecraft default
+</code></pre>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[Fixing 'Error opening terminal: screen-256color.']]></title>
-    <link href="http://blog.rem.co/blog/2013/06/06/fixing-error-opening-terminal-screen-256color-dot/"/>
+    <link href="https://rem.co/blog/2013/06/06/fixing-error-opening-terminal-screen-256color-dot/"/>
     <updated>2013-06-06T00:00:00+02:00</updated>
-    <id>http://blog.rem.co/blog/2013/06/06/fixing-error-opening-terminal-screen-256color-dot</id>
+    <id>https://rem.co/blog/2013/06/06/fixing-error-opening-terminal-screen-256color-dot</id>
     <content type="html"><![CDATA[<p>If you&rsquo;re using <code>tmux</code> or <code>screen</code> as a wrapper for your terminal sessions (such as when using the <a href="http://www.drbunsen.org/the-text-triumvirate/">Text Triumvirate</a>), chances are that you are presented with the following error when you invoke a command that uses 256 color mode (such as <code>multitail</code> or <code>htop</code>):</p>
 
 <pre><code>Error opening terminal: screen-256color.
@@ -25,173 +683,9 @@
 
 <p>I don&rsquo;t know if this is the recommended solution, but it&rsquo;s a pretty quick fix and seems to work on multiple distributions:</p>
 
-<p><code>
-cd /usr/share/terminfo/
+<pre><code>cd /usr/share/terminfo/
 cp x/xterm-256color s/screen-256color
-</code></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[SELinux: Allowing SSH public key authentication]]></title>
-    <link href="http://blog.rem.co/blog/2013/02/19/selinux-allowing-ssh-public-key-authentication/"/>
-    <updated>2013-02-19T17:03:00+01:00</updated>
-    <id>http://blog.rem.co/blog/2013/02/19/selinux-allowing-ssh-public-key-authentication</id>
-    <content type="html"><![CDATA[<h3>The issue</h3>
-
-<p>I experienced a seemingly weird issue with a freshly installed CentOS server today.</p>
-
-<p>SSH Public key authentication was correctly set up; The <code>sshd_config</code> was properly configured and a <code>~/.ssh/authorized_keys</code> was present with the correct rights and verified correct contents (as the file was yanked from another, working, server with <code>scp</code>).</p>
-
-<p>All attempts to connect to the machine using key authentication silently failed however.</p>
-
-<!-- more -->
-
-
-<p>
-After debugging the usual <code>sshd</code> stuff i noticed the following entries in <code>/var/log/audit/audit.log</code>:</p>
-
-<pre><code>type=USER_AUTH msg=audit(1361289386.691:2344): user pid=22997 uid=0 auid=0 ses=99 subj=unconfined_u:system_r:sshd_t:s0-s0:c0.c1023 msg='op=pubkey acct="root" exe="/usr/sbin/sshd" hostname=? addr=81.81.21.231 terminal=ssh res=failed'
-type=USER_AUTH msg=audit(1361289386.700:2347): user pid=22997 uid=0 auid=0 ses=99 subj=unconfined_u:system_r:sshd_t:s0-s0:c0.c1023 msg='op=pubkey acct="root" exe="/usr/sbin/sshd" hostname=? addr=81.81.21.231 terminal=ssh res=failed'
 </code></pre>
-
-<p>Turns out that SELinux was interfering with the key authentication because there was no security context for the newly created <code>~/.ssh</code> directory.</p>
-
-<h3>The solution</h3>
-
-<p>The fix is pretty easy:</p>
-
-<pre><code>$ restorecon -R -v /root/.ssh
-</code></pre>
-
-<p>After which key authentication started working and the messages in <code>audit.log</code> changed to:</p>
-
-<pre><code>type=USER_AUTH msg=audit(1361289395.365:2351): user pid=22997 uid=0 auid=0 ses=99 subj=unconfined_u:system_r:sshd_t:s0-s0:c0.c1023 msg='op=success acct="root" exe="/usr/sbin/sshd" hostname=? addr=81.81.21.231 terminal=ssh res=success'
-type=USER_AUTH msg=audit(1361289715.705:2378): user pid=23033 uid=0 auid=0 ses=99 subj=unconfined_u:system_r:sshd_t:s0-s0:c0.c1023 msg='op=pubkey_auth rport=41104 acct="root" exe="/usr/sbin/sshd" hostname=? addr=81.81.21.231 terminal=? res=success'
-type=USER_AUTH msg=audit(1361289715.705:2379): user pid=23033 uid=0 auid=0 ses=99 subj=unconfined_u:system_r:sshd_t:s0-s0:c0.c1023 msg='op=key algo=ssh-rsa size=1023 fp=a4:5c:4d:16:61:8c:af:7f:ea:c7:95:ec:15:a9:20:66 rport=41104 acct="root" exe="/usr/sbin/sshd" hostname=? addr=81.81.21.231 terminal=? res=success'
-type=USER_AUTH msg=audit(1361289715.714:2382): user pid=23033 uid=0 auid=0 ses=99 subj=unconfined_u:system_r:sshd_t:s0-s0:c0.c1023 msg='op=success acct="root" exe="/usr/sbin/sshd" hostname=? addr=81.81.21.231 terminal=ssh res=success'
-</code></pre>
-
-<p>Win!</p>
-
-<blockquote><p>No actual IP addresses or fingerprints were harmed during the creation of this article.</p></blockquote>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Ubuntu: Automatically selecting a fast mirror]]></title>
-    <link href="http://blog.rem.co/blog/2013/01/22/ubuntu-automatically-selecting-a-fast-mirror/"/>
-    <updated>2013-01-22T12:04:00+01:00</updated>
-    <id>http://blog.rem.co/blog/2013/01/22/ubuntu-automatically-selecting-a-fast-mirror</id>
-    <content type="html"><![CDATA[<p>Letting Ubuntu pick the <code>apt-get</code> mirror closest to you is pretty easy.</p>
-
-<p>Just add these mirror directives to the top of <code>/etc/apt/sources.list</code> and you&rsquo;re good to go:</p>
-
-<p><code>
-deb mirror://mirrors.ubuntu.com/mirrors.txt precise main restricted universe multiverse
-deb mirror://mirrors.ubuntu.com/mirrors.txt precise-updates main restricted universe multiverse
-deb mirror://mirrors.ubuntu.com/mirrors.txt precise-backports main restricted universe multiverse
-deb mirror://mirrors.ubuntu.com/mirrors.txt precise-security main restricted universe multiverse
-</code></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Munin: failing with Storable error]]></title>
-    <link href="http://blog.rem.co/blog/2013/01/21/munin-failing-with-storable-error/"/>
-    <updated>2013-01-21T17:29:00+01:00</updated>
-    <id>http://blog.rem.co/blog/2013/01/21/munin-failing-with-storable-error</id>
-    <content type="html"><![CDATA[<p>I suffered from a Munin version 2.0.10 installation that refused to update the majority of the graphs. Only the first two of a long list were being updated, the rest all &lsquo;hung&rsquo; at the same moment.</p>
-
-<p>After a little investigating, the problem surfaced:</p>
-
-<p><code>bash
-$ su - munin --shell=/bin/bash munin-cron
-File is not a perl storable at blib/lib/Storable.pm (autosplit into blib/lib/auto/Storable/fd_retrieve.al) line 398, at /usr/lib64/perl5/vendor_perl/5.12.4/Munin/Master/Utils.pm line 362
-File is not a perl storable at blib/lib/Storable.pm (autosplit into blib/lib/auto/Storable/fd_retrieve.al) line 398, at /usr/lib64/perl5/vendor_perl/5.12.4/Munin/Master/Utils.pm line 362
-</code></p>
-
-<!-- more -->
-
-
-<p>I started out by fixing all items the <code>munin-check</code> script suggested, which is always a good starting point.
-Execute the script in a similar fashion as you would do with <code>munin-cron</code>:</p>
-
-<p><code>bash
-$ su - munin --shell=/bin/bash munin-check
-</code>
-Correct all reported errors and check your cron again.</p>
-
-<p>In this particular case this didn&rsquo;t solve the issue however. There appeared to be some <code>.storable</code> files in the munin directory, which sounded like viable suspects according to the error messages:</p>
-
-<p><code>bash
-$ find /var/lib/munin/ -type f | grep storable
-/var/lib/munin/datafile.storable
-/var/lib/munin/htmlconf.storable
-/var/lib/munin/limits.storable
-/var/lib/munin/state-server-server.storable
-</code></p>
-
-<p>Turns out one of these was the culprit, as moving/deleting them fixed the issue; cron has resumed normal operation.
-<code>bash
-$ cd /var/lib/munin/ &amp;&amp; mv *.storable ~
-$ su - munin --shell=/bin/bash munin-cron
-$
-</code></p>
-
-<p>Best part of it is that the data collection doesn&rsquo;t seem to have been interrupted in the meantime; All graphs are up2date and have a complete history. Problem solved!</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Gentoo: Updating and Cleaning]]></title>
-    <link href="http://blog.rem.co/blog/2013/01/16/updating-and-cleaning-your-gentoo-linux-server/"/>
-    <updated>2013-01-16T23:40:00+01:00</updated>
-    <id>http://blog.rem.co/blog/2013/01/16/updating-and-cleaning-your-gentoo-linux-server</id>
-    <content type="html"><![CDATA[<p><img class="left <a" src="href="http://www.gentoo.org/images/gblend.png">http://www.gentoo.org/images/gblend.png</a>" width="100" height="100"> Keeping your Gentoo Linux server up to date isn&rsquo;t as straightforward as let&rsquo;s say an Ubuntu box, where you would just run <code>$ apt-get update &amp;&amp; apt-get upgrade &amp;&amp; apt-get clean</code> for example.</p>
-
-<p>Gentoo is far too flexible for a <em>one size fits all</em> approach. The commands outlined below come pretty close for daily use though:</p>
-
-<p><div><script src='https://gist.github.com/2835011.js'></script>
-<noscript><pre><code>emerge --sync &amp;&amp; emerge -uDNav --with-bdeps=y @world
-emerge --depclean &amp;&amp; revdep-rebuild &amp;&amp; eclean-dist</code></pre></noscript></div>
-</p>
-
-<!-- more -->
-
-
-<p>We start by syncing the portage tree, required to obtain the latest packages.
-After which we update the &ldquo;world&rdquo; group (which would entail all packages currently installed) with a couple of options:</p>
-
-<p>-u : Update</p>
-
-<p>-D : Deep, includes updates to prerequisites for packages registered in your world favorites</p>
-
-<p>-N : NewUSE, checks for changes to your USE flags (usually registered in <code>/etc/make.conf</code>or <code>/etc/portage/package.use</code>)</p>
-
-<p>-a : Ask, will show a dialog asking you of the packages to be merged are OK with you. Very useful when you invoke these commands manually, as I do every day. It gives you a last minute escape in case some crucial (like <code>sys-fs/udev</code>) or large (like <code>sys-devel/gcc</code>) package is about to be merged which you really aren&rsquo;t in the mood for.</p>
-
-<p>-v : Verbose, gives more useful output, including the selected USE flags for packages. (Which enables you to spot obvious errors early on).</p>
-
-<p>&mdash;with-bdeps=y : Includes build time dependencies, and is useful for solving some common merge errors. (This can also be done by setting <code>EMERGE_DEFAULT_OPTS="--with-bdeps=y"</code> in <code>/etc/make.conf</code>)</p>
-
-<p>That should suffice to update about every update-able package on your system.</p>
-
-<p><strong>Always make sure to read <em>and follow</em> the instructions that appear after the merge!</strong><br/>
-This is exactly why the second line is mentioned separately and isn&rsquo;t concatenated after the first; It gives you opportunity to execute the required steps for crucial packages that might otherwise break your system.</p>
-
-<p>After that we proceed with some basic cleanup:</p>
-
-<ul>
-<li>Remove obsolete packages with <code>emerge --depclean</code>.</li>
-<li>Check for broken dependencies/links with <code>revdep-rebuild</code>which will automatically fix the issues.</li>
-<li>Delete obsolete distfiles (downloaded source packages, required to merge the binaries) for packages that no longer exist on the system with <code>eclean-dist</code>.</li>
-</ul>
-
-
-<p>Running the sequence above on a regular schedule should ensure that you have a smooth running system!</p>
-
-<p>Got improvements or comments on the procedure outlined above? I&rsquo;d love to hear them in the comments below.</p>
 ]]></content>
   </entry>
   

@@ -1,0 +1,587 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Git: The Difference Between Lightweight and Annotated Tags - Rem.co: Remco Overdijk</title>
+  <meta name="author" content="Remco Overdijk">
+
+  
+  <meta name="description" content="I was reviewing some pull requests at work today. One of the PR&rsquo;s had an updated composer.lock file. We usually check if the reference matches &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+
+  
+  <link rel="canonical" href="https://rem.co/blog/2015/02/12/git-the-difference-between-lightweight-and-annotated-tags">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Rem.co: Remco Overdijk" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/libs/jquery-3.3.1.min.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="https://fonts.googleapis.com/css?family=Bitter:400,400i,700|Gloria+Hallelujah|PT+Sans:400,400i,700|Raleway:400,900" rel="stylesheet">
+<script src="/javascripts/modernizr-2.0.js" type="text/javascript"></script>
+<script src="/javascripts/libs/jquery-3.3.1.min.js" type="text/javascript"></script>
+<script src="/javascripts/octopress.js" type="text/javascript"></script>
+
+  
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-15985434-12"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-15985434-12');
+  </script>
+
+
+</head>
+
+<body   >
+		 <div id="top">
+  <header role="banner"><hgroup>
+  <h1><a href="/">rem</a></h1>
+    <h2>.co</h2>
+
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS<i class="icon-rss"></i></a></li>
+  
+</ul>
+  
+<form action="https://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:rem.co" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+    <li><a href="/"><i class="icon-pencil"></i>&nbsp;Blog</a></li>
+<li><a href="/blog/archives"><i class="icon-book"></i>&nbsp;Archives</a></li>
+<li><a href="/pictures"><i class="icon-camera"></i>&nbsp;Pictures</a></li>
+<li><a href="/dice"><i class="icon-lock"></i>&nbsp;Diceware</a></li>
+
+</ul>
+
+</nav>
+		 </div>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Git: The Difference Between Lightweight and Annotated Tags</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-02-12T14:05:50+01:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>12</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>2:05 pm</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="https://rem.co">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>I was reviewing some pull requests at work today. One of the PR&rsquo;s had an updated <code>composer.lock</code> file. We usually check if the <code>reference</code> matches the <code>version</code> for this update, to see if that commit is actually released on the module&rsquo;s <code>master</code> branch:</p>
+
+<figure class='code'><figcaption><span>Example of an updated composer.lock</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='diff'><span class='line'>&quot;name&quot;: &quot;company/module_name&quot;,
+</span><span class='line'><span class="gd">- &quot;version&quot;: &quot;0.11.0&quot;,</span>
+</span><span class='line'><span class="gi">+ &quot;version&quot;: &quot;0.12.0&quot;,</span>
+</span><span class='line'>&quot;source&quot;: {
+</span><span class='line'>  &quot;type&quot;: &quot;git&quot;,
+</span><span class='line'>  &quot;url&quot;: &quot;ssh://git@stash.company.net/packages/module_name.git&quot;,
+</span><span class='line'><span class="gd">-    &quot;reference&quot;: &quot;19ecfcb286052457697caad3359d7817e2dfa2f5&quot;</span>
+</span><span class='line'><span class="gi">+    &quot;reference&quot;: &quot;2c539864d72baede7f169f15eec8c3317e26c1bc&quot;</span>
+</span><span class='line'> },
+</span><span class='line'><span class="gd">- &quot;time&quot;: &quot;2014-10-08 11:12:23&quot;</span>
+</span><span class='line'><span class="gi">+ &quot;time&quot;: &quot;2014-11-18 16:47:02&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Usually, this <code>reference</code> matches the hash of the commit we&rsquo;ve tagged as this <code>version</code>. In this particular case however, the hash mentioned in <code>reference</code> was nowhere to be found in the commit log. So what&rsquo;s going on here?</p>
+
+<!-- more -->
+
+
+<p>To investigate, I tried checking out that particular hash:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>git checkout 2c539864d72baede7f169f15eec8c3317e26c1bc
+</span><span class='line'>Note: checking out <span class="s1">&#39;2c539864d72baede7f169f15eec8c3317e26c1bc&#39;</span>.
+</span><span class='line'>
+</span><span class='line'>You are in <span class="s1">&#39;detached HEAD&#39;</span> state. You can look around, make experimental
+</span><span class='line'>changes and commit them, and you can discard any commits you make in this
+</span><span class='line'>state without impacting any branches by performing another checkout.
+</span><span class='line'>
+</span><span class='line'>If you want to create a new branch to retain commits you create, you may
+</span><span class='line'><span class="k">do</span> so <span class="o">(</span>now or later<span class="o">)</span> by using -b with the checkout <span class="nb">command </span>again. Example:
+</span><span class='line'>
+</span><span class='line'>  git checkout -b new_branch_name
+</span><span class='line'>
+</span><span class='line'>HEAD is now at 155ffc0... Merge pull request <span class="c">#3 in packages/module_name from feature/some-feature to master</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>That&rsquo;s funny.. I check out <code>2c53986</code>, but I end up with <code>155ffc0</code>.</p>
+
+<p>If we check the <code>rev-list</code> for that tag, you&rsquo;ll notice that the latest commit is indeed <code>155ffc0</code>:</p>
+
+<figure class='code'><figcaption><span>checking the rev-list for a tag</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>git rev-list 0.12.0  <span class="p">|</span> head -5
+</span><span class='line'>155ffc0169e1c80e029de229d08767d3f7d69adc
+</span><span class='line'>e147d1873da0a66a816ec6578cd6ae9900c4985b
+</span><span class='line'>92471ae1cacf473a45a926a333591fc06750e45f
+</span><span class='line'>19ecfcb286052457697caad3359d7817e2dfa2f5
+</span><span class='line'>38df1fac8d30415fdb2666c1eaaee2d15ff0ae39
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If we check <code>show-ref</code> however, the tag points to a different hash instead:</p>
+
+<figure class='code'><figcaption><span>checking reference for a tag</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>git show-ref --tags <span class="p">|</span> grep 0.12.0
+</span><span class='line'>2c539864d72baede7f169f15eec8c3317e26c1bc refs/tags/0.12.0
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If we do the same for tag <code>0.11.0</code> you&rsquo;ll notice that they both point to the same commit however:</p>
+
+<figure class='code'><figcaption><span>lightweight tags point to the same hash</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>git show-ref --tags <span class="p">|</span> grep 0.11.0
+</span><span class='line'>19ecfcb286052457697caad3359d7817e2dfa2f5 refs/tags/0.11.0
+</span><span class='line'><span class="nv">$ </span>git rev-list 0.11.0  <span class="p">|</span> head -1
+</span><span class='line'>19ecfcb286052457697caad3359d7817e2dfa2f5
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So, what&rsquo;s the difference then? The answer is that there are two distinct types of tags.</p>
+
+<h2>Lightweight and Annotated Tags</h2>
+
+<p><span class='pullquote-right' data-pullquote='So, which one should I use? The short answer is **annotated tags**.'>
+This is all due to the fact that there are two distinct types of tags in git:</p>
+
+<ul>
+<li><strong>Lightweight tags</strong>: A tag that is attached to an existing commit. This merely functions as a pointer to a specific commit, and as such it &lsquo;piggybacks&rsquo; on that commit&rsquo;s hash as identification. This type of tag does not allow you to store any information that specific to the tag.</li>
+<li><strong>Annotated tags</strong>: A tag that has its own commit hash and is, as such, stored as a separate object in git. This tag allows you to store information that is related to this specific tag. You can add a tag message, GPG sign it, and the tagger is stored.</li>
+</ul>
+
+
+<p>So, which one should I use? The short answer is <strong>annotated tags</strong>. <a href="http://stackoverflow.com/questions/4971746/why-should-i-care-about-lightweight-vs-annotated-tags/4971817#4971817">Read this StackOverflow answer to see why</a>, because I can&rsquo;t explain it any clearer than that :)
+</span>
+Creating an annotated tag is easy:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>git tag -s -a -m <span class="s2">&quot;JIRA-11: Include your tag message here&quot;</span> 0.12.0
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li><code>-s</code> will GPG sign your tag. More about this further down.</li>
+<li><code>-a</code> will create an annotated tag.</li>
+<li><code>-m "&lt;message&gt;"</code> will add a tag message.</li>
+<li>If you need to amend / fix / replace an existing tag, you can use the <code>-f</code> parameter to overwrite the current tag.</li>
+</ul>
+
+
+<h2>Why should I care?</h2>
+
+<p>You <em>should</em> care about the advantages of annotated tags. To elaborate, here are three viable use cases:</p>
+
+<h3>Whodunnit</h3>
+
+<p>Take my <code>composer.lock</code> example. We write modules in separate modules, and include those modules using <code>composer</code> in actual projects. If i review a project, I only see the <code>composer.lock</code> file, but don&rsquo;t immediately see the code for the actual module. I need some way to make sure that the code that&rsquo;s being rolled out in the current project is approved and stable. This usually means that I have to dive into the module&rsquo;s code and review that as well. But I&rsquo;m no expert on every single module my company has created, so I&rsquo;m probably not the best reviewer for a (large) number of modules. How do I know that the code has been reviewed and it&rsquo;s all good? I check the <code>tag</code>. If it has been tagged by the module&rsquo;s owner I can rest assured that a proper and thorough review has been done before this release was tagged. Annotated tags make this easy:</p>
+
+<figure class='code'><figcaption><span>Getting information about a tag</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>git show 0.12.0
+</span><span class='line'>
+</span><span class='line'>tag 0.12.0
+</span><span class='line'>Tagger: Remco Overdijk &lt;remco@maxserv.com&gt;
+</span><span class='line'>Date:   Thu Feb <span class="m">12</span> 14:58:11 <span class="m">2015</span> +0100
+</span><span class='line'>
+</span><span class='line'>OPS-227: Release v0.12.0, which includes fixes <span class="k">for</span> OPS-224, PUP-81 and a cherry-pick of 155ffc0
+</span><span class='line'>-----BEGIN PGP SIGNATURE-----
+</span><span class='line'>Version: GnuPG/MacGPG2 v2.0.22 <span class="o">(</span>Darwin<span class="o">)</span>
+</span><span class='line'>Comment: GPGTools - https://gpgtools.org
+</span><span class='line'>
+</span><span class='line'>iQEcBAABCgAGBQJU3LFzAAoJEOmkwfHWjjgAGpkIAJCwZi2gbXHFTPAbaQBvr8gi
+</span><span class='line'>Ds834V02vuMx+dB3rtrYZ4vp+IKxWIYH5hQmgYM7bgQu9yF/3+4xhIP/2n01Mtnu
+</span><span class='line'>C4dWyU5zC/6YciiheOa++4xAg+qLYihXT3uclUJwWBhYNJxV9+lzeGX9RMLAfWAM
+</span><span class='line'>3abcUDCrmIveF9v5SrFu8cEj5/GRGcx8xiVuFiOdvReOZKkkiFq5Jeb+cUkux44q
+</span><span class='line'>yK3tacSVfdPmD9st0WVlOGBB0oaoV/mNd2a/4/fjfn/IUYh+9iMJmvLNtvEmWwEC
+</span><span class='line'><span class="nv">WEj3ehXkuuab9tQ8fDs7ERlzuU1HqPw9b7tX0zfJBnAShEqkpBkCaOXJ3iBlYI0</span><span class="o">=</span>
+</span><span class='line'><span class="o">=</span>dV3m
+</span><span class='line'>-----END PGP SIGNATURE-----
+</span><span class='line'>
+</span><span class='line'>commit 155ffc0169e1c80e029de229d08767d3f7d69adc
+</span><span class='line'>Merge: 19ecfcb e147d18
+</span><span class='line'>Author: Some Developer &lt;devs@company.net&gt;
+</span><span class='line'>Date:   Tue Nov <span class="m">18</span> 17:47:02 <span class="m">2014</span> +0100
+</span><span class='line'>
+</span><span class='line'>    Merge pull request <span class="c">#3 in packages/module_name from feature/some-feature to master</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>As you can see, <code>git show</code> has information about the tag, and specifically <em>who</em> tagged it. Further down, you see the actual commit that this tag is connected to. That commit has a different author, but the tag was done by me, so it should be all good, right? No need to delve into that code any further, so we can move on with our original PR.</p>
+
+<p>In short: Annotated tags give you <em>separation between tagger (reviewer and/or releaser) and author/committer</em>.</p>
+
+<h3>What is contained in this tag?</h3>
+
+<p>Another vital piece of information that is usually contained in the pull request and/or other review docs that may exist is the context of the change set:</p>
+
+<ul>
+<li>Which changes are included in this change set?</li>
+<li>To which JIRA tickets are these changes related?</li>
+<li>Why have we decided to release these changes as a new tag?</li>
+<li>Are any additional actions required to make this release work? (Play-books)</li>
+</ul>
+
+
+<p>As said, we usually document these changes in the PR, which gives a good overview of the entire context. But if you&rsquo;re on the &lsquo;receiving end&rsquo; of the repository, and you don&rsquo;t have access to the review software for instance, that context might not be as clear.</p>
+
+<p>That&rsquo;s why it&rsquo;s a good idea to copy all (or some) details from the PR into the annotated tag message, so a permanent piece of documentation about the how/what/when and why exists in the repository. See the example above for a plausible tag message.</p>
+
+<h3>Whodunnit for paranoid people</h3>
+
+<p>Because, let&rsquo;s face it, everyone should be a bit paranoid these days. How do I know that the tag <em>and/or</em> the repository haven&rsquo;t been tampered with? Everyone can impersonate you in git, as long as they have write access to the <code>origin</code> repository. So let&rsquo;s say that your private key has leaked, a hacker has configured <code>git config user.email</code> with your e-mail address, committed some malware to your repository and moved your tag to a version that includes the malware. <em>That&rsquo;s not good. That&rsquo;s not good at all.</em></p>
+
+<p>Granted, if the above scenario should happen to you, you probably have bigger issues than verifying a tag. But what if you pull in some external changes that you don&rsquo;t quite trust? Or what if one of your enterprise customers wants to ensure that they pull in a verified set of changes onto their platforms?</p>
+
+<p>That&rsquo;s why you GPG sign your tags. Remember that <code>-s</code> parameter we&rsquo;ve added?
+During creation of the tag you&rsquo;ll notice this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>You need a passphrase to unlock the secret key <span class="k">for</span>
+</span><span class='line'>user: <span class="s2">&quot;Remco Overdijk &lt;remco@maxserv.com&gt;&quot;</span>
+</span><span class='line'>2048-bit RSA key, ID D68E3800, created 2013-10-02 <span class="o">(</span>main key ID D90A625D<span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>and in the <code>git show</code> example above you&rsquo;ll notice that a PGP signature was included. We can use this information to verify if the <code>tag</code> was intact (not tampered with), and that it was actually signed by someone we know <strong>and trust</strong>:</p>
+
+<figure class='code'><figcaption><span>verifying a tag</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>git verify-tag 0.12.0
+</span><span class='line'>gpg: Signature made <span class="k">do</span> <span class="m">12</span> feb 14:58:11 <span class="m">2015</span> CET using RSA key ID D68E3800
+</span><span class='line'>gpg: Good signature from <span class="s2">&quot;Remco Overdijk &lt;remco@maxserv.com&gt;&quot;</span>
+</span><span class='line'>gpg:                 aka <span class="s2">&quot;Remco Overdijk &lt;remco@maxserv.nl&gt;&quot;</span>
+</span><span class='line'>gpg:                 aka <span class="s2">&quot;keybase.io/remz &lt;remz@keybase.io&gt;&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Yes, that tag has a good signature, and it was signed by me, whom I explicitly added to my GPG web of trust.</p>
+
+<p>So, now you know how and why. Start using annotated tags!</p>
+
+<blockquote><p>Certain details, messages, addresses and hashes in this article have been altered to protect company specific details.</p></blockquote>
+
+
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Remco Overdijk</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2015-02-12T14:05:50+01:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>12</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>2:05 pm</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/git/'>git</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/02/09/bacula-cancelling-all-jobs-that-are-currently-writing/" title="Previous Post: Bacula: Cancelling all jobs that are currently writing">&laquo; Bacula: Cancelling all jobs that are currently writing</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2015/03/09/puppet-calculating-average-catalog-compilation-times/" title="Next Post: Puppet: Calculating average catalog compilation times">Puppet: Calculating average catalog compilation times &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1><i class="icon-user icon-large"></i>&nbsp;About Me</h1>
+	<div id="so">
+	<a href="https://stackoverflow.com/users/813718/remco-overdijk">
+		<img src="https://stackoverflow.com/users/flair/813718.png" width="208" height="58" alt="profile for Remco Overdijk at Stack Overflow, Q&amp;A for professional and enthusiast programmers" title="profile for Remco Overdijk at Stack Overflow, Q&amp;A for professional and enthusiast programmers">
+	</a>
+	</div>
+</section>
+<section>
+  <h1><i class="icon-pencil icon-large"></i>&nbsp;Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/03/09/puppet-calculating-average-catalog-compilation-times/">Puppet: Calculating Average Catalog Compilation Times</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/02/12/git-the-difference-between-lightweight-and-annotated-tags/">Git: The Difference Between Lightweight and Annotated Tags</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/02/09/bacula-cancelling-all-jobs-that-are-currently-writing/">Bacula: Cancelling All Jobs That Are Currently Writing</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/01/15/bacula-purging-and-deleting-old-volumes/">Bacula: Purging and Deleting Old Volumes</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/01/14/music-end-of-the-year-mix-2014/">Music: End of the Year Mix 2014</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1><i class="icon-twitter icon-large"></i>&nbsp;Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  <script type="text/javascript">
+     $(document).ready(function(){
+      getTwitterFeed("RemzJay", 5, 0);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <p>Follow <a href="http://twitter.com/RemzJay">@RemzJay</a></p>
+  
+</section>
+
+
+<section>
+  <h1><i class="icon-github-alt icon-large"></i>&nbsp;GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/Remz-Jay">@Remz-Jay</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'Remz-Jay',
+            count: 10,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+<section class="flickr">
+    <h1><i class="icon-camera icon-large"></i>&nbsp;Flickr Albums</h1>
+		<ul id="flickrsets">
+          <li><a href="https://www.flickr.com/photos/93556621@N05/21961762008" target="_blank"><img src="https://farm6.staticflickr.com/5634/21961762008_7d225b59ba_n.jpg" class="aside-flickr" title="The bus"/></a><h2><a href="https://www.flickr.com/photos/93556621@N05/21961762008">NYC in B/W</a></h2><p></p></li><li><a href="https://www.flickr.com/photos/93556621@N05/21738387919" target="_blank"><img src="https://farm6.staticflickr.com/5627/21738387919_2f513ec807_n.jpg" class="aside-flickr" title="IMG_4732.jpg"/></a><h2><a href="https://www.flickr.com/photos/93556621@N05/21738387919">USA 2015</a></h2><p></p></li><li><a href="https://www.flickr.com/photos/93556621@N05/8519041005" target="_blank"><img src="https://farm9.staticflickr.com/8085/8519041005_d09c9c4cf6_n.jpg" class="aside-flickr" title="IMG_7581.jpg"/></a><h2><a href="https://www.flickr.com/photos/93556621@N05/8519041005">Vietnam 2011</a></h2><p>Backpacking trip through Thailand and Vietnam (North to South) by train and bus. </p></li>
+    </ul>
+</section>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p id="copyright">
+    &copy; 2018 - <a href="https://rem.co">Remco Overdijk</a><br/>
+    <span class="credit">Powered by <a href="http://octopress.org">Octopress</a>.</span>
+</p>
+<div id="fcontent">
+    <div id="fmenu">
+        <div class="fcol">
+            <h3>Navigation</h3>
+            <ul class="footer-navigation">
+                <li><a href="/"><i class="icon-pencil"></i>&nbsp;Blog</a></li>
+<li><a href="/blog/archives"><i class="icon-book"></i>&nbsp;Archives</a></li>
+<li><a href="/pictures"><i class="icon-camera"></i>&nbsp;Pictures</a></li>
+<li><a href="/dice"><i class="icon-lock"></i>&nbsp;Diceware</a></li>
+
+            </ul>
+        </div>
+        <div class="fcol">
+            <h3>Websites</h3>
+            <ul>
+                <li><a href="https://rem.co"><i class="icon-globe"></i>&nbsp;Rem.co</a></li>
+                <li><a href="http://overdijk.io"><i class="icon-globe"></i>&nbsp;Overdijk.io</a></li>
+                <li><a href="http://www.remz-jay.org"><i class="icon-globe"></i>&nbsp;Remz-Jay.org</a></li>
+                <li><a href="http://www.remz.nl"><i class="icon-globe"></i>&nbsp;Remz.nl</a></li>
+                <li><a href="http://remc.onl"><i class="icon-globe"></i>&nbsp;Remc.onl</a></li>
+                <li><a href="http://www.twitupdate.com"><i class="icon-globe"></i>&nbsp;Twitupdate</a></li>
+                <li><a href="http://www.socialmediascanner.com"><i class="icon-globe"></i>&nbsp;SocialMediaScanner</a></li>
+            </ul>
+        </div>
+        <div class="fcol">
+            <h3>Social Media</h3>
+            <ul>
+                <li><a href="http://twitter.com/remzjay"><i class="icon-twitter"></i>&nbsp;RemzJay on Twitter</a></li>
+                <li><a href="http://facebook.com/remco-overdijk"><i class="icon-facebook"></i>&nbsp;Remco-Overdijk on Facebook</a></li>
+                <li><a href="http://www.linkedin.com/in/remcooverdijk"><i class="icon-linkedin"></i>&nbsp;Remco Overdijk on LinkedIn</a></li>
+                <li><a href="https://github.com/Remz-Jay"><i class="icon-github-alt"></i>&nbsp;Remz-Jay on GitHub</a></li>
+                <li><a href="http://open.spotify.com/user/remzjay"><i class="icon-music"></i>&nbsp;RemzJay on Spotify</a></li>
+                <li><a href="https://keybase.io/remz"><i class="icon-globe"></i>&nbsp;Remz on Keybase.io</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'rem-co';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'https://rem.co/blog/2015/02/12/git-the-difference-between-lightweight-and-annotated-tags/';
+        var disqus_url = 'https://rem.co/blog/2015/02/12/git-the-difference-between-lightweight-and-annotated-tags/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

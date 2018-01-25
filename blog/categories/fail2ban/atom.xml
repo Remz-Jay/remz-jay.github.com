@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: fail2ban | Rem.co: Remco Overdijk]]></title>
+  <link href="https://rem.co/blog/categories/fail2ban/atom.xml" rel="self"/>
+  <link href="https://rem.co/"/>
+  <updated>2018-01-25T14:17:37+01:00</updated>
+  <id>https://rem.co/</id>
+  <author>
+    <name><![CDATA[Remco Overdijk]]></name>
+    <email><![CDATA[remco@rem.co]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Fail2Ban PhpMyAdmin script]]></title>
+    <link href="https://rem.co/blog/2009/12/09/fail2ban-phpmyadmin-script/"/>
+    <updated>2009-12-09T16:44:27+02:00</updated>
+    <id>https://rem.co/blog/2009/12/09/fail2ban-phpmyadmin-script</id>
+    <content type="html"><![CDATA[<p>While examining my webserver statistics, I noticed that quite a lot 404&rsquo;s are being served on most of my domains to scan bots that are trying to find exploits in possible running PHPMyAdmin configurations.
+ Though harmless if you keep a clean ship with a decently configured PHPMyAdmin and the latest updates like I do, I still decided I couldn&rsquo;t let this behaviour unanswered. So I took action, and wrote a small fail2ban filter that permanently drops all traffic from the IP addresses these scans originate from, like I do with every address that misbehaves in any way.</p>
+
+<p> The regex used won&rsquo;t capture all attempts, but with my configuration only 1 hit is enough to get you banned (the scripts these scans call are <code>main.php</code> and <code>config.inc.php</code>, which aren&rsquo;t to be called directly, especially not when they fail with a 404 like these), and all scanning attempts I&rsquo;ve seen so far cycle through at least 20 different combinations.</p>
+
+<p> Well, enough talk, here is the <code>filter.d</code> file:</p>
+
+<pre><code class="ini filter.d"> # Fail2Ban configuration file
+ #
+ # Author: Remco Overdijk
+ #
+ # $Revision: 4 $
+ #
+
+ [Definition]
+
+ # Option:  failregex
+ # Notes.:  regex to match the 404'ed PMA file in the logfile. The
+ #          host must be matched by a group named 'host'. The tag '&lt;HOST&gt;' can
+ #          be used for standard IP/hostname matching and is only an alias for
+ #          (?:::f{4,6}:)?(?P&lt;host&gt;\S+)
+ # Values:  TEXT
+ #
+ failregex = &lt;HOST&gt; -.*'GET .*(php|pma|PMA|p/m/a|db|sql|admin).*/(config/config\.inc|main)\.php.*'.*404.*
+
+ # Option:  ignoreregex
+ # Notes.:  regex to ignore. If this regex matches, the line is ignored.
+ # Values:  TEXT
+ #
+ ignoreregex =
+</code></pre>
+
+<p>And this is of course accompanied by a bit in <code>jail.conf</code>:</p>
+
+<pre><code class="ini jail.conf">[apache-pma]
+
+ enabled = true
+ filter = apache-pma
+ action = iptables-allports[name=pma]
+ mail-whois[name=pma, dest=&lt;YOURADDRHERE&gt;]
+ logpath = /var/log/apache2/access_log
+ bantime = -1
+ maxretry = 1
+</code></pre>
+
+<p>Works for me, another 20 additional IPs/day onto the shitlist!</p>
+
+<h4>Update:</h4>
+
+<p> It seems another variation of these scans are hitting the NIC&rsquo;s quite often; One for Zen Cart to be more precise.
+ You can easily add support countering this scanner as well, simply by expanding the failregex with this line:</p>
+
+<p><code>^&lt;HOST&gt; -.*'GET .*(cart|boutique|catalog|butik|shop|zen|store).*/install\.txt.*'.*404.*</code></p>
+
+<p> You can put multiple regexes within one failregex, just put each one on a new line.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Iptables: Creating persistent bans from Fail2Ban]]></title>
+    <link href="https://rem.co/blog/2009/08/18/iptables-creating-persistent-bans-from-fail2ban/"/>
+    <updated>2009-08-18T15:53:10+02:00</updated>
+    <id>https://rem.co/blog/2009/08/18/iptables-creating-persistent-bans-from-fail2ban</id>
+    <content type="html"><![CDATA[<p>On my servers I use the nifty program <a href="http://www.fail2ban.org/wiki/index.php/Main_Page">Fail2Ban</a> to perform logbased automatic firewalling of &lsquo;bad&rsquo; ip&rsquo;s.</p>
+
+<p>The idea behind this is easy: Some IP performs an action I don&rsquo;t approve of. This can be any number of things, e.g. requesting pages in Apache that are commonly accessed by bots and/or scanners, or trying to log in to SSH with accounts that do not exist on the system. This bad behavior gets logged, and Fail2Ban keeps tabs on those logs, and using a number of rules it determines if a host is &lsquo;bad&rsquo; enough to temporarily or permanently ban all access to the server. It does so by adding a few chains to Iptables (one for each thing it checks for), and dynamically adding/removing IP&rsquo;s to/from these chains.</p>
+
+<p>This all works perfectly. However, there&rsquo;s one issue; When Iptables gets reloaded, it restores its default rules, removing the Fail2Ban chains and all the rules they contain, even if the ip&rsquo;s in the chain were marked as permanent.</p>
+
+<p>I created a workaround for this problem, consisting of two simple steps:</p>
+
+<ul>
+<li><p>When a &lsquo;bad&rsquo; ip gets banned, it&rsquo;s added to the Iptables chain, but also written to a file, containing all collected &lsquo;bad&rsquo; ip&rsquo;s. (I use <code>/etc/shitlist</code> for this purpose).</p></li>
+<li><p>Whenever Iptables gets reloaded, I run a PHP script that checks the <code>/etc/shitlist</code> file for &lsquo;safe&rsquo; and duplicate ip&rsquo;s, and writes all other ip&rsquo;s to the permanent Blocklist chain. (The checking for &lsquo;safe&rsquo; ip&rsquo;s might be a bit unneeded, but with my Fail2Ban rules it&rsquo;s possible that one of my own ip&rsquo;s gets banned for 10 minutes if a SSH login attempt fails for 5 times. Though it&rsquo;s a temporary ban, the ip will still get written to the shitlist, and would end up in the permanent Blocklist).</p></li>
+</ul>
+
+
+<p>To make this work, I made the following changes:</p>
+
+<p>Every <code>jail</code> in Fail2Ban uses an <code>action.d</code> script to perform (un)banning. I defaulted all actions to an action script called <code>iptables-allports.conf</code>. Basically this action drops everything in Iptables if a package originates from the &lsquo;bad&rsquo; IP.</p>
+
+<p>I updated the ban action such that:</p>
+
+<pre><code>actionban = iptables -I fail2ban-&lt;name&gt; 1 -s &lt;ip&gt; -j DROP
+echo &lt;ip&gt; &gt;&gt; /etc/shitlist
+</code></pre>
+
+<p>After that I created a PHP script that updates Iptables with the ip&rsquo;s contained in the shitlist:</p>
+
+<pre><code class="php shitlist.php">&lt;?php 
+/** script that loads a shitlist file into iptables */ 
+//CONFIG 
+$shitlists = array("/root/list.txt","/etc/shitlist");
+$chain = "Blocklist";
+$safelist = array("x.x.x.x", "y.y.y.y", "z.z.z.z");
+
+echo "Reading current IPTABLES state\r\n";
+$data = shell_exec('iptables -S '.$chain);
+$iparr = explode(' ',$data);
+$j = 0;
+$ref = array();
+for($i=0;$i&lt;sizeof($iparr);$i++) {
+    if(substr_count($iparr[$i],".")==3) {
+        $ref[$j] = $iparr[$i];
+         $j++;
+     }
+}
+sort($ref);
+$total = 0;
+foreach($shitlists as $shitlist) {
+    echo "Reading shitlist at $shitlist\r\n";
+    //READ FILE
+    $fh = fopen($shitlist,'r');
+    if($fh) {
+        $itt = 0;
+        $iparr = array();
+        while(!feof($fh)) {
+            $ip = trim(fgets($fh));
+            if(strlen($ip)&gt;6) {
+                if(array_search($ip,$iparr)===false&amp;&amp;array_search($ip,$safelist)===false&amp;&amp;array_search($ip."/32",$ref)===false) {
+                    $iparr[] = $ip;
+                    echo "Now adding $ip to $chain\r\n";
+                    $ins = 18+$itt;
+                    shell_exec("iptables -I ".$chain." ".$ins." -s ".$ip."/32 -j DROP");
+                    $itt++;
+                }
+            }
+        }
+        fclose($fh);
+        echo "Finished adding $itt ip's from list $shitlist to chain $chain . Bye!\r\n";
+        $total = $total + $itt;
+    } else {
+        echo "Could not open shitlist file $shitlist . Skipping this list\r\n";
+    }
+}
+echo "Finished adding $total ip's to chain $chain from ".sizeof($shitlists)." shitlists.\r\n";
+?&gt; 
+</code></pre>
+
+<p>You can run the script from the commandline (as root!) simply by stating <code>php shitlist.php</code>, or add it to the startup script of your Iptables installation.</p>
+
+<p>Hope this helps keeping your NIC&rsquo;s available for VALID traffic!</p>
+
+<h3>Update:</h3>
+
+<p>Made some changes to the script to check for already existing bans, to keep your chains clean!</p>
+
+<h3>Update 2:</h3>
+
+<p>Little tweak to the script so it now loads an array of lists, in case you have various sources.</p>
+]]></content>
+  </entry>
+  
+</feed>

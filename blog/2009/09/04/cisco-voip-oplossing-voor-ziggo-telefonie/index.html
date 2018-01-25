@@ -1,0 +1,660 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Cisco VoIP Oplossing Voor Ziggo Telefonie - Rem.co: Remco Overdijk</title>
+  <meta name="author" content="Remco Overdijk">
+
+  
+  <meta name="description" content="This article is only available in Dutch. Sinds een recente verhuizing beschik ik thuis over een Ziggo Alles-in-1 Plus pakket, met internet, tv, én &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+
+  
+  <link rel="canonical" href="https://rem.co/blog/2009/09/04/cisco-voip-oplossing-voor-ziggo-telefonie">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Rem.co: Remco Overdijk" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/libs/jquery-3.3.1.min.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="https://fonts.googleapis.com/css?family=Bitter:400,400i,700|Gloria+Hallelujah|PT+Sans:400,400i,700|Raleway:400,900" rel="stylesheet">
+<script src="/javascripts/modernizr-2.0.js" type="text/javascript"></script>
+<script src="/javascripts/libs/jquery-3.3.1.min.js" type="text/javascript"></script>
+<script src="/javascripts/octopress.js" type="text/javascript"></script>
+
+  
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-15985434-12"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-15985434-12');
+  </script>
+
+
+</head>
+
+<body   >
+		 <div id="top">
+  <header role="banner"><hgroup>
+  <h1><a href="/">rem</a></h1>
+    <h2>.co</h2>
+
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS<i class="icon-rss"></i></a></li>
+  
+</ul>
+  
+<form action="https://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:rem.co" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+    <li><a href="/"><i class="icon-pencil"></i>&nbsp;Blog</a></li>
+<li><a href="/blog/archives"><i class="icon-book"></i>&nbsp;Archives</a></li>
+<li><a href="/pictures"><i class="icon-camera"></i>&nbsp;Pictures</a></li>
+<li><a href="/dice"><i class="icon-lock"></i>&nbsp;Diceware</a></li>
+
+</ul>
+
+</nav>
+		 </div>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Cisco VoIP Oplossing Voor Ziggo Telefonie</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2009-09-04T11:39:48+02:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2009</span></span> <span class='time'>11:39 am</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="https://rem.co">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><blockquote><p>This article is only available in Dutch.</p></blockquote>
+
+
+<p>Sinds een recente verhuizing beschik ik thuis over een Ziggo Alles-in-1 Plus pakket, met internet, tv, én telefonie.</p>
+
+<p>Daarvoor maakte ik gebruik van een Cisco VoIP netwerk op basis van een externe SIP provider. Natuurlijk wilde ik mijn Cisco netwerk blijven gebruiken, maar dan wel op basis van de Ziggo telefonie aansluiting.</p>
+
+<p>Helaas maakt Ziggo gebruik van het <a href="http://en.wikipedia.org/wiki/PacketCable">PacketCable</a> protocol over <a href="http://en.wikipedia.org/wiki/DOCSIS">EuroDocsis</a>, in plaats van <a href="http://en.wikipedia.org/wiki/Session_Initiation_Protocol">SIP</a>.
+Daarnaast heeft het Motorola SurfBoard modem dat bij het Ziggo abonnement geleverd wordt geen SIP interface voor het LAN, maar beschikt over 2 <a href="http://en.wikipedia.org/wiki/Plain_old_telephone_service">POTS</a> poorten op <a href="http://en.wikipedia.org/wiki/RJ11,_RJ14,_RJ25">RJ11</a> connectoren.</p>
+
+<p>Alsof dat nog niet genoeg ellende is maakt Ziggo <em>geen</em> gebruik van <a href="http://en.wikipedia.org/wiki/Dual-tone_multi-frequency">DTMF ETSI</a> signalering voor onder andere nummerweergave, maar in plaats daarvan het veel minder bekende <a href="http://en.wikipedia.org/wiki/FSK_standards_for_use_in_Caller_ID_and_remote_metering">Bellcore FSK</a>.</p>
+
+<p>Goed, tot zover de met technische termen bezaaide probleemvorming. Tijd voor een oplossing om je mooie VoIP apparatuur aan de gang te krijgen! Er zijn naar mijn ervaring bijzonder weinig how-to&rsquo;s / handleidingen of tutorials te vinden op het internet om een dergelijke setup te maken, en de informatie over het Ziggo netwerk is zo mogelijk nog beperkter, vandaar deze uitgebreide uitleg om voor eens en altijd van dat probleem af te zijn!</p>
+
+<h3>De basis</h3>
+
+<p> Als basis voor deze tutorial gebruik ik de volgende hardware:</p>
+
+<ul>
+<li><a href="http://www.cisco.com/en/US/products/hw/routers/ps221/products_data_sheet09186a00800920f2.html">Cisco 1760-V Modular Access Router</a></li>
+<li><a href="http://www.cisco.com/en/US/products/hw/phones/ps379/ps1854/">Cisco 7940 IP-Phones</a></li>
+<li><a href="http://www.cisco.com/en/US/products/ps5946/">Cisco 7971GE IP-Phones</a></li>
+<li><a href="http://www.motorola.com/staticfiles/Business/Products/Modems%20and%20Gateways/Modems/Digital%20Voice%20Modems/SBV5121/_Documents/Static%20Files/SBV5121e-data-sheet-534281-001-a.pdf">Motorola SBV5121e VoIP Cable Modem</a></li>
+</ul>
+
+
+<p>Naast deze hardware heb ik nog een tweede router (voor o.a. Wireless) en de nodige switching apparatuur draaien, maar dat maakt voor het doel van deze tutorial weinig uit.</p>
+
+<p>Een schematische weergave van de aan elkaar geknoopte hardware:</p>
+
+<p><em>insert image</em></p>
+
+<h3>Stap 1: De hardware verbindingen</h3>
+
+<p> De meest ideale situatie zou zijn om de (digitale) VoIP toestellen digitaal via SIP of een ander protocol met Ziggo te verbinden om zo de beste gesprekskwaliteit en de laagste latency te krijgen. Helaas is dit dus niet mogelijk in combinatie met het Motorola modem, en zijn we veroordeeld tot het gebruik van analoge lijnen.
+ Gelukkig beschikt de Cisco 1760 router over de mogelijkheid om aangesloten te worden op PSTN lijnen doormiddel van een Voice Interface Card.
+ Om van deze mogelijkheid gebruik te maken moet je router over een aantal zaken beschikken:</p>
+
+<ul>
+<li>De mogelijkheid om VIC&rsquo;s te plaatsen</li>
+<li>Een PVDM kaart waarop een DSP chip aanwezig is om van je router een Voice Gateway te maken. (In dit voorbeeld wordt een <code>PVDM-256k-4=</code> gebruikt)</li>
+<li>De IOS versie op de router dient over het <code>IP Voice feature pack</code> te beschikken. (In dit voorbeeld wordt <code>IOS (C1700-ADVENTERPRISEK9-M) Version 12.4(15)T5 (fc4)</code> gebruikt, die daar naast Cisco Unified Call Manager ook over beschikt)</li>
+</ul>
+
+
+<p> De VIC die je vervolgens nodig hebt is van het Foreign Exchange Office (<code>FXO</code>) type. Andere typen als Ear&amp;Mouth (<code>E/M</code>) en Foreign Exchange Subscriber (<code>FXS</code>) zijn voor dit doeleinde <em>NIET</em> geschikt, en kunnen tevens niet gelijktijdig op dezelfde router gebruikt worden. Maak dus niet dezelfde fout als ik door een <code>VIC-2E/M</code> aan te schaffen omdat deze vrij goedkoop zijn, in de hoop dat het werkt.. want het werkt niet! Helaas is de <code>FXO</code> kaart de duurste van de collectie, zeker als je nummerweergave wilt. Een overzicht van alle beschikbare FXO kaarten kun je vinden bij <a href="http://www.cisco.com/en/US/products/hw/routers/ps274/products_tech_note09186a00800b53c7.shtml">Cisco</a>. Mijn advies is om de <code>VIC2-2FXO</code> te nemen, aangezien deze over alle benodigde opties beschikt (helaas wel de duurste kaart met 2 poorten).</p>
+
+<p> Goed, <code>PVDM</code> en <code>VIC</code> in de router, opstarten, en de analoge telefoonlijnen met RJ11 pluggen van de 2 <code>VIC</code> poorten naar de 2 poorten op het modem verbinden en we zijn klaar om te configureren!</p>
+
+<h3>Stap 2: Router configuratie</h3>
+
+<p> Gebruik je favoriete protocol om in te loggen op je router (RS232, ssh of telnet), zet de router in enable mode, en check of je PVDM en VIC actief zijn en werken en check gelijk op welke poorten ze zitten. De VIC2-2FXO zit in dit voorbeeld in slot 2, en beschikt over voice-ports 2/0 en 2/1.
+ Ga vervolgens verder met de configuratie van het geheel via <code>conf t</code>. Ik ga er van uit dat de basis van je router goed is ingesteld, en ga dus alleen in op de voice settings.</p>
+
+<h4>voice card</h4>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>trunk group pots
+</span><span class='line'> hunt-scheme round-robin
+</span><span class='line'> !</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We maken een hunt group aan voor de analoge lijnen, zodat de router zelf bepaalt welke lijn vrij is en deze voor inkomende/uitgaande oproepen gebruikt.</p>
+
+<h4>voice ports</h4>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>voice-port 2/0
+</span><span class='line'> trunk-group pots
+</span><span class='line'> cptone JP
+</span><span class='line'> connection plar 1337
+</span><span class='line'> caller-id enable
+</span><span class='line'> !
+</span><span class='line'> voice-port 2/1
+</span><span class='line'> trunk-group pots
+</span><span class='line'> cptone JP
+</span><span class='line'> connection plar 1337
+</span><span class='line'> caller-id enable
+</span><span class='line'> !</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Configureer beide voice-ports, en voeg ze aan de trunk group toe. Zet caller-id aan. De cptone parameter geeft aan wat voor landinstellingen de PSTN lijn gebruikt. Normaal gesproken zou dit NL zijn voor gebruik in Nederland, maar aangezien normale PSTN lijnen hier DTMF ETSI gebruiken werkt dat niet voor onze doeleinden. Daarom gebruiken we JP (Japan), aangezien daar FSK gebruikt wordt. Het klinkt wat vreemd, maar werkt perfect. Tenslotte voegen we een &quot;private line automatic ringdown&quot; (PLAR) toe op de lijnen. Hiermee zorgen we dat wanneer een oproep binnenkomt op de lijn, deze automatisch wordt doorgeschakeld naar de opgegeven PLAR lijn. De opgegeven PLAR lijn is in dit geval een Overlay voor de ephone DN&rsquo;s die we later zullen configureren. In het kort komt het erop neer dat zodra de lijn gebeld wordt de Overlay wordt aangeroepen, en alle toestellen die gekoppeld zijn aan de DN zullen overgaan.</p>
+
+<h4>codecs</h4>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>voice class codec 1
+</span><span class='line'> codec preference 1 g711ulaw
+</span><span class='line'> codec preference 2 g711alaw
+</span><span class='line'> !</span></code></pre></td></tr></table></div></figure>
+
+
+<p> Niet zo belangrijk voor dit voorbeeld, maar toch is het handig om in te stellen welke codecs gebruikt worden binnen het VoIP netwerk (bellen tussen de toestellen onderling). de PVDM DSP handelt verder de codecs voor de analoge lijnen af.</p>
+
+<h4>dial-peers</h4>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>dial-peer voice 1 pots
+</span><span class='line'> trunkgroup pots
+</span><span class='line'> preference 7
+</span><span class='line'> destination-pattern 0[1-9]........
+</span><span class='line'> incoming called-number .
+</span><span class='line'> no digit-strip
+</span><span class='line'> forward-digits all
+</span><span class='line'> !
+</span><span class='line'> dial-peer voice 2 pots
+</span><span class='line'> trunkgroup pots
+</span><span class='line'> destination-pattern 00[1-9]..........
+</span><span class='line'> incoming called-number .
+</span><span class='line'> no digit-strip
+</span><span class='line'> forward-digits all
+</span><span class='line'> !
+</span><span class='line'> dial-peer voice 3 pots
+</span><span class='line'> trunkgroup pots
+</span><span class='line'> destination-pattern 1233
+</span><span class='line'> incoming called-number .
+</span><span class='line'> no digit-strip
+</span><span class='line'> forward-digits all
+</span><span class='line'> !</span></code></pre></td></tr></table></div></figure>
+
+
+<p> Voeg dial-peers toe voor alle inkomende en uitgaande belpatronen. Voor het gemak gebruiken alle dial-peers hier hetzelfde inkomende patroon (.), om het binnenkomende gesprek rechtstreeks zonder modificatie door te zetten naar de PLAR. De dial-peers dienen uiteraard net als de lijnen gekoppeld te worden aan de trunk group.
+ De destination-patterns geven aan welke telefoonnummers geldig zijn, en indien een gedraaid nummer voldoet aan één van de patterns wordt het gesprek doorgezet naar de trunk, en zal dus gebruik maken van één van de PSTN lijnen. De opgegeven patterns zijn alles behalve compleet, maar dekken in ieder geval de volgende situaties:</p>
+
+<ul>
+<li>Een 10 cijferig telefoonnummer, beginnend met een 0, gevolgd door een 1 tot 9 en vervolgens nog 8 random cijfers. (Bijv. 0131212121)</li>
+<li>Een 13 cijferig internationaal telefoonnummer, beginnend met 00, gevolgd door een 1 tot 9 en nog 10 random cijfers. (Bijv. 0031131212121)</li>
+<li>Het nummer van de Ziggo voicemail, 1233.</li>
+</ul>
+
+
+<p>Standaard stript de dial-peer opgegeven dialpatterns van het nummer af alvorens deze door te geven, dus gebruiken we no digit-strip om dit te voorkomen. Tenslotte zorgen we dat alle overige gedraaide nummers (right-justified) worden doorgezet naar de PSTN lijn.</p>
+
+<h4>telephony service</h4>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>telephony-service
+</span><span class='line'> load 7960-7940 P000308000400
+</span><span class='line'> load 7971 SCCP70.8-2-2SR1S
+</span><span class='line'> load 7970 SCCP70.8-2-2SR1S
+</span><span class='line'> max-ephones 5
+</span><span class='line'> max-dn 5
+</span><span class='line'> ip source-address 10.0.0.5 port 2000
+</span><span class='line'> auto assign 1 to 5
+</span><span class='line'> calling-number initiator
+</span><span class='line'> system message ccme1 ready..
+</span><span class='line'> url services http://10.0.0.35:8080/CSFEnterprise-war/
+</span><span class='line'> cnf-file perphone
+</span><span class='line'> network-locale NL
+</span><span class='line'> time-zone 28
+</span><span class='line'> time-format 24
+</span><span class='line'> date-format dd-mm-yy
+</span><span class='line'> voicemail 1233
+</span><span class='line'> max-conferences 4 gain -6
+</span><span class='line'> moh rick.au
+</span><span class='line'> transfer-system full-consult dss
+</span><span class='line'> create cnf-files version-stamp 7960 Apr 17 2009 09:02:53
+</span><span class='line'> !</span></code></pre></td></tr></table></div></figure>
+
+
+<p> Configureer je VoIP telephony service naar eigen inzicht. Bovenstaande configuratie is slechts een voorbeeld van mijn eigen configuratie. Zaken waar je op moet letten zijn of je loads goed gespecificeerd zijn (denk ook aan de tftp statements), het voicemail nummer (in dit geval extern naar Ziggo) voor wanneer op de Berichten knop op de telefoon wordt gedrukt, en de land instellingen.</p>
+
+<h4>DN&rsquo;s</h4>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>ephone-dn 1
+</span><span class='line'> number 1234
+</span><span class='line'> label Woonkamer
+</span><span class='line'> description 013xxxxxxx
+</span><span class='line'> name Woonkamer
+</span><span class='line'> call-forward busy 1235
+</span><span class='line'> call-forward noan 1235 timeout 120
+</span><span class='line'> ephone-hunt login
+</span><span class='line'> !
+</span><span class='line'> ephone-dn 2
+</span><span class='line'> number 1235
+</span><span class='line'> label Kantoor
+</span><span class='line'> description 013xxxxxxx
+</span><span class='line'> name Kantoor
+</span><span class='line'> call-forward busy 1234
+</span><span class='line'> call-forward noan 1234 timeout 120
+</span><span class='line'> ephone-hunt login
+</span><span class='line'> !
+</span><span class='line'> ephone-dn 3
+</span><span class='line'> number 1337
+</span><span class='line'> label Extern
+</span><span class='line'> description Extern Overlay
+</span><span class='line'> name Extern
+</span><span class='line'> !</span></code></pre></td></tr></table></div></figure>
+
+
+<p> Voeg een ephone DN toe voor ieder toestel dat je aan gaat sluiten, met een eigen nummer (dit nummer en label is zichtbaar op het toestel, en wordt gebruikt om onderling met elkaar te bellen). Ik heb de DN&rsquo;s zo ingesteld dat wanneer ze niet beantwoord worden/bezet zijn automatisch de andere DN wordt aangeroepen. Voeg tenslotte de Overlay DN toe die in de voice-ports is gespecificeerd, en geef het een label zodat je op je telefoons kunt zien dat een oproep van de Externe lijn afkomstig is.</p>
+
+<h4>ephones</h4>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>ephone 3
+</span><span class='line'> mac-address 000D.EDAB.5055
+</span><span class='line'> speed-dial 1 xxxxxxxxxx label &quot;xxxx&quot;
+</span><span class='line'> type 7940
+</span><span class='line'> button 1o2,3
+</span><span class='line'> pin 1235
+</span><span class='line'> !
+</span><span class='line'> ephone 4
+</span><span class='line'> conference admin
+</span><span class='line'> mac-address 0015.2BD2.01C7
+</span><span class='line'> username &quot;remco&quot; password xxxxxxxx
+</span><span class='line'> speed-dial 1 xxxxxxxxxx label &quot;xxxx&quot;
+</span><span class='line'> speed-dial 2 xxxxxxxxxx label &quot;xxxx&quot;
+</span><span class='line'> speed-dial 3 xxxxxxxxxx label &quot;xxxx&quot;
+</span><span class='line'> type 7971
+</span><span class='line'> button 1o1,3
+</span><span class='line'> pin 1234
+</span><span class='line'> !</span></code></pre></td></tr></table></div></figure>
+
+
+<p> Voeg ephones toe voor ieder toestel dat je hebt. Configuratie hangt natuurlijk af van het toestel dat je hebt en hoe je wil dat hij reageert. Voeg users en speeddials toe naar wens. De enige cruciale data is het MAC adres (anders weet de router niet welk toestel aan de ephone te koppelen), en de button configuratie.</p>
+
+<p> De button configuratie zorgt er namelijk voor dat een lijn aan het toestel gekoppeld wordt, inclusief de Overlay DN. zo heeft ephone 3 een button <code>1o2,3</code> . Dit houdt in dat DN&rsquo;s 2 en 3 in overlay mode onder button 1 van dit toestel zitten. De router zoekt automatisch de meest unieke lijn uit, en presenteert deze DN onder de knop. Aangezien Overlay DN 3 op meerdere toestellen wordt gebruikt is deze het minst uniek, en zal enkel op de achtergrond aanwezig zijn. ephone 4 maakt op button 1 gebruik van DN&rsquo;s 1 en 3. Op deze manier presenteren beide toestellen hun eigen nummer, maar luisteren op de achtergrond wel mee naar de Overlay DN, en zullen dus gelijktijdig overgaan zodra een gesprek binnenkomt op de trunk en deze wordt doorgezet naar de Overlay DN.</p>
+
+<h3>Stap 3: klaar!</h3>
+
+<p> Save je configuratie door een <code>copy run start</code> te doen, en je zou aan de gang moeten kunnen!</p>
+
+<ul>
+<li>Onderling bellen kan door de unieke DN van een ephone te bellen (1234 en 1235 in dit geval)</li>
+<li>Extern bellen kan door een telefoonnummer te draaien dat gespecificeerd is in één van de dial-peers</li>
+<li>Voicemail is gekoppeld onder de berichtenknop van een toestel.</li>
+<li>Binnenkomende gesprekken zullen op alle toestellen die gebruik maken van de Overlay DN overgaan, inclusief nummerweergave!</li>
+</ul>
+
+
+<p><em>Veel succes!</em></p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Remco Overdijk</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2009-09-04T11:39:48+02:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2009</span></span> <span class='time'>11:39 am</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/cisco/'>cisco</a>, <a class='category' href='/blog/categories/voip/'>voip</a>, <a class='category' href='/blog/categories/ziggo/'>ziggo</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2009/08/18/iptables-creating-persistent-bans-from-fail2ban/" title="Previous Post: Iptables: Creating persistent bans from Fail2Ban">&laquo; Iptables: Creating persistent bans from Fail2Ban</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2009/09/20/impi-graphs-in-munin/" title="Next Post: IPMI graphs in Munin">IPMI graphs in Munin &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1><i class="icon-user icon-large"></i>&nbsp;About Me</h1>
+	<div id="so">
+	<a href="https://stackoverflow.com/users/813718/remco-overdijk">
+		<img src="https://stackoverflow.com/users/flair/813718.png" width="208" height="58" alt="profile for Remco Overdijk at Stack Overflow, Q&amp;A for professional and enthusiast programmers" title="profile for Remco Overdijk at Stack Overflow, Q&amp;A for professional and enthusiast programmers">
+	</a>
+	</div>
+</section>
+<section>
+  <h1><i class="icon-pencil icon-large"></i>&nbsp;Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/03/09/puppet-calculating-average-catalog-compilation-times/">Puppet: Calculating Average Catalog Compilation Times</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/02/12/git-the-difference-between-lightweight-and-annotated-tags/">Git: The Difference Between Lightweight and Annotated Tags</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/02/09/bacula-cancelling-all-jobs-that-are-currently-writing/">Bacula: Cancelling All Jobs That Are Currently Writing</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/01/15/bacula-purging-and-deleting-old-volumes/">Bacula: Purging and Deleting Old Volumes</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/01/14/music-end-of-the-year-mix-2014/">Music: End of the Year Mix 2014</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1><i class="icon-twitter icon-large"></i>&nbsp;Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  <script type="text/javascript">
+     $(document).ready(function(){
+      getTwitterFeed("RemzJay", 5, 0);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <p>Follow <a href="http://twitter.com/RemzJay">@RemzJay</a></p>
+  
+</section>
+
+
+<section>
+  <h1><i class="icon-github-alt icon-large"></i>&nbsp;GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/Remz-Jay">@Remz-Jay</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'Remz-Jay',
+            count: 10,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+<section class="flickr">
+    <h1><i class="icon-camera icon-large"></i>&nbsp;Flickr Albums</h1>
+		<ul id="flickrsets">
+          <li><a href="https://www.flickr.com/photos/93556621@N05/21961762008" target="_blank"><img src="https://farm6.staticflickr.com/5634/21961762008_7d225b59ba_n.jpg" class="aside-flickr" title="The bus"/></a><h2><a href="https://www.flickr.com/photos/93556621@N05/21961762008">NYC in B/W</a></h2><p></p></li><li><a href="https://www.flickr.com/photos/93556621@N05/21738387919" target="_blank"><img src="https://farm6.staticflickr.com/5627/21738387919_2f513ec807_n.jpg" class="aside-flickr" title="IMG_4732.jpg"/></a><h2><a href="https://www.flickr.com/photos/93556621@N05/21738387919">USA 2015</a></h2><p></p></li><li><a href="https://www.flickr.com/photos/93556621@N05/8519041005" target="_blank"><img src="https://farm9.staticflickr.com/8085/8519041005_d09c9c4cf6_n.jpg" class="aside-flickr" title="IMG_7581.jpg"/></a><h2><a href="https://www.flickr.com/photos/93556621@N05/8519041005">Vietnam 2011</a></h2><p>Backpacking trip through Thailand and Vietnam (North to South) by train and bus. </p></li>
+    </ul>
+</section>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p id="copyright">
+    &copy; 2018 - <a href="https://rem.co">Remco Overdijk</a><br/>
+    <span class="credit">Powered by <a href="http://octopress.org">Octopress</a>.</span>
+</p>
+<div id="fcontent">
+    <div id="fmenu">
+        <div class="fcol">
+            <h3>Navigation</h3>
+            <ul class="footer-navigation">
+                <li><a href="/"><i class="icon-pencil"></i>&nbsp;Blog</a></li>
+<li><a href="/blog/archives"><i class="icon-book"></i>&nbsp;Archives</a></li>
+<li><a href="/pictures"><i class="icon-camera"></i>&nbsp;Pictures</a></li>
+<li><a href="/dice"><i class="icon-lock"></i>&nbsp;Diceware</a></li>
+
+            </ul>
+        </div>
+        <div class="fcol">
+            <h3>Websites</h3>
+            <ul>
+                <li><a href="https://rem.co"><i class="icon-globe"></i>&nbsp;Rem.co</a></li>
+                <li><a href="http://overdijk.io"><i class="icon-globe"></i>&nbsp;Overdijk.io</a></li>
+                <li><a href="http://www.remz-jay.org"><i class="icon-globe"></i>&nbsp;Remz-Jay.org</a></li>
+                <li><a href="http://www.remz.nl"><i class="icon-globe"></i>&nbsp;Remz.nl</a></li>
+                <li><a href="http://remc.onl"><i class="icon-globe"></i>&nbsp;Remc.onl</a></li>
+                <li><a href="http://www.twitupdate.com"><i class="icon-globe"></i>&nbsp;Twitupdate</a></li>
+                <li><a href="http://www.socialmediascanner.com"><i class="icon-globe"></i>&nbsp;SocialMediaScanner</a></li>
+            </ul>
+        </div>
+        <div class="fcol">
+            <h3>Social Media</h3>
+            <ul>
+                <li><a href="http://twitter.com/remzjay"><i class="icon-twitter"></i>&nbsp;RemzJay on Twitter</a></li>
+                <li><a href="http://facebook.com/remco-overdijk"><i class="icon-facebook"></i>&nbsp;Remco-Overdijk on Facebook</a></li>
+                <li><a href="http://www.linkedin.com/in/remcooverdijk"><i class="icon-linkedin"></i>&nbsp;Remco Overdijk on LinkedIn</a></li>
+                <li><a href="https://github.com/Remz-Jay"><i class="icon-github-alt"></i>&nbsp;Remz-Jay on GitHub</a></li>
+                <li><a href="http://open.spotify.com/user/remzjay"><i class="icon-music"></i>&nbsp;RemzJay on Spotify</a></li>
+                <li><a href="https://keybase.io/remz"><i class="icon-globe"></i>&nbsp;Remz on Keybase.io</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'rem-co';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'https://rem.co/blog/2009/09/04/cisco-voip-oplossing-voor-ziggo-telefonie/';
+        var disqus_url = 'https://rem.co/blog/2009/09/04/cisco-voip-oplossing-voor-ziggo-telefonie/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

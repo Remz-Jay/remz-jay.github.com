@@ -1,0 +1,796 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Gentoo: Running a Minecraft 1.8 Server - Rem.co: Remco Overdijk</title>
+  <meta name="author" content="Remco Overdijk">
+
+  
+  <meta name="description" content="Running a dedicated Minecraft server can be a challenging job. You have to find a balance between performance and usability using &ldquo;server &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+
+  
+  <link rel="canonical" href="https://rem.co/blog/2014/11/28/gentoo-running-a-minecraft-1-dot-8-server">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Rem.co: Remco Overdijk" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/libs/jquery-3.3.1.min.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="https://fonts.googleapis.com/css?family=Bitter:400,400i,700|Gloria+Hallelujah|PT+Sans:400,400i,700|Raleway:400,900" rel="stylesheet">
+<script src="/javascripts/modernizr-2.0.js" type="text/javascript"></script>
+<script src="/javascripts/libs/jquery-3.3.1.min.js" type="text/javascript"></script>
+<script src="/javascripts/octopress.js" type="text/javascript"></script>
+
+  
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-15985434-12"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-15985434-12');
+  </script>
+
+
+</head>
+
+<body   >
+		 <div id="top">
+  <header role="banner"><hgroup>
+  <h1><a href="/">rem</a></h1>
+    <h2>.co</h2>
+
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS<i class="icon-rss"></i></a></li>
+  
+</ul>
+  
+<form action="https://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:rem.co" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+    <li><a href="/"><i class="icon-pencil"></i>&nbsp;Blog</a></li>
+<li><a href="/blog/archives"><i class="icon-book"></i>&nbsp;Archives</a></li>
+<li><a href="/pictures"><i class="icon-camera"></i>&nbsp;Pictures</a></li>
+<li><a href="/dice"><i class="icon-lock"></i>&nbsp;Diceware</a></li>
+
+</ul>
+
+</nav>
+		 </div>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Gentoo: Running a Minecraft 1.8 Server</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-11-28T13:36:57+01:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>28</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>1:36 pm</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="https://rem.co">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Running a dedicated Minecraft server can be a challenging job. You have to find a balance between performance and usability using &ldquo;server software&rdquo; that doesn&rsquo;t seem to be designed to provide for long running, resilient services.</p>
+
+<p>Being a first-time Minecraft server operator I had to tackle various challenges in order to come up with a way to provide a stable and reliable service to my players. The following article is a recollection of the things I implemented and scripts I wrote in order to run a Minecraft 1.8 server. The scripts mentioned are specific to Gentoo Linux, but could also be used on most other Linux flavours, albeit with some modifications to match that platform&rsquo;s <code>init.d</code> scripts.</p>
+
+<!-- more --> 
+
+
+<h2>Preparations</h2>
+
+<h3>Screen</h3>
+
+<p>In the scripts we&rsquo;re going to use we use <code>screen</code> as the means to deamonize the Minecraft process. I&rsquo;ve given this a lot of thought, because using <code>screen</code> as a deamonizer feels very wrong  to me when there are dedicated tools (such as the <code>start-stop-daemon</code>) for that particular job. Furthermore, I&rsquo;m more of a <code>tmux</code> guy myself when it comes to terminal multiplexing.</p>
+
+<p>However, after searching the internet, <code>screen</code> seems to be the most popular way of daemonizing Minecraft by far. I don&rsquo;t dare to speculate on wether this is caused by a lack of knowledge in the Minecraft server scene or based on a sound choice.</p>
+
+<p>I have my own reasons for using <code>screen</code> instead of <code>start-stop-deamon</code> or <code>tmux</code>:
+-  <code>screen</code> (and/or <code>tmux</code>) allows me to interact with the game&rsquo;s console. If I use <code>start-stop-daemon</code> instead, the process will be truly deamonized, and there is no way to bring it to the foreground anymore to allow for interaction. Why do we <em>need</em> console interaction you might ask? Because we do backups for example. In order to have reliable backups, we have to tell the Minecraft server to flush any changes to the disk and stop saving while the backup is running. This is all done using console commands.
+- <code>screen</code> has an awesome command, <code>stuff</code>, that allows us to send commands to a detached (deamonized)  instance. This provides us with the possibility of interacting with a running instance using scripts/services <em>outside</em> of that screen instance.</p>
+
+<p>So, before we continue, make sure <code>screen</code> is installed on your box:</p>
+
+<pre><code># emerge -av app-misc/screen
+</code></pre>
+
+<h3>Java SE 8</h3>
+
+<p>My first attempts on running Minecraft 1.8 used the JDK that was present on my box at that time, being <code>IcedTea JDK 6.1.13.3 [icedtea-bin-6]</code>. You <em>can</em> actually use that JDK (or any other Java SE 6 JDK/JRE for that matter), but my installation was haunted by substantial, noticeable lag while the server process was using 100% CPU non-stop (on one core, the  main Minecraft server process being single-threaded) and the console and logs were spammed with these warnings:</p>
+
+<pre><code>[23:52:10] [Server thread/WARN]: Can't keep up! Did the system time change, or is the server overloaded? Running 19381ms behind, skipping 387 tick(s)
+</code></pre>
+
+<p>Despite all optimisations that you will read about in this article that were already in effect at that time, the lag remained, and would at times get so bad that Minecraft&rsquo;s  internal watchdog would mark the server as crashed:</p>
+
+<pre><code>[21:21:15] [Server Watchdog/FATAL]: A single server tick took 60.00 seconds (should be max 0.05)
+[21:21:15] [Server Watchdog/FATAL]: Considering it to be crashed, server will forcibly shutdown.
+[21:21:15] [Server Watchdog/ERROR]: This crash report has been saved to: /mnt/ramdisk/./crash-reports/crash-2014-11-27_21.21.15-server.txt
+[21:21:15] [Server Shutdown Thread/INFO]: Stopping server
+</code></pre>
+
+<p>After some research on the internet some posts mentioned that upgrading to Java 8 could make all the difference, so I did. And it worked! While CPU usage is still reasonably high (around 70~80% at most times), the lag and warnings are gone, and subsequently, so are the crashes. So, I&rsquo;ll advise to use the same JDK as I did in this article. To install:</p>
+
+<pre><code># emerge -av dev-java/oracle-jdk-bin
+</code></pre>
+
+<p><strong>Read</strong> the error you receive from running that command, resolve the fetch restriction by following the instructions in that error message and continue installing. Afterwards:</p>
+
+<pre><code># java-config --list-available-vms
+The following VMs are available for generation-2:
+1)      IcedTea JDK 6.1.13.3 [icedtea-bin-6]
+*)      Oracle JDK 1.8.0.25 [oracle-jdk-bin-1.8] 
+
+# java-config --set-system-vm 2
+Now using oracle-jdk-bin-1.8 as your generation-2 system JVM
+</code></pre>
+
+<p>The command above marks the newly installed JDK as your system JVM. This might not be a possibility for you if you have other software on your system that is incompatible with Java 8 (or the Oracle JDK). In that case, you can set the installed JDK as the User VM for the user you are using to run Minecraft. To do so:</p>
+
+<pre><code># su &lt;minecraftuser&gt;
+$ java-config --set-user-vm 2
+Now using oracle-jdk-bin-1.8 as your user JVM
+</code></pre>
+
+<h3>RAMDisk</h3>
+
+<p>Being haunted by performance issues, I&rsquo;ve read quite a lot on Minecraft server performance and optimisation. There is one article that stands out from the crowd and is a <em>must</em> read for everyone running Minecraft servers. I encourage you to go and read <a href="http://www.sk89q.com/2013/03/improving-your-minecraft-servers-performance/">sk89q&rsquo;s Improving your Minecraft server’s performance</a> first before continuing this article.</p>
+
+<p>Among other minor optimisations, such as the Java flags that are used in my setup, one of the biggest influences is the use of a RAMDisk to host your Minecraft setup on. This eliminates any delays caused by <code>iowait</code> due to slow disks and speeds up various tasks, such as loading the map. I use a Dell PowerEdge 1950 III Blade server as the hardware platform for my Minecraft server, and although beefy as it may be for this purpose, it is not equipped with SSD&rsquo;s which is a potential cause for performance degradation. The installation/use of a RAMDisk is quite easy, but there are some drawbacks you have to keep in mind, such as that RAMDisks are not permanent storage. In case you suffer a power outage or kernel panic, the data on your RAMDisk is gone. To counter this issue, you&rsquo;ll have to implement some way to synchronise the RAMDisk from/to persistant storage.</p>
+
+<p>The <code>init.d</code> script we&rsquo;ll later discuss takes care of all this hassle, but in order for it to work, we first have to create the RAMDisk.</p>
+
+<p>Edit your <code>/etc/fstab</code> and add a RAMDisk at a mountpoint of your choise:</p>
+
+<pre><code># vim /etc/fstab
+tmpfs                   /mnt/ramdisk    tmpfs           rw,nodev,nosuid,size=2G,uid=1000,gid=1000,mode=1700     0 0
+</code></pre>
+
+<p>Adjust the <code>size=</code> parameter to match the amount of spare (unused) RAM you have available and the size of your actual Minecraft installation. (My installation is only 300MB actually, but I have 36GB RAM in this machine which is mostly vacant so I picked a comfortably large disk size). Adjust the <code>uid=</code> and <code>gid=</code> parameters to the id&rsquo;s of the dedicated user you are using to run your Minecraft server with. (Never run trivial services such as this as <code>root</code>!).</p>
+
+<p>Next, create the mountpoint:</p>
+
+<pre><code># mkdir /mnt/ramdisk
+</code></pre>
+
+<p>And try to mount the RAMDisk and see if it works:</p>
+
+<pre><code># mount /mnt/ramdisk
+# df -h
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sda3        63G   48G   13G  80% /
+udev             10M  4.0K   10M   1% /dev
+tmpfs           7.9G  628K  7.9G   1% /run
+shm             7.9G     0  7.9G   0% /dev/shm
+cgroup_root      10M     0   10M   0% /sys/fs/cgroup
+tmpfs           7.9G   72K  7.9G   1% /tmp
+/dev/sdb1       200G  192G  8.2G  96% /mnt/backups
+tmpfs           2.0G  297M  1.8G  15% /mnt/ramdisk 
+</code></pre>
+
+<h3>Install Minecraft as you normally would</h3>
+
+<p>If you haven&rsquo;t done so already, install a Minecraft like you normally would. For me, that is a directory <code>/home/remco/minecraft</code>  which contains the server <code>.jar</code>, the world and all settings.</p>
+
+<h2>The Scripts</h2>
+
+<p>The <code>init.d</code> script is what makes this setup tick. It does all the heavy lifting. The location for this script is <code>/etc/init.d/minecraft</code></p>
+
+<figure class='code'><figcaption><span> (minecraft-init.d.sh)</span> <a href='/downloads/code/minecraft-init.d.sh'>download</a></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+<span class='line-number'>88</span>
+<span class='line-number'>89</span>
+<span class='line-number'>90</span>
+<span class='line-number'>91</span>
+<span class='line-number'>92</span>
+<span class='line-number'>93</span>
+<span class='line-number'>94</span>
+<span class='line-number'>95</span>
+<span class='line-number'>96</span>
+<span class='line-number'>97</span>
+<span class='line-number'>98</span>
+<span class='line-number'>99</span>
+<span class='line-number'>100</span>
+<span class='line-number'>101</span>
+<span class='line-number'>102</span>
+<span class='line-number'>103</span>
+<span class='line-number'>104</span>
+<span class='line-number'>105</span>
+<span class='line-number'>106</span>
+<span class='line-number'>107</span>
+<span class='line-number'>108</span>
+<span class='line-number'>109</span>
+<span class='line-number'>110</span>
+<span class='line-number'>111</span>
+<span class='line-number'>112</span>
+<span class='line-number'>113</span>
+<span class='line-number'>114</span>
+<span class='line-number'>115</span>
+<span class='line-number'>116</span>
+<span class='line-number'>117</span>
+<span class='line-number'>118</span>
+<span class='line-number'>119</span>
+<span class='line-number'>120</span>
+<span class='line-number'>121</span>
+<span class='line-number'>122</span>
+<span class='line-number'>123</span>
+<span class='line-number'>124</span>
+<span class='line-number'>125</span>
+<span class='line-number'>126</span>
+<span class='line-number'>127</span>
+<span class='line-number'>128</span>
+<span class='line-number'>129</span>
+<span class='line-number'>130</span>
+<span class='line-number'>131</span>
+<span class='line-number'>132</span>
+<span class='line-number'>133</span>
+<span class='line-number'>134</span>
+<span class='line-number'>135</span>
+<span class='line-number'>136</span>
+<span class='line-number'>137</span>
+<span class='line-number'>138</span>
+<span class='line-number'>139</span>
+<span class='line-number'>140</span>
+<span class='line-number'>141</span>
+<span class='line-number'>142</span>
+<span class='line-number'>143</span>
+<span class='line-number'>144</span>
+<span class='line-number'>145</span>
+<span class='line-number'>146</span>
+<span class='line-number'>147</span>
+<span class='line-number'>148</span>
+<span class='line-number'>149</span>
+<span class='line-number'>150</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#!/sbin/runscript</span>
+</span><span class='line'><span class="c"># Copyright 2014 Rem.co Linux Solutions</span>
+</span><span class='line'><span class="c"># Distributed under the terms of the GNU General Public License v2</span>
+</span><span class='line'><span class="c"># $Header: $</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">extra_commands</span><span class="o">=</span><span class="s2">&quot;syncup syncdown backup rotate emptyrestart watch&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">description</span><span class="o">=</span><span class="s2">&quot;Manages a Minecraft installation running under a dedicated user inside a daemonized screen session&quot;</span>
+</span><span class='line'><span class="nv">description_syncdown</span><span class="o">=</span><span class="s2">&quot;Synchronizes the RAMdisk back to the persistant storage&quot;</span>
+</span><span class='line'><span class="nv">description_syncup</span><span class="o">=</span><span class="s2">&quot;Synchronizes the persistant storage to the RAMdisk&quot;</span>
+</span><span class='line'><span class="nv">description_backup</span><span class="o">=</span><span class="s2">&quot;Takes a full backup of the minecraft installation and rotates old backups&quot;</span>
+</span><span class='line'><span class="nv">description_rotate</span><span class="o">=</span><span class="s2">&quot;Rotates old backups&quot;</span>
+</span><span class='line'><span class="nv">description_emptyrestart</span><span class="o">=</span><span class="s2">&quot;Checks if any users are online in minecraft. If not, restarting the service&quot;</span>
+</span><span class='line'><span class="nv">description_watch</span><span class="o">=</span><span class="s2">&quot;Checks if minecraft is still running if it resides in the &#39;started&#39; state. Restarts the service if not.&quot;</span>
+</span><span class='line'>
+</span><span class='line'>depend<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  need net localmount
+</span><span class='line'>  after bootmisc
+</span><span class='line'>  use logger
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>start<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  ebegin <span class="s2">&quot;Starting Minecraft&quot;</span>
+</span><span class='line'>  <span class="k">if</span> ! sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -list <span class="p">|</span> grep -q <span class="s2">&quot;${SCREENNAME}&quot;</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>      launch <span class="o">||</span> <span class="k">return</span> 1
+</span><span class='line'>  <span class="k">else</span>
+</span><span class='line'>      eerror <span class="s2">&quot;Minecraft screen session is already present, not launching new one.&quot;</span>
+</span><span class='line'>  <span class="k">fi</span>
+</span><span class='line'>  eend <span class="nv">$?</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>stop<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  ebegin <span class="s2">&quot;Stopping Minecraft&quot;</span>
+</span><span class='line'>  <span class="k">if</span> ! sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -list <span class="p">|</span> grep -q <span class="s2">&quot;${SCREENNAME}&quot;</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>      eerror <span class="s2">&quot;The Minecraft screen session cannot be found so we can&#39;t stop it&quot;</span>
+</span><span class='line'>  <span class="k">else</span>
+</span><span class='line'>      sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -S <span class="k">${</span><span class="nv">SCREENNAME</span><span class="k">}</span> -p <span class="m">0</span> -X stuff <span class="s2">&quot;stop$(printf \\r)&quot;</span>
+</span><span class='line'>      sleep 5
+</span><span class='line'>      <span class="c">#Check if the screen session closed cleanly, otherwise kill it with fire.</span>
+</span><span class='line'>      <span class="k">if</span> sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -list <span class="p">|</span> grep -q <span class="s2">&quot;${SCREENNAME}&quot;</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>          sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -S <span class="k">${</span><span class="nv">SCREENNAME</span><span class="k">}</span> -X <span class="nb">kill</span>
+</span><span class='line'><span class="nb">     </span><span class="k">fi</span>
+</span><span class='line'>  <span class="k">fi</span>
+</span><span class='line'>  eend <span class="nv">$?</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>reload<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  ebegin <span class="s2">&quot;Reload Minecraft&quot;</span>
+</span><span class='line'>  stop
+</span><span class='line'>  sleep 3
+</span><span class='line'>  start
+</span><span class='line'>  eend <span class="nv">$?</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>launch<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">if</span> ! mountpoint -q <span class="k">${</span><span class="nv">RAMDISK</span><span class="k">}</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>      mount <span class="k">${</span><span class="nv">RAMDISK</span><span class="k">}</span>
+</span><span class='line'>  <span class="k">fi</span>
+</span><span class='line'>  sup <span class="o">||</span> <span class="k">return</span> 1
+</span><span class='line'>  sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -dmS <span class="k">${</span><span class="nv">SCREENNAME</span><span class="k">}</span> bash -c <span class="s2">&quot;cd ${RAMDISK}; java -server -XX:+UseConcMarkSweepGC -Xms2G -Xmx4G -jar ${JARFILE} nogui&quot;</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>sdown<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  rsync --quiet --archive --delete --recursive --force <span class="k">${</span><span class="nv">RAMDISK</span><span class="k">}</span>/ <span class="k">${</span><span class="nv">PERSISTDIR</span><span class="k">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>syncdown<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  ebegin <span class="s2">&quot;Syncing RAMdisk to Persistant Storage&quot;</span>
+</span><span class='line'>  sdown <span class="o">||</span> <span class="k">return</span> 1
+</span><span class='line'>  eend <span class="nv">$?</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>sup<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  rsync --quiet --archive <span class="k">${</span><span class="nv">PERSISTDIR</span><span class="k">}</span>/ <span class="k">${</span><span class="nv">RAMDISK</span><span class="k">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>syncup<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  ebegin <span class="s2">&quot;Syncing Persistant Storage to RAMdisk&quot;</span>
+</span><span class='line'>  sup <span class="o">||</span> <span class="k">return</span> 1
+</span><span class='line'>  eend <span class="nv">$?</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>backup<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  ebegin <span class="s2">&quot;Taking a backup&quot;</span>
+</span><span class='line'>  <span class="k">if</span> ! sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -list <span class="p">|</span> grep -q <span class="s2">&quot;${SCREENNAME}&quot;</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>      eerror <span class="s2">&quot;Minecraft is not running, not taking a live backup&quot;</span>
+</span><span class='line'>  <span class="k">fi</span>
+</span><span class='line'>  <span class="nv">H</span><span class="o">=</span><span class="k">$(</span>date +<span class="s2">&quot;%H&quot;</span><span class="k">)</span>
+</span><span class='line'>  <span class="nv">NOW</span><span class="o">=</span><span class="k">$(</span>date +<span class="s2">&quot;%H:%M&quot;</span><span class="k">)</span>
+</span><span class='line'>  sdown <span class="o">||</span> <span class="k">return</span> 1
+</span><span class='line'>  sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -S <span class="k">${</span><span class="nv">SCREENNAME</span><span class="k">}</span> -p <span class="m">0</span> -X stuff <span class="s2">&quot;say Hourly backup for $NOW is starting. The World is no longer saving...$(printf \\r)&quot;</span>
+</span><span class='line'>  sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -S <span class="k">${</span><span class="nv">SCREENNAME</span><span class="k">}</span> -p <span class="m">0</span> -X stuff <span class="s2">&quot;save-off$(printf \\r)&quot;</span>
+</span><span class='line'>  sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -S <span class="k">${</span><span class="nv">SCREENNAME</span><span class="k">}</span> -p <span class="m">0</span> -X stuff <span class="s2">&quot;save-all$(printf \\r)&quot;</span>
+</span><span class='line'>  sleep 5
+</span><span class='line'>  sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> /usr/bin/time -f <span class="s2">&quot;%e sec at %P CPU&quot;</span> -o /tmp/mctime sh -c <span class="s2">&quot;sync; sleep 5; sudo -u ${RUNAS} nice tar czf ${BACKUPDIR}/${PREFIX}$(date +&quot;</span>%d-%m-%Y-%H<span class="s2">&quot;).tar.gz -C ${RAMDISK} .&quot;</span>
+</span><span class='line'>  sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -S <span class="k">${</span><span class="nv">SCREENNAME</span><span class="k">}</span> -p <span class="m">0</span> -X stuff <span class="s2">&quot;save-on$(printf \\r)&quot;</span>
+</span><span class='line'>  sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -S <span class="k">${</span><span class="nv">SCREENNAME</span><span class="k">}</span> -p <span class="m">0</span> -X stuff <span class="s2">&quot;say Hourly backup for $NOW is complete and ran for $(cat /tmp/mctime). The World is saving once more.$(printf \\r)&quot;</span>
+</span><span class='line'>  rm /tmp/mctime
+</span><span class='line'>  <span class="k">if</span> <span class="o">((</span> <span class="m">19</span> &lt;<span class="o">=</span> 10#<span class="nv">$H</span> <span class="o">&amp;&amp;</span> 10#<span class="nv">$H</span> &lt; <span class="m">23</span> <span class="o">))</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>      rot <span class="o">||</span> <span class="k">return</span> 1
+</span><span class='line'>  <span class="k">fi</span>
+</span><span class='line'>  eend <span class="nv">$?</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>rot<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  <span class="o">[</span> -d <span class="k">${</span><span class="nv">BACKUPDIR</span><span class="k">}</span>/daily-saves <span class="o">]</span> <span class="o">||</span> mkdir -p <span class="k">${</span><span class="nv">BACKUPDIR</span><span class="k">}</span>/daily-saves
+</span><span class='line'>  find <span class="k">${</span><span class="nv">BACKUPDIR</span><span class="k">}</span> -maxdepth <span class="m">1</span> -type f -name <span class="s2">&quot;${PREFIX}$(date -d &quot;</span>yesterday 20:00 <span class="s2">&quot; &#39;+%d-%m-%Y-%H&#39;).tar.gz&quot;</span> <span class="se">\</span>
+</span><span class='line'>      -exec cp <span class="o">{}</span> <span class="k">${</span><span class="nv">BACKUPDIR</span><span class="k">}</span>/daily-saves/daily_<span class="k">$(</span>date -d <span class="s2">&quot;yesterday 20:00 &quot;</span> <span class="s1">&#39;+%d-%m-%Y&#39;</span><span class="k">)</span>.tar.gz <span class="se">\;</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">[</span> -f <span class="k">${</span><span class="nv">BACKUPDIR</span><span class="k">}</span>/daily-saves/daily_<span class="k">$(</span>date -d <span class="s2">&quot;yesterday 20:00 &quot;</span> <span class="s1">&#39;+%d-%m-%Y&#39;</span><span class="k">)</span>.tar.gz <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>      find <span class="k">${</span><span class="nv">BACKUPDIR</span><span class="k">}</span> -maxdepth <span class="m">1</span> -type f -name <span class="s2">&quot;${PREFIX}$(date -d &quot;</span>yesterday 20:00 <span class="s2">&quot; &#39;+%d-%m-%Y&#39;)-*.tar.gz&quot;</span> -exec rm <span class="o">{}</span> <span class="se">\;</span>
+</span><span class='line'>  <span class="k">else</span>
+</span><span class='line'>      ewarn <span class="s2">&quot;Could not locate yesterday&#39;s daily save. Not rotating yesterday&#39;s hourly saves.&quot;</span>
+</span><span class='line'>  <span class="k">fi</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>rotate<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  ebegin <span class="s2">&quot;Starting daily backup rotation&quot;</span>
+</span><span class='line'>  rot <span class="o">||</span> <span class="k">return</span> 1
+</span><span class='line'>  eend <span class="nv">$?</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>emptyrestart<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -S <span class="k">${</span><span class="nv">SCREENNAME</span><span class="k">}</span> -p <span class="m">0</span> -X hardcopy /tmp/<span class="k">${</span><span class="nv">SCREENNAME</span><span class="k">}</span>.dump.1
+</span><span class='line'>  sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -S <span class="k">${</span><span class="nv">SCREENNAME</span><span class="k">}</span> -p <span class="m">0</span> -X stuff <span class="s2">&quot;list$(printf \\r)&quot;</span>
+</span><span class='line'>  <span class="c"># We need to wait for the command to complete, or the diff will we unreliable</span>
+</span><span class='line'>  sleep 1
+</span><span class='line'>  sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -S <span class="k">${</span><span class="nv">SCREENNAME</span><span class="k">}</span> -p <span class="m">0</span> -X hardcopy /tmp/<span class="k">${</span><span class="nv">SCREENNAME</span><span class="k">}</span>.dump.2
+</span><span class='line'>  <span class="nv">NUMP</span><span class="o">=</span><span class="k">$(</span>diff -u /tmp/<span class="k">${</span><span class="nv">SCREENNAME</span><span class="k">}</span>.dump.<span class="o">{</span>1,2<span class="o">}</span> <span class="p">|</span> grep -E <span class="s2">&quot;^\+&quot;</span> <span class="p">|</span> grep -Po <span class="s1">&#39;\d+/\d+&#39;</span> <span class="p">|</span> cut -d<span class="s1">&#39;/&#39;</span> -f1<span class="k">)</span>
+</span><span class='line'>  rm /tmp/<span class="k">${</span><span class="nv">SCREENNAME</span><span class="k">}</span>.dump.<span class="o">{</span>1,2<span class="o">}</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">[</span> <span class="k">${</span><span class="nv">NUMP</span><span class="k">}</span> -eq <span class="m">0</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>      reload <span class="o">||</span> <span class="k">return</span> 1
+</span><span class='line'>  <span class="k">else</span>
+</span><span class='line'>      ewarn <span class="s2">&quot;There are ${NUMP} player(s) online. Not restarting.&quot;</span>
+</span><span class='line'>  <span class="k">fi</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>watch<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">[</span> <span class="k">$(</span>rc-service minecraft status <span class="p">|</span> grep -i <span class="s2">&quot;started&quot;</span> <span class="p">|</span> wc -l<span class="k">)</span> -eq <span class="m">1</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>      einfo <span class="s2">&quot;MC should be running&quot;</span>
+</span><span class='line'>      <span class="k">if</span> ! sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -list <span class="p">|</span> grep -q <span class="s2">&quot;${SCREENNAME}&quot;</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>                  ewarn <span class="s2">&quot;But it is not! Restarting service&quot;</span>
+</span><span class='line'>          sdown <span class="o">||</span> <span class="k">return</span> 1
+</span><span class='line'>          launch <span class="o">||</span> <span class="k">return</span> 1
+</span><span class='line'>      <span class="k">else</span>
+</span><span class='line'>          einfo <span class="s2">&quot;And it is. Good.&quot;</span>
+</span><span class='line'>      <span class="k">fi</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">else</span>
+</span><span class='line'>      einfo <span class="s2">&quot;MC is in stopped state. Not doing anything.&quot;</span>
+</span><span class='line'>  <span class="k">fi</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The <code>init.d</code> script loads settings from a <code>conf.d</code> script. The location for
+this script is <code>/etc/conf.d/minecraft</code></p>
+
+<figure class='code'><figcaption><span> (minecraft-conf.d.sh)</span> <a href='/downloads/code/minecraft-conf.d.sh'>download</a></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">BACKUPDIR</span><span class="o">=</span>/mnt/backups/minecraft
+</span><span class='line'><span class="nv">RAMDISK</span><span class="o">=</span>/mnt/ramdisk
+</span><span class='line'><span class="nv">PERSISTDIR</span><span class="o">=</span>/home/remco/minecraft
+</span><span class='line'><span class="nv">PREFIX</span><span class="o">=</span><span class="s2">&quot;mc-backup_&quot;</span>
+</span><span class='line'><span class="nv">RUNAS</span><span class="o">=</span><span class="s2">&quot;remco&quot;</span>
+</span><span class='line'><span class="nv">SCREENNAME</span><span class="o">=</span><span class="s2">&quot;minecraft&quot;</span>
+</span><span class='line'><span class="c">#JARFILE=&quot;minecraft_server.1.8.1.jar&quot;</span>
+</span><span class='line'><span class="c">#JARFILE=&quot;spigot1649.jar&quot;</span>
+</span><span class='line'><span class="nv">JARFILE</span><span class="o">=</span><span class="s2">&quot;spigot-1.8.jar&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Finishing up</h2>
+
+<ul>
+<li>Install cronjobs as <code>root</code>:</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># crontab -e</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>Add these lines:</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>0 * * * *       /etc/init.d/minecraft backup 1&gt; /dev/null
+</span><span class='line'>* * * * *       /sbin/rc-service minecraft watch 1&gt; /dev/null</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>Set service to start automatically:</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>rc-update add minecraft default</span></code></pre></td></tr></table></div></figure>
+
+
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Remco Overdijk</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2014-11-28T13:36:57+01:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>28</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>1:36 pm</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/gentoo/'>gentoo</a>, <a class='category' href='/blog/categories/linux/'>linux</a>, <a class='category' href='/blog/categories/minecraft/'>minecraft</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2014/06/10/git-moving-a-repository-to-a-new-server/" title="Previous Post: Git: Moving a repository to a new server">&laquo; Git: Moving a repository to a new server</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2015/01/14/music-end-of-the-year-mix-2014/" title="Next Post: Music: End Of The Year Mix 2014">Music: End Of The Year Mix 2014 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1><i class="icon-user icon-large"></i>&nbsp;About Me</h1>
+	<div id="so">
+	<a href="https://stackoverflow.com/users/813718/remco-overdijk">
+		<img src="https://stackoverflow.com/users/flair/813718.png" width="208" height="58" alt="profile for Remco Overdijk at Stack Overflow, Q&amp;A for professional and enthusiast programmers" title="profile for Remco Overdijk at Stack Overflow, Q&amp;A for professional and enthusiast programmers">
+	</a>
+	</div>
+</section>
+<section>
+  <h1><i class="icon-pencil icon-large"></i>&nbsp;Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/03/09/puppet-calculating-average-catalog-compilation-times/">Puppet: Calculating Average Catalog Compilation Times</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/02/12/git-the-difference-between-lightweight-and-annotated-tags/">Git: The Difference Between Lightweight and Annotated Tags</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/02/09/bacula-cancelling-all-jobs-that-are-currently-writing/">Bacula: Cancelling All Jobs That Are Currently Writing</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/01/15/bacula-purging-and-deleting-old-volumes/">Bacula: Purging and Deleting Old Volumes</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/01/14/music-end-of-the-year-mix-2014/">Music: End of the Year Mix 2014</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1><i class="icon-twitter icon-large"></i>&nbsp;Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  <script type="text/javascript">
+     $(document).ready(function(){
+      getTwitterFeed("RemzJay", 5, 0);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <p>Follow <a href="http://twitter.com/RemzJay">@RemzJay</a></p>
+  
+</section>
+
+
+<section>
+  <h1><i class="icon-github-alt icon-large"></i>&nbsp;GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/Remz-Jay">@Remz-Jay</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'Remz-Jay',
+            count: 10,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+<section class="flickr">
+    <h1><i class="icon-camera icon-large"></i>&nbsp;Flickr Albums</h1>
+		<ul id="flickrsets">
+          <li><a href="https://www.flickr.com/photos/93556621@N05/21961762008" target="_blank"><img src="https://farm6.staticflickr.com/5634/21961762008_7d225b59ba_n.jpg" class="aside-flickr" title="The bus"/></a><h2><a href="https://www.flickr.com/photos/93556621@N05/21961762008">NYC in B/W</a></h2><p></p></li><li><a href="https://www.flickr.com/photos/93556621@N05/21738387919" target="_blank"><img src="https://farm6.staticflickr.com/5627/21738387919_2f513ec807_n.jpg" class="aside-flickr" title="IMG_4732.jpg"/></a><h2><a href="https://www.flickr.com/photos/93556621@N05/21738387919">USA 2015</a></h2><p></p></li><li><a href="https://www.flickr.com/photos/93556621@N05/8519041005" target="_blank"><img src="https://farm9.staticflickr.com/8085/8519041005_d09c9c4cf6_n.jpg" class="aside-flickr" title="IMG_7581.jpg"/></a><h2><a href="https://www.flickr.com/photos/93556621@N05/8519041005">Vietnam 2011</a></h2><p>Backpacking trip through Thailand and Vietnam (North to South) by train and bus. </p></li>
+    </ul>
+</section>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p id="copyright">
+    &copy; 2018 - <a href="https://rem.co">Remco Overdijk</a><br/>
+    <span class="credit">Powered by <a href="http://octopress.org">Octopress</a>.</span>
+</p>
+<div id="fcontent">
+    <div id="fmenu">
+        <div class="fcol">
+            <h3>Navigation</h3>
+            <ul class="footer-navigation">
+                <li><a href="/"><i class="icon-pencil"></i>&nbsp;Blog</a></li>
+<li><a href="/blog/archives"><i class="icon-book"></i>&nbsp;Archives</a></li>
+<li><a href="/pictures"><i class="icon-camera"></i>&nbsp;Pictures</a></li>
+<li><a href="/dice"><i class="icon-lock"></i>&nbsp;Diceware</a></li>
+
+            </ul>
+        </div>
+        <div class="fcol">
+            <h3>Websites</h3>
+            <ul>
+                <li><a href="https://rem.co"><i class="icon-globe"></i>&nbsp;Rem.co</a></li>
+                <li><a href="http://overdijk.io"><i class="icon-globe"></i>&nbsp;Overdijk.io</a></li>
+                <li><a href="http://www.remz-jay.org"><i class="icon-globe"></i>&nbsp;Remz-Jay.org</a></li>
+                <li><a href="http://www.remz.nl"><i class="icon-globe"></i>&nbsp;Remz.nl</a></li>
+                <li><a href="http://remc.onl"><i class="icon-globe"></i>&nbsp;Remc.onl</a></li>
+                <li><a href="http://www.twitupdate.com"><i class="icon-globe"></i>&nbsp;Twitupdate</a></li>
+                <li><a href="http://www.socialmediascanner.com"><i class="icon-globe"></i>&nbsp;SocialMediaScanner</a></li>
+            </ul>
+        </div>
+        <div class="fcol">
+            <h3>Social Media</h3>
+            <ul>
+                <li><a href="http://twitter.com/remzjay"><i class="icon-twitter"></i>&nbsp;RemzJay on Twitter</a></li>
+                <li><a href="http://facebook.com/remco-overdijk"><i class="icon-facebook"></i>&nbsp;Remco-Overdijk on Facebook</a></li>
+                <li><a href="http://www.linkedin.com/in/remcooverdijk"><i class="icon-linkedin"></i>&nbsp;Remco Overdijk on LinkedIn</a></li>
+                <li><a href="https://github.com/Remz-Jay"><i class="icon-github-alt"></i>&nbsp;Remz-Jay on GitHub</a></li>
+                <li><a href="http://open.spotify.com/user/remzjay"><i class="icon-music"></i>&nbsp;RemzJay on Spotify</a></li>
+                <li><a href="https://keybase.io/remz"><i class="icon-globe"></i>&nbsp;Remz on Keybase.io</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'rem-co';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'https://rem.co/blog/2014/11/28/gentoo-running-a-minecraft-1-dot-8-server/';
+        var disqus_url = 'https://rem.co/blog/2014/11/28/gentoo-running-a-minecraft-1-dot-8-server/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: Munin | The Rem.co Blog]]></title>
-  <link href="http://blog.rem.co/blog/categories/munin/atom.xml" rel="self"/>
-  <link href="http://blog.rem.co/"/>
-  <updated>2014-03-10T10:39:35+01:00</updated>
-  <id>http://blog.rem.co/</id>
+  <title><![CDATA[Category: munin | Rem.co: Remco Overdijk]]></title>
+  <link href="https://rem.co/blog/categories/munin/atom.xml" rel="self"/>
+  <link href="https://rem.co/"/>
+  <updated>2018-01-25T14:17:37+01:00</updated>
+  <id>https://rem.co/</id>
   <author>
     <name><![CDATA[Remco Overdijk]]></name>
     <email><![CDATA[remco@rem.co]]></email>
@@ -15,18 +15,17 @@
   
   <entry>
     <title type="html"><![CDATA[Munin: failing with Storable error]]></title>
-    <link href="http://blog.rem.co/blog/2013/01/21/munin-failing-with-storable-error/"/>
+    <link href="https://rem.co/blog/2013/01/21/munin-failing-with-storable-error/"/>
     <updated>2013-01-21T17:29:00+01:00</updated>
-    <id>http://blog.rem.co/blog/2013/01/21/munin-failing-with-storable-error</id>
+    <id>https://rem.co/blog/2013/01/21/munin-failing-with-storable-error</id>
     <content type="html"><![CDATA[<p>I suffered from a Munin version 2.0.10 installation that refused to update the majority of the graphs. Only the first two of a long list were being updated, the rest all &lsquo;hung&rsquo; at the same moment.</p>
 
 <p>After a little investigating, the problem surfaced:</p>
 
-<p><code>bash
-$ su - munin --shell=/bin/bash munin-cron
+<pre><code class="bash">$ su - munin --shell=/bin/bash munin-cron
 File is not a perl storable at blib/lib/Storable.pm (autosplit into blib/lib/auto/Storable/fd_retrieve.al) line 398, at /usr/lib64/perl5/vendor_perl/5.12.4/Munin/Master/Utils.pm line 362
 File is not a perl storable at blib/lib/Storable.pm (autosplit into blib/lib/auto/Storable/fd_retrieve.al) line 398, at /usr/lib64/perl5/vendor_perl/5.12.4/Munin/Master/Utils.pm line 362
-</code></p>
+</code></pre>
 
 <!-- more -->
 
@@ -34,20 +33,19 @@ File is not a perl storable at blib/lib/Storable.pm (autosplit into blib/lib/aut
 <p>I started out by fixing all items the <code>munin-check</code> script suggested, which is always a good starting point.
 Execute the script in a similar fashion as you would do with <code>munin-cron</code>:</p>
 
-<p><code>bash
-$ su - munin --shell=/bin/bash munin-check
-</code>
-Correct all reported errors and check your cron again.</p>
+<pre><code class="bash">$ su - munin --shell=/bin/bash munin-check
+</code></pre>
+
+<p>Correct all reported errors and check your cron again.</p>
 
 <p>In this particular case this didn&rsquo;t solve the issue however. There appeared to be some <code>.storable</code> files in the munin directory, which sounded like viable suspects according to the error messages:</p>
 
-<p><code>bash
-$ find /var/lib/munin/ -type f | grep storable
+<pre><code class="bash">$ find /var/lib/munin/ -type f | grep storable
 /var/lib/munin/datafile.storable
 /var/lib/munin/htmlconf.storable
 /var/lib/munin/limits.storable
 /var/lib/munin/state-server-server.storable
-</code></p>
+</code></pre>
 
 <p>Turns out one of these was the culprit, as moving/deleting them fixed the issue; cron has resumed normal operation.
 <code>bash
@@ -57,6 +55,135 @@ $
 </code></p>
 
 <p>Best part of it is that the data collection doesn&rsquo;t seem to have been interrupted in the meantime; All graphs are up2date and have a complete history. Problem solved!</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[IPMI graphs in Munin]]></title>
+    <link href="https://rem.co/blog/2009/09/20/impi-graphs-in-munin/"/>
+    <updated>2009-09-20T17:22:59+02:00</updated>
+    <id>https://rem.co/blog/2009/09/20/impi-graphs-in-munin</id>
+    <content type="html"><![CDATA[<p>It is possible to monitor fan speeds and temperatures on Dell Poweredge servers under Linux. You can achieve this by reading out the IPMI data that is available on the system.</p>
+
+<p>I used the steps on <a href="https://hep.pa.msu.edu/twiki/bin/view/AGLT2/DellCactiSetup">this website</a> to buffer the data gathered by IPMI to use in Cacti.</p>
+
+<p>However, in addition to Cacti I also use Munin to monitor various system parameters. Wouldn&rsquo;t it be nice to incorporate graphs for fan speeds and temperatures in Munin? I thought so, so I developed a way to do this.</p>
+
+<p>In this case the solution consists out of 2 munin plugins and a PHP script that formats the IPMI values for graphing use. This could also be done directly in the plugins, but since I&rsquo;m not such an <code>awk</code> and <code>sed</code> expert I chose to let a PHP script handle the transformation, so I&rsquo;d be done sooner (time is money my friends!).</p>
+
+<p> First up, the PHP script:</p>
+
+<pre><code class="php /usr/bin/ipmi.php">#!/usr/bin/php
+ &lt;?php
+ $handle = fopen('/dev/shm/dell.ipmi','r');
+ while(!feof($handle)) {
+ $line = fgets($handle);
+ if(preg_match('/AmbientTemp/',$line)) echo 'tambi.value '.fgets($handle);
+ if(preg_match('/CPU1Temp/',$line)) echo 'tcpu1.value '.fgets($handle);
+ if(preg_match('/CPU2Temp/',$line)) echo 'tcpu2.value '.fgets($handle);
+ if(preg_match('/Fan1/',$line)) echo 'fan1.value '.fgets($handle);
+ if(preg_match('/Fan2/',$line)) echo 'fan2.value '.fgets($handle);
+ if(preg_match('/Fan3/',$line)) echo 'fan3.value '.fgets($handle);
+ if(preg_match('/Fan4/',$line)) echo 'fan4.value '.fgets($handle);
+ if(preg_match('/Fan5/',$line)) echo 'fan5.value '.fgets($handle);
+ if(preg_match('/Fan6/',$line)) echo 'fan6.value '.fgets($handle);
+ if(preg_match('/PlanarTemp/',$line)) echo 'tplan.value '.fgets($handle);
+ if(preg_match('/RiserTemp/',$line)) echo 'trise.value '.fgets($handle);
+ }
+ fclose($handle);
+ ?&gt;
+</code></pre>
+
+<p> With the SHM values now being prefixed with matching Munin values, we can graph them in 2 plugins:</p>
+
+<pre><code class="bash /etc/munin/plugins/ipmitemps">#!/bin/sh
+ if [ '$1' = 'autoconf' ]; then
+ if [ -r /dev/shm/dell.ipmi ]; then
+ echo yes
+ exit 0
+ else
+ echo no
+ exit 1
+ fi 
+ fi 
+
+ if [ '$1' = 'config' ]; then
+ echo 'graph_title Dell 2850 IPMI Temperatures'
+ echo 'graph_order tcpu1 tcpu2 tambi tplan trise'
+ echo 'graph_vlabel Temperature (Deg C)'
+ echo 'graph_scale yes'
+ echo 'graph_info This graph shows sensor temperatures'
+ echo 'graph_category system'
+ echo 'tcpu1.label CPU1'
+ echo 'tcpu1.warning 80'
+ echo 'tcpu1.critical 90'
+ echo 'tcpu1.info XEON CPU 1 Temperature'
+ echo 'tcpu2.label CPU2'
+ echo 'tcpu2.warning 80'
+ echo 'tcpu2.critical 90'
+ echo 'tcpu2.info XEON CPU 2 Temperature'
+ echo 'tambi.label Ambient'
+ echo 'tambi.warning 80'
+ echo 'tambi.critical 90'
+ echo 'tambi.info Ambient Temperature'
+ echo 'tplan.label Planar'
+ echo 'tplan.warning 80'
+ echo 'tplan.critical 90'
+ echo 'tplan.info Planar Temperature'
+ echo 'trise.label Riser'
+ echo 'trise.warning 80'
+ echo 'trise.critical 90'
+ echo 'trise.info Riser Temperature'
+ exit 0
+ fi
+ /usr/bin/ipmi.php
+</code></pre>
+
+<p> and</p>
+
+<pre><code class="bash /etc/munin/plugins/ipmifans"> #!/bin/sh
+
+ if [ '$1' = 'autoconf' ]; then
+ if [ -r /dev/shm/dell.ipmi ]; then
+ echo yes
+ exit 0
+ else
+ echo no
+ exit 1
+ fi
+ fi
+
+ if [ '$1' = 'config' ]; then
+
+ echo 'graph_title Dell 2850 IPMI Fanspeeds'
+ echo 'graph_order fan1 fan2 fan3 fan4 fan5 fan6'
+ echo 'graph_vlabel Fanspeed (RPM)'
+ echo 'graph_scale yes'
+ echo 'graph_info This graph shows fanspeeds'
+ echo 'graph_category system'
+ echo 'fan1.label Fan1'
+ echo 'fan1.info Fan1 speed'
+ echo 'fan2.label Fan2'
+ echo 'fan2.info Fan2 speed'
+ echo 'fan3.label Fan3'
+ echo 'fan3.info Fan3 speed'
+ echo 'fan4.label Fan4'
+ echo 'fan4.info Fan4 speed'
+ echo 'fan5.label Fan5'
+ echo 'fan5.info Fan5 speed'
+ echo 'fan6.label Fan6'
+ echo 'fan6.info Fan6 speed'
+ exit 0
+ fi
+ /usr/bin/ipmi.php
+</code></pre>
+
+<p>Restart your <code>munin-node</code>, run the munin crons, and voila, graphs!
+ With these settings they will look like this:</p>
+
+<p><em>insert image</em></p>
+
+<p>You can modify the params to change the graphs ofcourse.</p>
 ]]></content>
   </entry>
   

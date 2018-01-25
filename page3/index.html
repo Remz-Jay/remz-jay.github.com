@@ -1,0 +1,1261 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Rem.co: Remco Overdijk</title>
+  <meta name="author" content="Remco Overdijk">
+
+  
+  <meta name="description" content="Keeping your Gentoo Linux server up to date isn&rsquo;t as straightforward as let&rsquo;s say an Ubuntu box, where you would just run $ apt-get &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+
+  
+  <link rel="canonical" href="https://rem.co/page3">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Rem.co: Remco Overdijk" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/libs/jquery-3.3.1.min.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="https://fonts.googleapis.com/css?family=Bitter:400,400i,700|Gloria+Hallelujah|PT+Sans:400,400i,700|Raleway:400,900" rel="stylesheet">
+<script src="/javascripts/modernizr-2.0.js" type="text/javascript"></script>
+<script src="/javascripts/libs/jquery-3.3.1.min.js" type="text/javascript"></script>
+<script src="/javascripts/octopress.js" type="text/javascript"></script>
+
+  
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-15985434-12"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-15985434-12');
+  </script>
+
+
+</head>
+
+<body   >
+		 <div id="top">
+  <header role="banner"><hgroup>
+  <h1><a href="/">rem</a></h1>
+    <h2>.co</h2>
+
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS<i class="icon-rss"></i></a></li>
+  
+</ul>
+  
+<form action="https://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:rem.co" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+    <li><a href="/"><i class="icon-pencil"></i>&nbsp;Blog</a></li>
+<li><a href="/blog/archives"><i class="icon-book"></i>&nbsp;Archives</a></li>
+<li><a href="/pictures"><i class="icon-camera"></i>&nbsp;Pictures</a></li>
+<li><a href="/dice"><i class="icon-lock"></i>&nbsp;Diceware</a></li>
+
+</ul>
+
+</nav>
+		 </div>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/01/16/updating-and-cleaning-your-gentoo-linux-server/">Gentoo: Updating and Cleaning</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-01-16T23:40:00+01:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>16</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>11:40 pm</span></time>
+        
+           | <a href="/blog/2013/01/16/updating-and-cleaning-your-gentoo-linux-server/#disqus_thread"
+             data-disqus-identifier="https://rem.co/blog/2013/01/16/updating-and-cleaning-your-gentoo-linux-server/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img class="left" src="/images/gblend.png" width="100" height="100"> Keeping your Gentoo Linux server up to date isn&rsquo;t as straightforward as let&rsquo;s say an Ubuntu box, where you would just run <code>$ apt-get update &amp;&amp; apt-get upgrade &amp;&amp; apt-get clean</code> for example.</p>
+
+<p>Gentoo is far too flexible for a <em>one size fits all</em> approach. The commands outlined below come pretty close for daily use though:</p>
+
+<div><script src='https://gist.github.com/2835011.js' async=''></script>
+<noscript><pre><code>emerge --sync &amp;&amp; emerge -uDNav --with-bdeps=y @world
+emerge --depclean &amp;&amp; emerge @preserved-rebuild &amp;&amp; revdep-rebuild &amp;&amp; eclean-dist
+
+genkernel --oldconfig --menuconfig --splash --save-config --makeopts=-j5 --install all
+grub-mkconfig -o /boot/grub/grub.cfg
+
+perl-cleaner --reallyall</code></pre></noscript></div>
+
+
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/01/16/updating-and-cleaning-your-gentoo-linux-server/">Read on&nbsp;<i class='icon-circle-arrow-right'></i></a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/01/16/2013-blogging-with-octopress/">2013: Blogging With Octopress</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-01-16T20:06:00+01:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>16</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>8:06 pm</span></time>
+        
+           | <a href="/blog/2013/01/16/2013-blogging-with-octopress/#disqus_thread"
+             data-disqus-identifier="https://rem.co/blog/2013/01/16/2013-blogging-with-octopress/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Well. Here we are!</p>
+
+<p>New year, new approach to blogging.</p>
+
+<p>In the past year I haven&rsquo;t managed to push out a lot of blog articles though I&rsquo;ve been working with loads of new, interesting technologies and approaches.</p>
+
+<p>Being a programmer, I blame the software I use to blog. In my case that&rsquo;s the <a href="http://www.typo3.org">TYPO3</a> installation at <a href="https://rem.co">rem.co</a>. It&rsquo;s recently been updated to TYPO3 6.0, and I haven&rsquo;t gotten around to fixing all the bugs that appeared after such a major upgrade.</p>
+
+<p>Moreover, that site uses the ancient tt_news plugin as a blog substitute, which makes blogging a bit… troublesome to put it mildly. Especially &ldquo;<em>advanced</em>&rdquo; stuff like including code snippets and multiple layouts in one article.</p>
+
+<p><img class="left" src="http://octopress.org/images/logo.png">
+Then <a href="http://octopress.org">Octopress</a> enters the stage, combining a lot of my favorite technologies to provide a somewhat nerdy approach to blogging.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/01/16/2013-blogging-with-octopress/">Read on&nbsp;<i class='icon-circle-arrow-right'></i></a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/12/09/fail2ban-phpmyadmin-script/">Fail2Ban PhpMyAdmin Script</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2009-12-09T16:44:27+02:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>9</span><span class='date-suffix'>th</span>, <span class='date-year'>2009</span></span> <span class='time'>4:44 pm</span></time>
+        
+           | <a href="/blog/2009/12/09/fail2ban-phpmyadmin-script/#disqus_thread"
+             data-disqus-identifier="https://rem.co/blog/2009/12/09/fail2ban-phpmyadmin-script/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>While examining my webserver statistics, I noticed that quite a lot 404&rsquo;s are being served on most of my domains to scan bots that are trying to find exploits in possible running PHPMyAdmin configurations.
+ Though harmless if you keep a clean ship with a decently configured PHPMyAdmin and the latest updates like I do, I still decided I couldn&rsquo;t let this behaviour unanswered. So I took action, and wrote a small fail2ban filter that permanently drops all traffic from the IP addresses these scans originate from, like I do with every address that misbehaves in any way.</p>
+
+<p> The regex used won&rsquo;t capture all attempts, but with my configuration only 1 hit is enough to get you banned (the scripts these scans call are <code>main.php</code> and <code>config.inc.php</code>, which aren&rsquo;t to be called directly, especially not when they fail with a 404 like these), and all scanning attempts I&rsquo;ve seen so far cycle through at least 20 different combinations.</p>
+
+<p> Well, enough talk, here is the <code>filter.d</code> file:</p>
+
+<figure class='code'><figcaption><span>filter.d</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class='ini'><span class='line'> <span class="c1"># Fail2Ban configuration file</span>
+</span><span class='line'> <span class="c1">#</span>
+</span><span class='line'> <span class="c1"># Author: Remco Overdijk</span>
+</span><span class='line'> <span class="c1">#</span>
+</span><span class='line'> <span class="c1"># $Revision: 4 $</span>
+</span><span class='line'> <span class="c1">#</span>
+</span><span class='line'>
+</span><span class='line'> <span class="k">[Definition]</span>
+</span><span class='line'>
+</span><span class='line'> <span class="c1"># Option:  failregex</span>
+</span><span class='line'> <span class="c1"># Notes.:  regex to match the 404&#39;ed PMA file in the logfile. The</span>
+</span><span class='line'> <span class="c1">#          host must be matched by a group named &#39;host&#39;. The tag &#39;&lt;HOST&gt;&#39; can</span>
+</span><span class='line'> <span class="c1">#          be used for standard IP/hostname matching and is only an alias for</span>
+</span><span class='line'> <span class="c1">#          (?:::f{4,6}:)?(?P&lt;host&gt;\S+)</span>
+</span><span class='line'> <span class="c1"># Values:  TEXT</span>
+</span><span class='line'> <span class="c1">#</span>
+</span><span class='line'> <span class="na">failregex</span> <span class="o">=</span> <span class="s">&lt;HOST&gt; -.*&#39;GET .*(php|pma|PMA|p/m/a|db|sql|admin).*/(config/config\.inc|main)\.php.*&#39;.*404.*</span>
+</span><span class='line'>
+</span><span class='line'> <span class="c1"># Option:  ignoreregex</span>
+</span><span class='line'> <span class="c1"># Notes.:  regex to ignore. If this regex matches, the line is ignored.</span>
+</span><span class='line'> <span class="c1"># Values:  TEXT</span>
+</span><span class='line'> <span class="c1">#</span>
+</span><span class='line'> <span class="na">ignoreregex</span> <span class="o">=</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And this is of course accompanied by a bit in <code>jail.conf</code>:</p>
+
+<figure class='code'><figcaption><span>jail.conf</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='ini'><span class='line'><span class="k">[apache-pma]</span>
+</span><span class='line'>
+</span><span class='line'> <span class="na">enabled</span> <span class="o">=</span> <span class="s">true</span>
+</span><span class='line'><span class="s"> filter = apache-pma</span>
+</span><span class='line'><span class="s"> action = iptables-allports[name=pma]</span>
+</span><span class='line'><span class="s"> mail-whois[name=pma, dest=&lt;YOURADDRHERE&gt;]</span>
+</span><span class='line'><span class="s"> logpath = /var/log/apache2/access_log</span>
+</span><span class='line'><span class="s"> bantime = -1</span>
+</span><span class='line'><span class="s"> maxretry = 1</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Works for me, another 20 additional IPs/day onto the shitlist!</p>
+
+<h4>Update:</h4>
+
+<p> It seems another variation of these scans are hitting the NIC&rsquo;s quite often; One for Zen Cart to be more precise.
+ You can easily add support countering this scanner as well, simply by expanding the failregex with this line:</p>
+
+<p><code>^&lt;HOST&gt; -.*'GET .*(cart|boutique|catalog|butik|shop|zen|store).*/install\.txt.*'.*404.*</code></p>
+
+<p> You can put multiple regexes within one failregex, just put each one on a new line.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/09/20/impi-graphs-in-munin/">IPMI Graphs in Munin</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2009-09-20T17:22:59+02:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>20</span><span class='date-suffix'>th</span>, <span class='date-year'>2009</span></span> <span class='time'>5:22 pm</span></time>
+        
+           | <a href="/blog/2009/09/20/impi-graphs-in-munin/#disqus_thread"
+             data-disqus-identifier="https://rem.co/blog/2009/09/20/impi-graphs-in-munin/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>It is possible to monitor fan speeds and temperatures on Dell Poweredge servers under Linux. You can achieve this by reading out the IPMI data that is available on the system.</p>
+
+<p>I used the steps on <a href="https://hep.pa.msu.edu/twiki/bin/view/AGLT2/DellCactiSetup">this website</a> to buffer the data gathered by IPMI to use in Cacti.</p>
+
+<p>However, in addition to Cacti I also use Munin to monitor various system parameters. Wouldn&rsquo;t it be nice to incorporate graphs for fan speeds and temperatures in Munin? I thought so, so I developed a way to do this.</p>
+
+<p>In this case the solution consists out of 2 munin plugins and a PHP script that formats the IPMI values for graphing use. This could also be done directly in the plugins, but since I&rsquo;m not such an <code>awk</code> and <code>sed</code> expert I chose to let a PHP script handle the transformation, so I&rsquo;d be done sooner (time is money my friends!).</p>
+
+<p> First up, the PHP script:</p>
+
+<figure class='code'><figcaption><span>/usr/bin/ipmi.php</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="c1">#!/usr/bin/php</span>
+</span><span class='line'> <span class="o">&lt;?</span><span class="nx">php</span>
+</span><span class='line'> <span class="nv">$handle</span> <span class="o">=</span> <span class="nb">fopen</span><span class="p">(</span><span class="s1">&#39;/dev/shm/dell.ipmi&#39;</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">);</span>
+</span><span class='line'> <span class="k">while</span><span class="p">(</span><span class="o">!</span><span class="nb">feof</span><span class="p">(</span><span class="nv">$handle</span><span class="p">))</span> <span class="p">{</span>
+</span><span class='line'> <span class="nv">$line</span> <span class="o">=</span> <span class="nb">fgets</span><span class="p">(</span><span class="nv">$handle</span><span class="p">);</span>
+</span><span class='line'> <span class="k">if</span><span class="p">(</span><span class="nb">preg_match</span><span class="p">(</span><span class="s1">&#39;/AmbientTemp/&#39;</span><span class="p">,</span><span class="nv">$line</span><span class="p">))</span> <span class="k">echo</span> <span class="s1">&#39;tambi.value &#39;</span><span class="o">.</span><span class="nb">fgets</span><span class="p">(</span><span class="nv">$handle</span><span class="p">);</span>
+</span><span class='line'> <span class="k">if</span><span class="p">(</span><span class="nb">preg_match</span><span class="p">(</span><span class="s1">&#39;/CPU1Temp/&#39;</span><span class="p">,</span><span class="nv">$line</span><span class="p">))</span> <span class="k">echo</span> <span class="s1">&#39;tcpu1.value &#39;</span><span class="o">.</span><span class="nb">fgets</span><span class="p">(</span><span class="nv">$handle</span><span class="p">);</span>
+</span><span class='line'> <span class="k">if</span><span class="p">(</span><span class="nb">preg_match</span><span class="p">(</span><span class="s1">&#39;/CPU2Temp/&#39;</span><span class="p">,</span><span class="nv">$line</span><span class="p">))</span> <span class="k">echo</span> <span class="s1">&#39;tcpu2.value &#39;</span><span class="o">.</span><span class="nb">fgets</span><span class="p">(</span><span class="nv">$handle</span><span class="p">);</span>
+</span><span class='line'> <span class="k">if</span><span class="p">(</span><span class="nb">preg_match</span><span class="p">(</span><span class="s1">&#39;/Fan1/&#39;</span><span class="p">,</span><span class="nv">$line</span><span class="p">))</span> <span class="k">echo</span> <span class="s1">&#39;fan1.value &#39;</span><span class="o">.</span><span class="nb">fgets</span><span class="p">(</span><span class="nv">$handle</span><span class="p">);</span>
+</span><span class='line'> <span class="k">if</span><span class="p">(</span><span class="nb">preg_match</span><span class="p">(</span><span class="s1">&#39;/Fan2/&#39;</span><span class="p">,</span><span class="nv">$line</span><span class="p">))</span> <span class="k">echo</span> <span class="s1">&#39;fan2.value &#39;</span><span class="o">.</span><span class="nb">fgets</span><span class="p">(</span><span class="nv">$handle</span><span class="p">);</span>
+</span><span class='line'> <span class="k">if</span><span class="p">(</span><span class="nb">preg_match</span><span class="p">(</span><span class="s1">&#39;/Fan3/&#39;</span><span class="p">,</span><span class="nv">$line</span><span class="p">))</span> <span class="k">echo</span> <span class="s1">&#39;fan3.value &#39;</span><span class="o">.</span><span class="nb">fgets</span><span class="p">(</span><span class="nv">$handle</span><span class="p">);</span>
+</span><span class='line'> <span class="k">if</span><span class="p">(</span><span class="nb">preg_match</span><span class="p">(</span><span class="s1">&#39;/Fan4/&#39;</span><span class="p">,</span><span class="nv">$line</span><span class="p">))</span> <span class="k">echo</span> <span class="s1">&#39;fan4.value &#39;</span><span class="o">.</span><span class="nb">fgets</span><span class="p">(</span><span class="nv">$handle</span><span class="p">);</span>
+</span><span class='line'> <span class="k">if</span><span class="p">(</span><span class="nb">preg_match</span><span class="p">(</span><span class="s1">&#39;/Fan5/&#39;</span><span class="p">,</span><span class="nv">$line</span><span class="p">))</span> <span class="k">echo</span> <span class="s1">&#39;fan5.value &#39;</span><span class="o">.</span><span class="nb">fgets</span><span class="p">(</span><span class="nv">$handle</span><span class="p">);</span>
+</span><span class='line'> <span class="k">if</span><span class="p">(</span><span class="nb">preg_match</span><span class="p">(</span><span class="s1">&#39;/Fan6/&#39;</span><span class="p">,</span><span class="nv">$line</span><span class="p">))</span> <span class="k">echo</span> <span class="s1">&#39;fan6.value &#39;</span><span class="o">.</span><span class="nb">fgets</span><span class="p">(</span><span class="nv">$handle</span><span class="p">);</span>
+</span><span class='line'> <span class="k">if</span><span class="p">(</span><span class="nb">preg_match</span><span class="p">(</span><span class="s1">&#39;/PlanarTemp/&#39;</span><span class="p">,</span><span class="nv">$line</span><span class="p">))</span> <span class="k">echo</span> <span class="s1">&#39;tplan.value &#39;</span><span class="o">.</span><span class="nb">fgets</span><span class="p">(</span><span class="nv">$handle</span><span class="p">);</span>
+</span><span class='line'> <span class="k">if</span><span class="p">(</span><span class="nb">preg_match</span><span class="p">(</span><span class="s1">&#39;/RiserTemp/&#39;</span><span class="p">,</span><span class="nv">$line</span><span class="p">))</span> <span class="k">echo</span> <span class="s1">&#39;trise.value &#39;</span><span class="o">.</span><span class="nb">fgets</span><span class="p">(</span><span class="nv">$handle</span><span class="p">);</span>
+</span><span class='line'> <span class="p">}</span>
+</span><span class='line'> <span class="nb">fclose</span><span class="p">(</span><span class="nv">$handle</span><span class="p">);</span>
+</span><span class='line'> <span class="cp">?&gt;</span><span class="x"></span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p> With the SHM values now being prefixed with matching Munin values, we can graph them in 2 plugins:</p>
+
+<figure class='code'><figcaption><span>/etc/munin/plugins/ipmitemps</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c">#!/bin/sh</span>
+</span><span class='line'> <span class="k">if</span> <span class="o">[</span> <span class="s1">&#39;$1&#39;</span> <span class="o">=</span> <span class="s1">&#39;autoconf&#39;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'> <span class="k">if</span> <span class="o">[</span> -r /dev/shm/dell.ipmi <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'> <span class="nb">echo </span>yes
+</span><span class='line'> <span class="nb">exit </span>0
+</span><span class='line'> <span class="k">else</span>
+</span><span class='line'> <span class="nb">echo </span>no
+</span><span class='line'> <span class="nb">exit </span>1
+</span><span class='line'> <span class="k">fi</span>
+</span><span class='line'> <span class="k">fi</span>
+</span><span class='line'>
+</span><span class='line'> <span class="k">if</span> <span class="o">[</span> <span class="s1">&#39;$1&#39;</span> <span class="o">=</span> <span class="s1">&#39;config&#39;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;graph_title Dell 2850 IPMI Temperatures&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;graph_order tcpu1 tcpu2 tambi tplan trise&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;graph_vlabel Temperature (Deg C)&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;graph_scale yes&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;graph_info This graph shows sensor temperatures&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;graph_category system&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;tcpu1.label CPU1&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;tcpu1.warning 80&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;tcpu1.critical 90&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;tcpu1.info XEON CPU 1 Temperature&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;tcpu2.label CPU2&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;tcpu2.warning 80&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;tcpu2.critical 90&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;tcpu2.info XEON CPU 2 Temperature&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;tambi.label Ambient&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;tambi.warning 80&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;tambi.critical 90&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;tambi.info Ambient Temperature&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;tplan.label Planar&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;tplan.warning 80&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;tplan.critical 90&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;tplan.info Planar Temperature&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;trise.label Riser&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;trise.warning 80&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;trise.critical 90&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;trise.info Riser Temperature&#39;</span>
+</span><span class='line'> <span class="nb">exit </span>0
+</span><span class='line'> <span class="k">fi</span>
+</span><span class='line'> /usr/bin/ipmi.php
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p> and</p>
+
+<figure class='code'><figcaption><span>/etc/munin/plugins/ipmifans</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'> <span class="c">#!/bin/sh</span>
+</span><span class='line'>
+</span><span class='line'> <span class="k">if</span> <span class="o">[</span> <span class="s1">&#39;$1&#39;</span> <span class="o">=</span> <span class="s1">&#39;autoconf&#39;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'> <span class="k">if</span> <span class="o">[</span> -r /dev/shm/dell.ipmi <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'> <span class="nb">echo </span>yes
+</span><span class='line'> <span class="nb">exit </span>0
+</span><span class='line'> <span class="k">else</span>
+</span><span class='line'> <span class="nb">echo </span>no
+</span><span class='line'> <span class="nb">exit </span>1
+</span><span class='line'> <span class="k">fi</span>
+</span><span class='line'> <span class="k">fi</span>
+</span><span class='line'>
+</span><span class='line'> <span class="k">if</span> <span class="o">[</span> <span class="s1">&#39;$1&#39;</span> <span class="o">=</span> <span class="s1">&#39;config&#39;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;graph_title Dell 2850 IPMI Fanspeeds&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;graph_order fan1 fan2 fan3 fan4 fan5 fan6&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;graph_vlabel Fanspeed (RPM)&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;graph_scale yes&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;graph_info This graph shows fanspeeds&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;graph_category system&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;fan1.label Fan1&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;fan1.info Fan1 speed&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;fan2.label Fan2&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;fan2.info Fan2 speed&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;fan3.label Fan3&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;fan3.info Fan3 speed&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;fan4.label Fan4&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;fan4.info Fan4 speed&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;fan5.label Fan5&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;fan5.info Fan5 speed&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;fan6.label Fan6&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;fan6.info Fan6 speed&#39;</span>
+</span><span class='line'> <span class="nb">exit </span>0
+</span><span class='line'> <span class="k">fi</span>
+</span><span class='line'> /usr/bin/ipmi.php
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Restart your <code>munin-node</code>, run the munin crons, and voila, graphs!
+ With these settings they will look like this:</p>
+
+<p><em>insert image</em></p>
+
+<p>You can modify the params to change the graphs ofcourse.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/09/04/cisco-voip-oplossing-voor-ziggo-telefonie/">Cisco VoIP Oplossing Voor Ziggo Telefonie</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2009-09-04T11:39:48+02:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2009</span></span> <span class='time'>11:39 am</span></time>
+        
+           | <a href="/blog/2009/09/04/cisco-voip-oplossing-voor-ziggo-telefonie/#disqus_thread"
+             data-disqus-identifier="https://rem.co/blog/2009/09/04/cisco-voip-oplossing-voor-ziggo-telefonie/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><blockquote><p>This article is only available in Dutch.</p></blockquote>
+
+
+<p>Sinds een recente verhuizing beschik ik thuis over een Ziggo Alles-in-1 Plus pakket, met internet, tv, én telefonie.</p>
+
+<p>Daarvoor maakte ik gebruik van een Cisco VoIP netwerk op basis van een externe SIP provider. Natuurlijk wilde ik mijn Cisco netwerk blijven gebruiken, maar dan wel op basis van de Ziggo telefonie aansluiting.</p>
+
+<p>Helaas maakt Ziggo gebruik van het <a href="http://en.wikipedia.org/wiki/PacketCable">PacketCable</a> protocol over <a href="http://en.wikipedia.org/wiki/DOCSIS">EuroDocsis</a>, in plaats van <a href="http://en.wikipedia.org/wiki/Session_Initiation_Protocol">SIP</a>.
+Daarnaast heeft het Motorola SurfBoard modem dat bij het Ziggo abonnement geleverd wordt geen SIP interface voor het LAN, maar beschikt over 2 <a href="http://en.wikipedia.org/wiki/Plain_old_telephone_service">POTS</a> poorten op <a href="http://en.wikipedia.org/wiki/RJ11,_RJ14,_RJ25">RJ11</a> connectoren.</p>
+
+<p>Alsof dat nog niet genoeg ellende is maakt Ziggo <em>geen</em> gebruik van <a href="http://en.wikipedia.org/wiki/Dual-tone_multi-frequency">DTMF ETSI</a> signalering voor onder andere nummerweergave, maar in plaats daarvan het veel minder bekende <a href="http://en.wikipedia.org/wiki/FSK_standards_for_use_in_Caller_ID_and_remote_metering">Bellcore FSK</a>.</p>
+
+<p>Goed, tot zover de met technische termen bezaaide probleemvorming. Tijd voor een oplossing om je mooie VoIP apparatuur aan de gang te krijgen! Er zijn naar mijn ervaring bijzonder weinig how-to&rsquo;s / handleidingen of tutorials te vinden op het internet om een dergelijke setup te maken, en de informatie over het Ziggo netwerk is zo mogelijk nog beperkter, vandaar deze uitgebreide uitleg om voor eens en altijd van dat probleem af te zijn!</p>
+
+<h3>De basis</h3>
+
+<p> Als basis voor deze tutorial gebruik ik de volgende hardware:</p>
+
+<ul>
+<li><a href="http://www.cisco.com/en/US/products/hw/routers/ps221/products_data_sheet09186a00800920f2.html">Cisco 1760-V Modular Access Router</a></li>
+<li><a href="http://www.cisco.com/en/US/products/hw/phones/ps379/ps1854/">Cisco 7940 IP-Phones</a></li>
+<li><a href="http://www.cisco.com/en/US/products/ps5946/">Cisco 7971GE IP-Phones</a></li>
+<li><a href="http://www.motorola.com/staticfiles/Business/Products/Modems%20and%20Gateways/Modems/Digital%20Voice%20Modems/SBV5121/_Documents/Static%20Files/SBV5121e-data-sheet-534281-001-a.pdf">Motorola SBV5121e VoIP Cable Modem</a></li>
+</ul>
+
+
+<p>Naast deze hardware heb ik nog een tweede router (voor o.a. Wireless) en de nodige switching apparatuur draaien, maar dat maakt voor het doel van deze tutorial weinig uit.</p>
+
+<p>Een schematische weergave van de aan elkaar geknoopte hardware:</p>
+
+<p><em>insert image</em></p>
+
+<h3>Stap 1: De hardware verbindingen</h3>
+
+<p> De meest ideale situatie zou zijn om de (digitale) VoIP toestellen digitaal via SIP of een ander protocol met Ziggo te verbinden om zo de beste gesprekskwaliteit en de laagste latency te krijgen. Helaas is dit dus niet mogelijk in combinatie met het Motorola modem, en zijn we veroordeeld tot het gebruik van analoge lijnen.
+ Gelukkig beschikt de Cisco 1760 router over de mogelijkheid om aangesloten te worden op PSTN lijnen doormiddel van een Voice Interface Card.
+ Om van deze mogelijkheid gebruik te maken moet je router over een aantal zaken beschikken:</p>
+
+<ul>
+<li>De mogelijkheid om VIC&rsquo;s te plaatsen</li>
+<li>Een PVDM kaart waarop een DSP chip aanwezig is om van je router een Voice Gateway te maken. (In dit voorbeeld wordt een <code>PVDM-256k-4=</code> gebruikt)</li>
+<li>De IOS versie op de router dient over het <code>IP Voice feature pack</code> te beschikken. (In dit voorbeeld wordt <code>IOS (C1700-ADVENTERPRISEK9-M) Version 12.4(15)T5 (fc4)</code> gebruikt, die daar naast Cisco Unified Call Manager ook over beschikt)</li>
+</ul>
+
+
+<p> De VIC die je vervolgens nodig hebt is van het Foreign Exchange Office (<code>FXO</code>) type. Andere typen als Ear&amp;Mouth (<code>E/M</code>) en Foreign Exchange Subscriber (<code>FXS</code>) zijn voor dit doeleinde <em>NIET</em> geschikt, en kunnen tevens niet gelijktijdig op dezelfde router gebruikt worden. Maak dus niet dezelfde fout als ik door een <code>VIC-2E/M</code> aan te schaffen omdat deze vrij goedkoop zijn, in de hoop dat het werkt.. want het werkt niet! Helaas is de <code>FXO</code> kaart de duurste van de collectie, zeker als je nummerweergave wilt. Een overzicht van alle beschikbare FXO kaarten kun je vinden bij <a href="http://www.cisco.com/en/US/products/hw/routers/ps274/products_tech_note09186a00800b53c7.shtml">Cisco</a>. Mijn advies is om de <code>VIC2-2FXO</code> te nemen, aangezien deze over alle benodigde opties beschikt (helaas wel de duurste kaart met 2 poorten).</p>
+
+<p> Goed, <code>PVDM</code> en <code>VIC</code> in de router, opstarten, en de analoge telefoonlijnen met RJ11 pluggen van de 2 <code>VIC</code> poorten naar de 2 poorten op het modem verbinden en we zijn klaar om te configureren!</p>
+
+<h3>Stap 2: Router configuratie</h3>
+
+<p> Gebruik je favoriete protocol om in te loggen op je router (RS232, ssh of telnet), zet de router in enable mode, en check of je PVDM en VIC actief zijn en werken en check gelijk op welke poorten ze zitten. De VIC2-2FXO zit in dit voorbeeld in slot 2, en beschikt over voice-ports 2/0 en 2/1.
+ Ga vervolgens verder met de configuratie van het geheel via <code>conf t</code>. Ik ga er van uit dat de basis van je router goed is ingesteld, en ga dus alleen in op de voice settings.</p>
+
+<h4>voice card</h4>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>trunk group pots
+</span><span class='line'> hunt-scheme round-robin
+</span><span class='line'> !</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We maken een hunt group aan voor de analoge lijnen, zodat de router zelf bepaalt welke lijn vrij is en deze voor inkomende/uitgaande oproepen gebruikt.</p>
+
+<h4>voice ports</h4>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>voice-port 2/0
+</span><span class='line'> trunk-group pots
+</span><span class='line'> cptone JP
+</span><span class='line'> connection plar 1337
+</span><span class='line'> caller-id enable
+</span><span class='line'> !
+</span><span class='line'> voice-port 2/1
+</span><span class='line'> trunk-group pots
+</span><span class='line'> cptone JP
+</span><span class='line'> connection plar 1337
+</span><span class='line'> caller-id enable
+</span><span class='line'> !</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Configureer beide voice-ports, en voeg ze aan de trunk group toe. Zet caller-id aan. De cptone parameter geeft aan wat voor landinstellingen de PSTN lijn gebruikt. Normaal gesproken zou dit NL zijn voor gebruik in Nederland, maar aangezien normale PSTN lijnen hier DTMF ETSI gebruiken werkt dat niet voor onze doeleinden. Daarom gebruiken we JP (Japan), aangezien daar FSK gebruikt wordt. Het klinkt wat vreemd, maar werkt perfect. Tenslotte voegen we een &quot;private line automatic ringdown&quot; (PLAR) toe op de lijnen. Hiermee zorgen we dat wanneer een oproep binnenkomt op de lijn, deze automatisch wordt doorgeschakeld naar de opgegeven PLAR lijn. De opgegeven PLAR lijn is in dit geval een Overlay voor de ephone DN&rsquo;s die we later zullen configureren. In het kort komt het erop neer dat zodra de lijn gebeld wordt de Overlay wordt aangeroepen, en alle toestellen die gekoppeld zijn aan de DN zullen overgaan.</p>
+
+<h4>codecs</h4>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>voice class codec 1
+</span><span class='line'> codec preference 1 g711ulaw
+</span><span class='line'> codec preference 2 g711alaw
+</span><span class='line'> !</span></code></pre></td></tr></table></div></figure>
+
+
+<p> Niet zo belangrijk voor dit voorbeeld, maar toch is het handig om in te stellen welke codecs gebruikt worden binnen het VoIP netwerk (bellen tussen de toestellen onderling). de PVDM DSP handelt verder de codecs voor de analoge lijnen af.</p>
+
+<h4>dial-peers</h4>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>dial-peer voice 1 pots
+</span><span class='line'> trunkgroup pots
+</span><span class='line'> preference 7
+</span><span class='line'> destination-pattern 0[1-9]........
+</span><span class='line'> incoming called-number .
+</span><span class='line'> no digit-strip
+</span><span class='line'> forward-digits all
+</span><span class='line'> !
+</span><span class='line'> dial-peer voice 2 pots
+</span><span class='line'> trunkgroup pots
+</span><span class='line'> destination-pattern 00[1-9]..........
+</span><span class='line'> incoming called-number .
+</span><span class='line'> no digit-strip
+</span><span class='line'> forward-digits all
+</span><span class='line'> !
+</span><span class='line'> dial-peer voice 3 pots
+</span><span class='line'> trunkgroup pots
+</span><span class='line'> destination-pattern 1233
+</span><span class='line'> incoming called-number .
+</span><span class='line'> no digit-strip
+</span><span class='line'> forward-digits all
+</span><span class='line'> !</span></code></pre></td></tr></table></div></figure>
+
+
+<p> Voeg dial-peers toe voor alle inkomende en uitgaande belpatronen. Voor het gemak gebruiken alle dial-peers hier hetzelfde inkomende patroon (.), om het binnenkomende gesprek rechtstreeks zonder modificatie door te zetten naar de PLAR. De dial-peers dienen uiteraard net als de lijnen gekoppeld te worden aan de trunk group.
+ De destination-patterns geven aan welke telefoonnummers geldig zijn, en indien een gedraaid nummer voldoet aan één van de patterns wordt het gesprek doorgezet naar de trunk, en zal dus gebruik maken van één van de PSTN lijnen. De opgegeven patterns zijn alles behalve compleet, maar dekken in ieder geval de volgende situaties:</p>
+
+<ul>
+<li>Een 10 cijferig telefoonnummer, beginnend met een 0, gevolgd door een 1 tot 9 en vervolgens nog 8 random cijfers. (Bijv. 0131212121)</li>
+<li>Een 13 cijferig internationaal telefoonnummer, beginnend met 00, gevolgd door een 1 tot 9 en nog 10 random cijfers. (Bijv. 0031131212121)</li>
+<li>Het nummer van de Ziggo voicemail, 1233.</li>
+</ul>
+
+
+<p>Standaard stript de dial-peer opgegeven dialpatterns van het nummer af alvorens deze door te geven, dus gebruiken we no digit-strip om dit te voorkomen. Tenslotte zorgen we dat alle overige gedraaide nummers (right-justified) worden doorgezet naar de PSTN lijn.</p>
+
+<h4>telephony service</h4>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>telephony-service
+</span><span class='line'> load 7960-7940 P000308000400
+</span><span class='line'> load 7971 SCCP70.8-2-2SR1S
+</span><span class='line'> load 7970 SCCP70.8-2-2SR1S
+</span><span class='line'> max-ephones 5
+</span><span class='line'> max-dn 5
+</span><span class='line'> ip source-address 10.0.0.5 port 2000
+</span><span class='line'> auto assign 1 to 5
+</span><span class='line'> calling-number initiator
+</span><span class='line'> system message ccme1 ready..
+</span><span class='line'> url services http://10.0.0.35:8080/CSFEnterprise-war/
+</span><span class='line'> cnf-file perphone
+</span><span class='line'> network-locale NL
+</span><span class='line'> time-zone 28
+</span><span class='line'> time-format 24
+</span><span class='line'> date-format dd-mm-yy
+</span><span class='line'> voicemail 1233
+</span><span class='line'> max-conferences 4 gain -6
+</span><span class='line'> moh rick.au
+</span><span class='line'> transfer-system full-consult dss
+</span><span class='line'> create cnf-files version-stamp 7960 Apr 17 2009 09:02:53
+</span><span class='line'> !</span></code></pre></td></tr></table></div></figure>
+
+
+<p> Configureer je VoIP telephony service naar eigen inzicht. Bovenstaande configuratie is slechts een voorbeeld van mijn eigen configuratie. Zaken waar je op moet letten zijn of je loads goed gespecificeerd zijn (denk ook aan de tftp statements), het voicemail nummer (in dit geval extern naar Ziggo) voor wanneer op de Berichten knop op de telefoon wordt gedrukt, en de land instellingen.</p>
+
+<h4>DN&rsquo;s</h4>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>ephone-dn 1
+</span><span class='line'> number 1234
+</span><span class='line'> label Woonkamer
+</span><span class='line'> description 013xxxxxxx
+</span><span class='line'> name Woonkamer
+</span><span class='line'> call-forward busy 1235
+</span><span class='line'> call-forward noan 1235 timeout 120
+</span><span class='line'> ephone-hunt login
+</span><span class='line'> !
+</span><span class='line'> ephone-dn 2
+</span><span class='line'> number 1235
+</span><span class='line'> label Kantoor
+</span><span class='line'> description 013xxxxxxx
+</span><span class='line'> name Kantoor
+</span><span class='line'> call-forward busy 1234
+</span><span class='line'> call-forward noan 1234 timeout 120
+</span><span class='line'> ephone-hunt login
+</span><span class='line'> !
+</span><span class='line'> ephone-dn 3
+</span><span class='line'> number 1337
+</span><span class='line'> label Extern
+</span><span class='line'> description Extern Overlay
+</span><span class='line'> name Extern
+</span><span class='line'> !</span></code></pre></td></tr></table></div></figure>
+
+
+<p> Voeg een ephone DN toe voor ieder toestel dat je aan gaat sluiten, met een eigen nummer (dit nummer en label is zichtbaar op het toestel, en wordt gebruikt om onderling met elkaar te bellen). Ik heb de DN&rsquo;s zo ingesteld dat wanneer ze niet beantwoord worden/bezet zijn automatisch de andere DN wordt aangeroepen. Voeg tenslotte de Overlay DN toe die in de voice-ports is gespecificeerd, en geef het een label zodat je op je telefoons kunt zien dat een oproep van de Externe lijn afkomstig is.</p>
+
+<h4>ephones</h4>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>ephone 3
+</span><span class='line'> mac-address 000D.EDAB.5055
+</span><span class='line'> speed-dial 1 xxxxxxxxxx label &quot;xxxx&quot;
+</span><span class='line'> type 7940
+</span><span class='line'> button 1o2,3
+</span><span class='line'> pin 1235
+</span><span class='line'> !
+</span><span class='line'> ephone 4
+</span><span class='line'> conference admin
+</span><span class='line'> mac-address 0015.2BD2.01C7
+</span><span class='line'> username &quot;remco&quot; password xxxxxxxx
+</span><span class='line'> speed-dial 1 xxxxxxxxxx label &quot;xxxx&quot;
+</span><span class='line'> speed-dial 2 xxxxxxxxxx label &quot;xxxx&quot;
+</span><span class='line'> speed-dial 3 xxxxxxxxxx label &quot;xxxx&quot;
+</span><span class='line'> type 7971
+</span><span class='line'> button 1o1,3
+</span><span class='line'> pin 1234
+</span><span class='line'> !</span></code></pre></td></tr></table></div></figure>
+
+
+<p> Voeg ephones toe voor ieder toestel dat je hebt. Configuratie hangt natuurlijk af van het toestel dat je hebt en hoe je wil dat hij reageert. Voeg users en speeddials toe naar wens. De enige cruciale data is het MAC adres (anders weet de router niet welk toestel aan de ephone te koppelen), en de button configuratie.</p>
+
+<p> De button configuratie zorgt er namelijk voor dat een lijn aan het toestel gekoppeld wordt, inclusief de Overlay DN. zo heeft ephone 3 een button <code>1o2,3</code> . Dit houdt in dat DN&rsquo;s 2 en 3 in overlay mode onder button 1 van dit toestel zitten. De router zoekt automatisch de meest unieke lijn uit, en presenteert deze DN onder de knop. Aangezien Overlay DN 3 op meerdere toestellen wordt gebruikt is deze het minst uniek, en zal enkel op de achtergrond aanwezig zijn. ephone 4 maakt op button 1 gebruik van DN&rsquo;s 1 en 3. Op deze manier presenteren beide toestellen hun eigen nummer, maar luisteren op de achtergrond wel mee naar de Overlay DN, en zullen dus gelijktijdig overgaan zodra een gesprek binnenkomt op de trunk en deze wordt doorgezet naar de Overlay DN.</p>
+
+<h3>Stap 3: klaar!</h3>
+
+<p> Save je configuratie door een <code>copy run start</code> te doen, en je zou aan de gang moeten kunnen!</p>
+
+<ul>
+<li>Onderling bellen kan door de unieke DN van een ephone te bellen (1234 en 1235 in dit geval)</li>
+<li>Extern bellen kan door een telefoonnummer te draaien dat gespecificeerd is in één van de dial-peers</li>
+<li>Voicemail is gekoppeld onder de berichtenknop van een toestel.</li>
+<li>Binnenkomende gesprekken zullen op alle toestellen die gebruik maken van de Overlay DN overgaan, inclusief nummerweergave!</li>
+</ul>
+
+
+<p><em>Veel succes!</em></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/08/18/iptables-creating-persistent-bans-from-fail2ban/">Iptables: Creating Persistent Bans From Fail2Ban</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2009-08-18T15:53:10+02:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>18</span><span class='date-suffix'>th</span>, <span class='date-year'>2009</span></span> <span class='time'>3:53 pm</span></time>
+        
+           | <a href="/blog/2009/08/18/iptables-creating-persistent-bans-from-fail2ban/#disqus_thread"
+             data-disqus-identifier="https://rem.co/blog/2009/08/18/iptables-creating-persistent-bans-from-fail2ban/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>On my servers I use the nifty program <a href="http://www.fail2ban.org/wiki/index.php/Main_Page">Fail2Ban</a> to perform logbased automatic firewalling of &lsquo;bad&rsquo; ip&rsquo;s.</p>
+
+<p>The idea behind this is easy: Some IP performs an action I don&rsquo;t approve of. This can be any number of things, e.g. requesting pages in Apache that are commonly accessed by bots and/or scanners, or trying to log in to SSH with accounts that do not exist on the system. This bad behavior gets logged, and Fail2Ban keeps tabs on those logs, and using a number of rules it determines if a host is &lsquo;bad&rsquo; enough to temporarily or permanently ban all access to the server. It does so by adding a few chains to Iptables (one for each thing it checks for), and dynamically adding/removing IP&rsquo;s to/from these chains.</p>
+
+<p>This all works perfectly. However, there&rsquo;s one issue; When Iptables gets reloaded, it restores its default rules, removing the Fail2Ban chains and all the rules they contain, even if the ip&rsquo;s in the chain were marked as permanent.</p>
+
+<p>I created a workaround for this problem, consisting of two simple steps:</p>
+
+<ul>
+<li><p>When a &lsquo;bad&rsquo; ip gets banned, it&rsquo;s added to the Iptables chain, but also written to a file, containing all collected &lsquo;bad&rsquo; ip&rsquo;s. (I use <code>/etc/shitlist</code> for this purpose).</p></li>
+<li><p>Whenever Iptables gets reloaded, I run a PHP script that checks the <code>/etc/shitlist</code> file for &lsquo;safe&rsquo; and duplicate ip&rsquo;s, and writes all other ip&rsquo;s to the permanent Blocklist chain. (The checking for &lsquo;safe&rsquo; ip&rsquo;s might be a bit unneeded, but with my Fail2Ban rules it&rsquo;s possible that one of my own ip&rsquo;s gets banned for 10 minutes if a SSH login attempt fails for 5 times. Though it&rsquo;s a temporary ban, the ip will still get written to the shitlist, and would end up in the permanent Blocklist).</p></li>
+</ul>
+
+
+<p>To make this work, I made the following changes:</p>
+
+<p>Every <code>jail</code> in Fail2Ban uses an <code>action.d</code> script to perform (un)banning. I defaulted all actions to an action script called <code>iptables-allports.conf</code>. Basically this action drops everything in Iptables if a package originates from the &lsquo;bad&rsquo; IP.</p>
+
+<p>I updated the ban action such that:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>actionban = iptables -I fail2ban-&lt;name&gt; 1 -s &lt;ip&gt; -j DROP
+</span><span class='line'>echo &lt;ip&gt; &gt;&gt; /etc/shitlist</span></code></pre></td></tr></table></div></figure>
+
+
+<p>After that I created a PHP script that updates Iptables with the ip&rsquo;s contained in the shitlist:</p>
+
+<figure class='code'><figcaption><span>shitlist.php</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span class='line'><span class="sd">/** script that loads a shitlist file into iptables */</span>
+</span><span class='line'><span class="c1">//CONFIG </span>
+</span><span class='line'><span class="nv">$shitlists</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s2">&quot;/root/list.txt&quot;</span><span class="p">,</span><span class="s2">&quot;/etc/shitlist&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$chain</span> <span class="o">=</span> <span class="s2">&quot;Blocklist&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$safelist</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s2">&quot;x.x.x.x&quot;</span><span class="p">,</span> <span class="s2">&quot;y.y.y.y&quot;</span><span class="p">,</span> <span class="s2">&quot;z.z.z.z&quot;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">echo</span> <span class="s2">&quot;Reading current IPTABLES state</span><span class="se">\r\n</span><span class="s2">&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$data</span> <span class="o">=</span> <span class="nb">shell_exec</span><span class="p">(</span><span class="s1">&#39;iptables -S &#39;</span><span class="o">.</span><span class="nv">$chain</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$iparr</span> <span class="o">=</span> <span class="nb">explode</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="nv">$data</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$ref</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+</span><span class='line'><span class="k">for</span><span class="p">(</span><span class="nv">$i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="nv">$i</span><span class="o">&lt;</span><span class="nb">sizeof</span><span class="p">(</span><span class="nv">$iparr</span><span class="p">);</span><span class="nv">$i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="nb">substr_count</span><span class="p">(</span><span class="nv">$iparr</span><span class="p">[</span><span class="nv">$i</span><span class="p">],</span><span class="s2">&quot;.&quot;</span><span class="p">)</span><span class="o">==</span><span class="mi">3</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nv">$ref</span><span class="p">[</span><span class="nv">$j</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$iparr</span><span class="p">[</span><span class="nv">$i</span><span class="p">];</span>
+</span><span class='line'>       <span class="nv">$j</span><span class="o">++</span><span class="p">;</span>
+</span><span class='line'>   <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="nb">sort</span><span class="p">(</span><span class="nv">$ref</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$total</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="k">foreach</span><span class="p">(</span><span class="nv">$shitlists</span> <span class="k">as</span> <span class="nv">$shitlist</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">echo</span> <span class="s2">&quot;Reading shitlist at </span><span class="si">$shitlist\r\n</span><span class="s2">&quot;</span><span class="p">;</span>
+</span><span class='line'>  <span class="c1">//READ FILE</span>
+</span><span class='line'>  <span class="nv">$fh</span> <span class="o">=</span> <span class="nb">fopen</span><span class="p">(</span><span class="nv">$shitlist</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="nv">$fh</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nv">$itt</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>      <span class="nv">$iparr</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+</span><span class='line'>      <span class="k">while</span><span class="p">(</span><span class="o">!</span><span class="nb">feof</span><span class="p">(</span><span class="nv">$fh</span><span class="p">))</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nv">$ip</span> <span class="o">=</span> <span class="nb">trim</span><span class="p">(</span><span class="nb">fgets</span><span class="p">(</span><span class="nv">$fh</span><span class="p">));</span>
+</span><span class='line'>          <span class="k">if</span><span class="p">(</span><span class="nb">strlen</span><span class="p">(</span><span class="nv">$ip</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">6</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>              <span class="k">if</span><span class="p">(</span><span class="nb">array_search</span><span class="p">(</span><span class="nv">$ip</span><span class="p">,</span><span class="nv">$iparr</span><span class="p">)</span><span class="o">===</span><span class="k">false</span><span class="o">&amp;&amp;</span><span class="nb">array_search</span><span class="p">(</span><span class="nv">$ip</span><span class="p">,</span><span class="nv">$safelist</span><span class="p">)</span><span class="o">===</span><span class="k">false</span><span class="o">&amp;&amp;</span><span class="nb">array_search</span><span class="p">(</span><span class="nv">$ip</span><span class="o">.</span><span class="s2">&quot;/32&quot;</span><span class="p">,</span><span class="nv">$ref</span><span class="p">)</span><span class="o">===</span><span class="k">false</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                  <span class="nv">$iparr</span><span class="p">[]</span> <span class="o">=</span> <span class="nv">$ip</span><span class="p">;</span>
+</span><span class='line'>                  <span class="k">echo</span> <span class="s2">&quot;Now adding </span><span class="si">$ip</span><span class="s2"> to </span><span class="si">$chain\r\n</span><span class="s2">&quot;</span><span class="p">;</span>
+</span><span class='line'>                  <span class="nv">$ins</span> <span class="o">=</span> <span class="mi">18</span><span class="o">+</span><span class="nv">$itt</span><span class="p">;</span>
+</span><span class='line'>                  <span class="nb">shell_exec</span><span class="p">(</span><span class="s2">&quot;iptables -I &quot;</span><span class="o">.</span><span class="nv">$chain</span><span class="o">.</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="nv">$ins</span><span class="o">.</span><span class="s2">&quot; -s &quot;</span><span class="o">.</span><span class="nv">$ip</span><span class="o">.</span><span class="s2">&quot;/32 -j DROP&quot;</span><span class="p">);</span>
+</span><span class='line'>                  <span class="nv">$itt</span><span class="o">++</span><span class="p">;</span>
+</span><span class='line'>              <span class="p">}</span>
+</span><span class='line'>          <span class="p">}</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>      <span class="nb">fclose</span><span class="p">(</span><span class="nv">$fh</span><span class="p">);</span>
+</span><span class='line'>      <span class="k">echo</span> <span class="s2">&quot;Finished adding </span><span class="si">$itt</span><span class="s2"> ip&#39;s from list </span><span class="si">$shitlist</span><span class="s2"> to chain </span><span class="si">$chain</span><span class="s2"> . Bye!</span><span class="se">\r\n</span><span class="s2">&quot;</span><span class="p">;</span>
+</span><span class='line'>      <span class="nv">$total</span> <span class="o">=</span> <span class="nv">$total</span> <span class="o">+</span> <span class="nv">$itt</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">echo</span> <span class="s2">&quot;Could not open shitlist file </span><span class="si">$shitlist</span><span class="s2"> . Skipping this list</span><span class="se">\r\n</span><span class="s2">&quot;</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="k">echo</span> <span class="s2">&quot;Finished adding </span><span class="si">$total</span><span class="s2"> ip&#39;s to chain </span><span class="si">$chain</span><span class="s2"> from &quot;</span><span class="o">.</span><span class="nb">sizeof</span><span class="p">(</span><span class="nv">$shitlists</span><span class="p">)</span><span class="o">.</span><span class="s2">&quot; shitlists.</span><span class="se">\r\n</span><span class="s2">&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="cp">?&gt;</span><span class="x"> </span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You can run the script from the commandline (as root!) simply by stating <code>php shitlist.php</code>, or add it to the startup script of your Iptables installation.</p>
+
+<p>Hope this helps keeping your NIC&rsquo;s available for VALID traffic!</p>
+
+<h3>Update:</h3>
+
+<p>Made some changes to the script to check for already existing bans, to keep your chains clean!</p>
+
+<h3>Update 2:</h3>
+
+<p>Little tweak to the script so it now loads an array of lists, in case you have various sources.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/page4">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/page2">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1><i class="icon-user icon-large"></i>&nbsp;About Me</h1>
+	<div id="so">
+	<a href="https://stackoverflow.com/users/813718/remco-overdijk">
+		<img src="https://stackoverflow.com/users/flair/813718.png" width="208" height="58" alt="profile for Remco Overdijk at Stack Overflow, Q&amp;A for professional and enthusiast programmers" title="profile for Remco Overdijk at Stack Overflow, Q&amp;A for professional and enthusiast programmers">
+	</a>
+	</div>
+</section>
+<section>
+  <h1><i class="icon-pencil icon-large"></i>&nbsp;Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/03/09/puppet-calculating-average-catalog-compilation-times/">Puppet: Calculating Average Catalog Compilation Times</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/02/12/git-the-difference-between-lightweight-and-annotated-tags/">Git: The Difference Between Lightweight and Annotated Tags</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/02/09/bacula-cancelling-all-jobs-that-are-currently-writing/">Bacula: Cancelling All Jobs That Are Currently Writing</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/01/15/bacula-purging-and-deleting-old-volumes/">Bacula: Purging and Deleting Old Volumes</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/01/14/music-end-of-the-year-mix-2014/">Music: End of the Year Mix 2014</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1><i class="icon-twitter icon-large"></i>&nbsp;Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  <script type="text/javascript">
+     $(document).ready(function(){
+      getTwitterFeed("RemzJay", 5, 0);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <p>Follow <a href="http://twitter.com/RemzJay">@RemzJay</a></p>
+  
+</section>
+
+
+<section>
+  <h1><i class="icon-github-alt icon-large"></i>&nbsp;GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/Remz-Jay">@Remz-Jay</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'Remz-Jay',
+            count: 10,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+<section class="flickr">
+    <h1><i class="icon-camera icon-large"></i>&nbsp;Flickr Albums</h1>
+		<ul id="flickrsets">
+          <li><a href="https://www.flickr.com/photos/93556621@N05/21961762008" target="_blank"><img src="https://farm6.staticflickr.com/5634/21961762008_7d225b59ba_n.jpg" class="aside-flickr" title="The bus"/></a><h2><a href="https://www.flickr.com/photos/93556621@N05/21961762008">NYC in B/W</a></h2><p></p></li><li><a href="https://www.flickr.com/photos/93556621@N05/21738387919" target="_blank"><img src="https://farm6.staticflickr.com/5627/21738387919_2f513ec807_n.jpg" class="aside-flickr" title="IMG_4732.jpg"/></a><h2><a href="https://www.flickr.com/photos/93556621@N05/21738387919">USA 2015</a></h2><p></p></li><li><a href="https://www.flickr.com/photos/93556621@N05/8519041005" target="_blank"><img src="https://farm9.staticflickr.com/8085/8519041005_d09c9c4cf6_n.jpg" class="aside-flickr" title="IMG_7581.jpg"/></a><h2><a href="https://www.flickr.com/photos/93556621@N05/8519041005">Vietnam 2011</a></h2><p>Backpacking trip through Thailand and Vietnam (North to South) by train and bus. </p></li>
+    </ul>
+</section>
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p id="copyright">
+    &copy; 2018 - <a href="https://rem.co">Remco Overdijk</a><br/>
+    <span class="credit">Powered by <a href="http://octopress.org">Octopress</a>.</span>
+</p>
+<div id="fcontent">
+    <div id="fmenu">
+        <div class="fcol">
+            <h3>Navigation</h3>
+            <ul class="footer-navigation">
+                <li><a href="/"><i class="icon-pencil"></i>&nbsp;Blog</a></li>
+<li><a href="/blog/archives"><i class="icon-book"></i>&nbsp;Archives</a></li>
+<li><a href="/pictures"><i class="icon-camera"></i>&nbsp;Pictures</a></li>
+<li><a href="/dice"><i class="icon-lock"></i>&nbsp;Diceware</a></li>
+
+            </ul>
+        </div>
+        <div class="fcol">
+            <h3>Websites</h3>
+            <ul>
+                <li><a href="https://rem.co"><i class="icon-globe"></i>&nbsp;Rem.co</a></li>
+                <li><a href="http://overdijk.io"><i class="icon-globe"></i>&nbsp;Overdijk.io</a></li>
+                <li><a href="http://www.remz-jay.org"><i class="icon-globe"></i>&nbsp;Remz-Jay.org</a></li>
+                <li><a href="http://www.remz.nl"><i class="icon-globe"></i>&nbsp;Remz.nl</a></li>
+                <li><a href="http://remc.onl"><i class="icon-globe"></i>&nbsp;Remc.onl</a></li>
+                <li><a href="http://www.twitupdate.com"><i class="icon-globe"></i>&nbsp;Twitupdate</a></li>
+                <li><a href="http://www.socialmediascanner.com"><i class="icon-globe"></i>&nbsp;SocialMediaScanner</a></li>
+            </ul>
+        </div>
+        <div class="fcol">
+            <h3>Social Media</h3>
+            <ul>
+                <li><a href="http://twitter.com/remzjay"><i class="icon-twitter"></i>&nbsp;RemzJay on Twitter</a></li>
+                <li><a href="http://facebook.com/remco-overdijk"><i class="icon-facebook"></i>&nbsp;Remco-Overdijk on Facebook</a></li>
+                <li><a href="http://www.linkedin.com/in/remcooverdijk"><i class="icon-linkedin"></i>&nbsp;Remco Overdijk on LinkedIn</a></li>
+                <li><a href="https://github.com/Remz-Jay"><i class="icon-github-alt"></i>&nbsp;Remz-Jay on GitHub</a></li>
+                <li><a href="http://open.spotify.com/user/remzjay"><i class="icon-music"></i>&nbsp;RemzJay on Spotify</a></li>
+                <li><a href="https://keybase.io/remz"><i class="icon-globe"></i>&nbsp;Remz on Keybase.io</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'rem-co';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

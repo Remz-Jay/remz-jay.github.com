@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: OnApp | The Rem.co Blog]]></title>
-  <link href="http://blog.rem.co/blog/categories/onapp/atom.xml" rel="self"/>
-  <link href="http://blog.rem.co/"/>
-  <updated>2014-03-10T10:39:35+01:00</updated>
-  <id>http://blog.rem.co/</id>
+  <title><![CDATA[Category: onapp | Rem.co: Remco Overdijk]]></title>
+  <link href="https://rem.co/blog/categories/onapp/atom.xml" rel="self"/>
+  <link href="https://rem.co/"/>
+  <updated>2018-01-25T14:17:37+01:00</updated>
+  <id>https://rem.co/</id>
   <author>
     <name><![CDATA[Remco Overdijk]]></name>
     <email><![CDATA[remco@rem.co]]></email>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[OnApp: Using PHP to launch a VNC connection]]></title>
-    <link href="http://blog.rem.co/blog/2013/03/01/onapp-using-php-to-launch-a-vnc-connection/"/>
+    <link href="https://rem.co/blog/2013/03/01/onapp-using-php-to-launch-a-vnc-connection/"/>
     <updated>2013-03-01T12:48:00+01:00</updated>
-    <id>http://blog.rem.co/blog/2013/03/01/onapp-using-php-to-launch-a-vnc-connection</id>
+    <id>https://rem.co/blog/2013/03/01/onapp-using-php-to-launch-a-vnc-connection</id>
     <content type="html"><![CDATA[<p>If you&rsquo;re an <a href="http://onapp.com/">OnApp</a> user you probably know you can make a VNC connection to your VM&rsquo;s using the Control Panel.
 This uses a java applet in your browser as the VNC client.</p>
 
@@ -33,49 +33,46 @@ GET /virtual_machines/:virtual_machine_id/console.json
 
 <p>As I&rsquo;m lazy I didn&rsquo;t want to do this manually every time, so I devised a little PHP script that can aid in finding the right information:</p>
 
-<!-- more -->
+<!-- more -->  
 
 
-<p></p>
-
-<p>``` php OnApp VNC Initiator
-&lt;?php
-/<em>*
+<pre><code class="php OnApp VNC Initiator">&lt;?php
+/**
  * GET /virtual_machines/:virtual_machine_id/console.xml
  * GET /virtual_machines/:id.xml
  *
  * The first will start the console session and give you the port number to connect to.
  *
  * The second call, you are looking for remote_access_password.
- </em>/
-$CPURL = &ldquo;&rdquo;; // Insert the IP/hostname for your OnApp CP here
-$VMID = &ldquo;&rdquo;; // Insert the VM&rsquo;s unique ID here
-$username = &ldquo;&rdquo;; // Insert your own username here
-$password = &ldquo;&rdquo;; // Insert the password for your account here</p>
+ */
+$CPURL = ""; // Insert the IP/hostname for your OnApp CP here
+$VMID = ""; // Insert the VM's unique ID here
+$username = ""; // Insert your own username here
+$password = ""; // Insert the password for your account here
 
-<p>$ch = curl_init(&ldquo;<a href="http://">http://</a>{$CPURL}/virtual_machines/{$VMID}/console.json&rdquo;);</p>
+$ch = curl_init("http://{$CPURL}/virtual_machines/{$VMID}/console.json");
 
-<p>curl_setopt($ch, CURLOPT_USERPWD, $username . &ldquo;:&rdquo; . $password);
+curl_setopt($ch, CURLOPT_USERPWD, $username . ":" . $password);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 $result = curl_exec($ch);
 $set_one = json_decode($result);
-curl_setopt($ch, CURLOPT_URL, &ldquo;<a href="http://">http://</a>{$CPURL}/virtual_machines/{$VMID}.json&rdquo;);
+curl_setopt($ch, CURLOPT_URL, "http://{$CPURL}/virtual_machines/{$VMID}.json");
 $result = curl_exec($ch);
 $set_two = json_decode($result);
-$port = $set_one->remote_access_session->port;
-echo &ldquo;PORT:\t&rdquo; . $set_one->remote_access_session->port . PHP_EOL;
-echo &ldquo;REMOTE_KEY:\t&rdquo; . $set_one->remote_access_session->remote_key . PHP_EOL;
-$rap = $set_two->virtual_machine->remote_access_password;
-echo &ldquo;REMOTE_ACCESS_PASSWORD:\t&rdquo; . $rap . PHP_EOL;
-$un = &ldquo;root&rdquo;;
-$pw = $set_two->virtual_machine->initial_root_password;
-echo &ldquo;ROOTPASS:\t&rdquo; . $pw . PHP_EOL;
+$port = $set_one-&gt;remote_access_session-&gt;port;
+echo "PORT:\t" . $set_one-&gt;remote_access_session-&gt;port . PHP_EOL;
+echo "REMOTE_KEY:\t" . $set_one-&gt;remote_access_session-&gt;remote_key . PHP_EOL;
+$rap = $set_two-&gt;virtual_machine-&gt;remote_access_password;
+echo "REMOTE_ACCESS_PASSWORD:\t" . $rap . PHP_EOL;
+$un = "root";
+$pw = $set_two-&gt;virtual_machine-&gt;initial_root_password;
+echo "ROOTPASS:\t" . $pw . PHP_EOL;
 curl_close($ch);
-$constructedURL = &ldquo;vnc://{$CPURL}:{$port}/?vncPassword=&rdquo; . urlencode($rap);
+$constructedURL = "vnc://{$CPURL}:{$port}/?vncPassword=" . urlencode($rap);
 echo $constructedURL . PHP_EOL;
-shell_exec(&ldquo;open &rdquo; . $constructedURL);
-?>
-```</p>
+shell_exec("open " . $constructedURL);
+?&gt;
+</code></pre>
 
 <h3>Usage</h3>
 

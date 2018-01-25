@@ -1,0 +1,467 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Iptables: Creating Persistent Bans From Fail2Ban - Rem.co: Remco Overdijk</title>
+  <meta name="author" content="Remco Overdijk">
+
+  
+  <meta name="description" content="On my servers I use the nifty program Fail2Ban to perform logbased automatic firewalling of &lsquo;bad&rsquo; ip&rsquo;s. The idea behind this is &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+
+  
+  <link rel="canonical" href="https://rem.co/blog/2009/08/18/iptables-creating-persistent-bans-from-fail2ban">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Rem.co: Remco Overdijk" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/libs/jquery-3.3.1.min.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="https://fonts.googleapis.com/css?family=Bitter:400,400i,700|Gloria+Hallelujah|PT+Sans:400,400i,700|Raleway:400,900" rel="stylesheet">
+<script src="/javascripts/modernizr-2.0.js" type="text/javascript"></script>
+<script src="/javascripts/libs/jquery-3.3.1.min.js" type="text/javascript"></script>
+<script src="/javascripts/octopress.js" type="text/javascript"></script>
+
+  
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-15985434-12"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-15985434-12');
+  </script>
+
+
+</head>
+
+<body   >
+		 <div id="top">
+  <header role="banner"><hgroup>
+  <h1><a href="/">rem</a></h1>
+    <h2>.co</h2>
+
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS<i class="icon-rss"></i></a></li>
+  
+</ul>
+  
+<form action="https://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:rem.co" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+    <li><a href="/"><i class="icon-pencil"></i>&nbsp;Blog</a></li>
+<li><a href="/blog/archives"><i class="icon-book"></i>&nbsp;Archives</a></li>
+<li><a href="/pictures"><i class="icon-camera"></i>&nbsp;Pictures</a></li>
+<li><a href="/dice"><i class="icon-lock"></i>&nbsp;Diceware</a></li>
+
+</ul>
+
+</nav>
+		 </div>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Iptables: Creating Persistent Bans From Fail2Ban</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2009-08-18T15:53:10+02:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>18</span><span class='date-suffix'>th</span>, <span class='date-year'>2009</span></span> <span class='time'>3:53 pm</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="https://rem.co">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>On my servers I use the nifty program <a href="http://www.fail2ban.org/wiki/index.php/Main_Page">Fail2Ban</a> to perform logbased automatic firewalling of &lsquo;bad&rsquo; ip&rsquo;s.</p>
+
+<p>The idea behind this is easy: Some IP performs an action I don&rsquo;t approve of. This can be any number of things, e.g. requesting pages in Apache that are commonly accessed by bots and/or scanners, or trying to log in to SSH with accounts that do not exist on the system. This bad behavior gets logged, and Fail2Ban keeps tabs on those logs, and using a number of rules it determines if a host is &lsquo;bad&rsquo; enough to temporarily or permanently ban all access to the server. It does so by adding a few chains to Iptables (one for each thing it checks for), and dynamically adding/removing IP&rsquo;s to/from these chains.</p>
+
+<p>This all works perfectly. However, there&rsquo;s one issue; When Iptables gets reloaded, it restores its default rules, removing the Fail2Ban chains and all the rules they contain, even if the ip&rsquo;s in the chain were marked as permanent.</p>
+
+<p>I created a workaround for this problem, consisting of two simple steps:</p>
+
+<ul>
+<li><p>When a &lsquo;bad&rsquo; ip gets banned, it&rsquo;s added to the Iptables chain, but also written to a file, containing all collected &lsquo;bad&rsquo; ip&rsquo;s. (I use <code>/etc/shitlist</code> for this purpose).</p></li>
+<li><p>Whenever Iptables gets reloaded, I run a PHP script that checks the <code>/etc/shitlist</code> file for &lsquo;safe&rsquo; and duplicate ip&rsquo;s, and writes all other ip&rsquo;s to the permanent Blocklist chain. (The checking for &lsquo;safe&rsquo; ip&rsquo;s might be a bit unneeded, but with my Fail2Ban rules it&rsquo;s possible that one of my own ip&rsquo;s gets banned for 10 minutes if a SSH login attempt fails for 5 times. Though it&rsquo;s a temporary ban, the ip will still get written to the shitlist, and would end up in the permanent Blocklist).</p></li>
+</ul>
+
+
+<p>To make this work, I made the following changes:</p>
+
+<p>Every <code>jail</code> in Fail2Ban uses an <code>action.d</code> script to perform (un)banning. I defaulted all actions to an action script called <code>iptables-allports.conf</code>. Basically this action drops everything in Iptables if a package originates from the &lsquo;bad&rsquo; IP.</p>
+
+<p>I updated the ban action such that:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>actionban = iptables -I fail2ban-&lt;name&gt; 1 -s &lt;ip&gt; -j DROP
+</span><span class='line'>echo &lt;ip&gt; &gt;&gt; /etc/shitlist</span></code></pre></td></tr></table></div></figure>
+
+
+<p>After that I created a PHP script that updates Iptables with the ip&rsquo;s contained in the shitlist:</p>
+
+<figure class='code'><figcaption><span>shitlist.php</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span class='line'><span class="sd">/** script that loads a shitlist file into iptables */</span>
+</span><span class='line'><span class="c1">//CONFIG </span>
+</span><span class='line'><span class="nv">$shitlists</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s2">&quot;/root/list.txt&quot;</span><span class="p">,</span><span class="s2">&quot;/etc/shitlist&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$chain</span> <span class="o">=</span> <span class="s2">&quot;Blocklist&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$safelist</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s2">&quot;x.x.x.x&quot;</span><span class="p">,</span> <span class="s2">&quot;y.y.y.y&quot;</span><span class="p">,</span> <span class="s2">&quot;z.z.z.z&quot;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">echo</span> <span class="s2">&quot;Reading current IPTABLES state</span><span class="se">\r\n</span><span class="s2">&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$data</span> <span class="o">=</span> <span class="nb">shell_exec</span><span class="p">(</span><span class="s1">&#39;iptables -S &#39;</span><span class="o">.</span><span class="nv">$chain</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$iparr</span> <span class="o">=</span> <span class="nb">explode</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="nv">$data</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$ref</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+</span><span class='line'><span class="k">for</span><span class="p">(</span><span class="nv">$i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="nv">$i</span><span class="o">&lt;</span><span class="nb">sizeof</span><span class="p">(</span><span class="nv">$iparr</span><span class="p">);</span><span class="nv">$i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="nb">substr_count</span><span class="p">(</span><span class="nv">$iparr</span><span class="p">[</span><span class="nv">$i</span><span class="p">],</span><span class="s2">&quot;.&quot;</span><span class="p">)</span><span class="o">==</span><span class="mi">3</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nv">$ref</span><span class="p">[</span><span class="nv">$j</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$iparr</span><span class="p">[</span><span class="nv">$i</span><span class="p">];</span>
+</span><span class='line'>       <span class="nv">$j</span><span class="o">++</span><span class="p">;</span>
+</span><span class='line'>   <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="nb">sort</span><span class="p">(</span><span class="nv">$ref</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$total</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="k">foreach</span><span class="p">(</span><span class="nv">$shitlists</span> <span class="k">as</span> <span class="nv">$shitlist</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">echo</span> <span class="s2">&quot;Reading shitlist at </span><span class="si">$shitlist\r\n</span><span class="s2">&quot;</span><span class="p">;</span>
+</span><span class='line'>  <span class="c1">//READ FILE</span>
+</span><span class='line'>  <span class="nv">$fh</span> <span class="o">=</span> <span class="nb">fopen</span><span class="p">(</span><span class="nv">$shitlist</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="nv">$fh</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nv">$itt</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>      <span class="nv">$iparr</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+</span><span class='line'>      <span class="k">while</span><span class="p">(</span><span class="o">!</span><span class="nb">feof</span><span class="p">(</span><span class="nv">$fh</span><span class="p">))</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nv">$ip</span> <span class="o">=</span> <span class="nb">trim</span><span class="p">(</span><span class="nb">fgets</span><span class="p">(</span><span class="nv">$fh</span><span class="p">));</span>
+</span><span class='line'>          <span class="k">if</span><span class="p">(</span><span class="nb">strlen</span><span class="p">(</span><span class="nv">$ip</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">6</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>              <span class="k">if</span><span class="p">(</span><span class="nb">array_search</span><span class="p">(</span><span class="nv">$ip</span><span class="p">,</span><span class="nv">$iparr</span><span class="p">)</span><span class="o">===</span><span class="k">false</span><span class="o">&amp;&amp;</span><span class="nb">array_search</span><span class="p">(</span><span class="nv">$ip</span><span class="p">,</span><span class="nv">$safelist</span><span class="p">)</span><span class="o">===</span><span class="k">false</span><span class="o">&amp;&amp;</span><span class="nb">array_search</span><span class="p">(</span><span class="nv">$ip</span><span class="o">.</span><span class="s2">&quot;/32&quot;</span><span class="p">,</span><span class="nv">$ref</span><span class="p">)</span><span class="o">===</span><span class="k">false</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                  <span class="nv">$iparr</span><span class="p">[]</span> <span class="o">=</span> <span class="nv">$ip</span><span class="p">;</span>
+</span><span class='line'>                  <span class="k">echo</span> <span class="s2">&quot;Now adding </span><span class="si">$ip</span><span class="s2"> to </span><span class="si">$chain\r\n</span><span class="s2">&quot;</span><span class="p">;</span>
+</span><span class='line'>                  <span class="nv">$ins</span> <span class="o">=</span> <span class="mi">18</span><span class="o">+</span><span class="nv">$itt</span><span class="p">;</span>
+</span><span class='line'>                  <span class="nb">shell_exec</span><span class="p">(</span><span class="s2">&quot;iptables -I &quot;</span><span class="o">.</span><span class="nv">$chain</span><span class="o">.</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="nv">$ins</span><span class="o">.</span><span class="s2">&quot; -s &quot;</span><span class="o">.</span><span class="nv">$ip</span><span class="o">.</span><span class="s2">&quot;/32 -j DROP&quot;</span><span class="p">);</span>
+</span><span class='line'>                  <span class="nv">$itt</span><span class="o">++</span><span class="p">;</span>
+</span><span class='line'>              <span class="p">}</span>
+</span><span class='line'>          <span class="p">}</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>      <span class="nb">fclose</span><span class="p">(</span><span class="nv">$fh</span><span class="p">);</span>
+</span><span class='line'>      <span class="k">echo</span> <span class="s2">&quot;Finished adding </span><span class="si">$itt</span><span class="s2"> ip&#39;s from list </span><span class="si">$shitlist</span><span class="s2"> to chain </span><span class="si">$chain</span><span class="s2"> . Bye!</span><span class="se">\r\n</span><span class="s2">&quot;</span><span class="p">;</span>
+</span><span class='line'>      <span class="nv">$total</span> <span class="o">=</span> <span class="nv">$total</span> <span class="o">+</span> <span class="nv">$itt</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">echo</span> <span class="s2">&quot;Could not open shitlist file </span><span class="si">$shitlist</span><span class="s2"> . Skipping this list</span><span class="se">\r\n</span><span class="s2">&quot;</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="k">echo</span> <span class="s2">&quot;Finished adding </span><span class="si">$total</span><span class="s2"> ip&#39;s to chain </span><span class="si">$chain</span><span class="s2"> from &quot;</span><span class="o">.</span><span class="nb">sizeof</span><span class="p">(</span><span class="nv">$shitlists</span><span class="p">)</span><span class="o">.</span><span class="s2">&quot; shitlists.</span><span class="se">\r\n</span><span class="s2">&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="cp">?&gt;</span><span class="x"> </span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You can run the script from the commandline (as root!) simply by stating <code>php shitlist.php</code>, or add it to the startup script of your Iptables installation.</p>
+
+<p>Hope this helps keeping your NIC&rsquo;s available for VALID traffic!</p>
+
+<h3>Update:</h3>
+
+<p>Made some changes to the script to check for already existing bans, to keep your chains clean!</p>
+
+<h3>Update 2:</h3>
+
+<p>Little tweak to the script so it now loads an array of lists, in case you have various sources.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Remco Overdijk</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2009-08-18T15:53:10+02:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>18</span><span class='date-suffix'>th</span>, <span class='date-year'>2009</span></span> <span class='time'>3:53 pm</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/fail2ban/'>fail2ban</a>, <a class='category' href='/blog/categories/firewall/'>firewall</a>, <a class='category' href='/blog/categories/iptables/'>iptables</a>, <a class='category' href='/blog/categories/linux/'>linux</a>, <a class='category' href='/blog/categories/php/'>php</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2009/05/29/css-overlapping-flash-content-with-css/" title="Previous Post: CSS: Overlapping Flash content with CSS">&laquo; CSS: Overlapping Flash content with CSS</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2009/09/04/cisco-voip-oplossing-voor-ziggo-telefonie/" title="Next Post: Cisco VoIP oplossing voor Ziggo telefonie">Cisco VoIP oplossing voor Ziggo telefonie &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1><i class="icon-user icon-large"></i>&nbsp;About Me</h1>
+	<div id="so">
+	<a href="https://stackoverflow.com/users/813718/remco-overdijk">
+		<img src="https://stackoverflow.com/users/flair/813718.png" width="208" height="58" alt="profile for Remco Overdijk at Stack Overflow, Q&amp;A for professional and enthusiast programmers" title="profile for Remco Overdijk at Stack Overflow, Q&amp;A for professional and enthusiast programmers">
+	</a>
+	</div>
+</section>
+<section>
+  <h1><i class="icon-pencil icon-large"></i>&nbsp;Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/03/09/puppet-calculating-average-catalog-compilation-times/">Puppet: Calculating Average Catalog Compilation Times</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/02/12/git-the-difference-between-lightweight-and-annotated-tags/">Git: The Difference Between Lightweight and Annotated Tags</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/02/09/bacula-cancelling-all-jobs-that-are-currently-writing/">Bacula: Cancelling All Jobs That Are Currently Writing</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/01/15/bacula-purging-and-deleting-old-volumes/">Bacula: Purging and Deleting Old Volumes</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/01/14/music-end-of-the-year-mix-2014/">Music: End of the Year Mix 2014</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1><i class="icon-twitter icon-large"></i>&nbsp;Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  <script type="text/javascript">
+     $(document).ready(function(){
+      getTwitterFeed("RemzJay", 5, 0);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <p>Follow <a href="http://twitter.com/RemzJay">@RemzJay</a></p>
+  
+</section>
+
+
+<section>
+  <h1><i class="icon-github-alt icon-large"></i>&nbsp;GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/Remz-Jay">@Remz-Jay</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'Remz-Jay',
+            count: 10,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+<section class="flickr">
+    <h1><i class="icon-camera icon-large"></i>&nbsp;Flickr Albums</h1>
+		<ul id="flickrsets">
+          <li><a href="https://www.flickr.com/photos/93556621@N05/21961762008" target="_blank"><img src="https://farm6.staticflickr.com/5634/21961762008_7d225b59ba_n.jpg" class="aside-flickr" title="The bus"/></a><h2><a href="https://www.flickr.com/photos/93556621@N05/21961762008">NYC in B/W</a></h2><p></p></li><li><a href="https://www.flickr.com/photos/93556621@N05/21738387919" target="_blank"><img src="https://farm6.staticflickr.com/5627/21738387919_2f513ec807_n.jpg" class="aside-flickr" title="IMG_4732.jpg"/></a><h2><a href="https://www.flickr.com/photos/93556621@N05/21738387919">USA 2015</a></h2><p></p></li><li><a href="https://www.flickr.com/photos/93556621@N05/8519041005" target="_blank"><img src="https://farm9.staticflickr.com/8085/8519041005_d09c9c4cf6_n.jpg" class="aside-flickr" title="IMG_7581.jpg"/></a><h2><a href="https://www.flickr.com/photos/93556621@N05/8519041005">Vietnam 2011</a></h2><p>Backpacking trip through Thailand and Vietnam (North to South) by train and bus. </p></li>
+    </ul>
+</section>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p id="copyright">
+    &copy; 2018 - <a href="https://rem.co">Remco Overdijk</a><br/>
+    <span class="credit">Powered by <a href="http://octopress.org">Octopress</a>.</span>
+</p>
+<div id="fcontent">
+    <div id="fmenu">
+        <div class="fcol">
+            <h3>Navigation</h3>
+            <ul class="footer-navigation">
+                <li><a href="/"><i class="icon-pencil"></i>&nbsp;Blog</a></li>
+<li><a href="/blog/archives"><i class="icon-book"></i>&nbsp;Archives</a></li>
+<li><a href="/pictures"><i class="icon-camera"></i>&nbsp;Pictures</a></li>
+<li><a href="/dice"><i class="icon-lock"></i>&nbsp;Diceware</a></li>
+
+            </ul>
+        </div>
+        <div class="fcol">
+            <h3>Websites</h3>
+            <ul>
+                <li><a href="https://rem.co"><i class="icon-globe"></i>&nbsp;Rem.co</a></li>
+                <li><a href="http://overdijk.io"><i class="icon-globe"></i>&nbsp;Overdijk.io</a></li>
+                <li><a href="http://www.remz-jay.org"><i class="icon-globe"></i>&nbsp;Remz-Jay.org</a></li>
+                <li><a href="http://www.remz.nl"><i class="icon-globe"></i>&nbsp;Remz.nl</a></li>
+                <li><a href="http://remc.onl"><i class="icon-globe"></i>&nbsp;Remc.onl</a></li>
+                <li><a href="http://www.twitupdate.com"><i class="icon-globe"></i>&nbsp;Twitupdate</a></li>
+                <li><a href="http://www.socialmediascanner.com"><i class="icon-globe"></i>&nbsp;SocialMediaScanner</a></li>
+            </ul>
+        </div>
+        <div class="fcol">
+            <h3>Social Media</h3>
+            <ul>
+                <li><a href="http://twitter.com/remzjay"><i class="icon-twitter"></i>&nbsp;RemzJay on Twitter</a></li>
+                <li><a href="http://facebook.com/remco-overdijk"><i class="icon-facebook"></i>&nbsp;Remco-Overdijk on Facebook</a></li>
+                <li><a href="http://www.linkedin.com/in/remcooverdijk"><i class="icon-linkedin"></i>&nbsp;Remco Overdijk on LinkedIn</a></li>
+                <li><a href="https://github.com/Remz-Jay"><i class="icon-github-alt"></i>&nbsp;Remz-Jay on GitHub</a></li>
+                <li><a href="http://open.spotify.com/user/remzjay"><i class="icon-music"></i>&nbsp;RemzJay on Spotify</a></li>
+                <li><a href="https://keybase.io/remz"><i class="icon-globe"></i>&nbsp;Remz on Keybase.io</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'rem-co';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'https://rem.co/blog/2009/08/18/iptables-creating-persistent-bans-from-fail2ban/';
+        var disqus_url = 'https://rem.co/blog/2009/08/18/iptables-creating-persistent-bans-from-fail2ban/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

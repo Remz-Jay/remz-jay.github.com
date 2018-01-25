@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[The Rem.co Blog]]></title>
-  <link href="http://blog.rem.co/atom.xml" rel="self"/>
-  <link href="http://blog.rem.co/"/>
-  <updated>2014-03-10T10:39:35+01:00</updated>
-  <id>http://blog.rem.co/</id>
+  <title><![CDATA[Rem.co: Remco Overdijk]]></title>
+  <link href="https://rem.co/atom.xml" rel="self"/>
+  <link href="https://rem.co/"/>
+  <updated>2018-01-25T14:17:37+01:00</updated>
+  <id>https://rem.co/</id>
   <author>
     <name><![CDATA[Remco Overdijk]]></name>
     <email><![CDATA[remco@rem.co]]></email>
@@ -14,10 +14,1060 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Fixing 'Error opening terminal: screen-256color.']]></title>
-    <link href="http://blog.rem.co/blog/2013/06/06/fixing-error-opening-terminal-screen-256color-dot/"/>
+    <title type="html"><![CDATA[Puppet: Calculating Average Catalog Compilation Times]]></title>
+    <link href="https://rem.co/blog/2015/03/09/puppet-calculating-average-catalog-compilation-times/"/>
+    <updated>2015-03-09T18:25:18+01:00</updated>
+    <id>https://rem.co/blog/2015/03/09/puppet-calculating-average-catalog-compilation-times</id>
+    <content type="html"><![CDATA[<p><em>Just a quick post with the oneliner of the day.</em></p>
+
+<p>When you are debugging catalog compilation issues or other puppet performance issues in general, it is good to know exactly which catalogs are slow to compile. Knowing which catalogs are substantially slower than others allows you to focus on those catalogs and the modules they contain.</p>
+
+<p>I devised this bash oneliner, <a href="http://www.unixcl.com/2008/09/group-by-clause-functionality-in-awk.html">which is almost a direct copy of this example by Jadu Saikia</a>, so full credits go to him!</p>
+
+<figure class='code'><figcaption><span>Calculating Average Catalog Compilation Times in Puppet</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>cat /var/log/puppet/master.log <span class="p">|</span> grep -i <span class="s2">&quot;compiled catalog for&quot;</span> <span class="p">|</span> awk <span class="s1">&#39;{printf &quot;%s\t%s\r\n&quot;,$9,$14}&#39;</span> <span class="p">|</span> sort <span class="p">|</span> awk <span class="s1">&#39;BEGIN{FS=&quot;\t&quot;; printf(&quot;%-35s\t\t%s\t\t%s\t\t%s\n&quot;, &quot;Node&quot;,&quot;Count&quot;,&quot;Total&quot;,&quot;Average&quot;)} NR!=1 {a[$1]++;b[$1]=b[$1]+$2}END{for (i in a) printf(&quot;%-35s\t%10.0f\t%10.0f\t%10.2f\n&quot;, i, a[i], b[i], b[i]/a[i])}&#39;</span> <span class="p">|</span> sort -n -k4
+</span></code></pre></td></tr></table></div></figure>
+
+
+<!-- more -->
+
+
+<p>This will yield a result similar to:</p>
+
+<figure class='code'><figcaption><span>Results</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>Node                                            Count         Total         Average
+</span><span class='line'>node02.customer.nl                              <span class="m">71</span>              <span class="m">44</span>            0.62
+</span><span class='line'>srv08.customer.net                              <span class="m">71</span>              <span class="m">50</span>            0.70
+</span><span class='line'>solr.company.net                                <span class="m">71</span>              <span class="m">64</span>            0.90
+</span><span class='line'>data07.customer.io                              <span class="m">71</span>             <span class="m">599</span>            8.44
+</span><span class='line'>web21.customer.org                              <span class="m">73</span>             <span class="m">932</span>           12.77
+</span><span class='line'>node01.test.company.net                         <span class="m">79</span>            <span class="m">1894</span>           23.98
+</span><span class='line'>crm.company.net                                 <span class="m">70</span>            <span class="m">2325</span>           33.22
+</span><span class='line'>solr.website.com                                <span class="m">72</span>            <span class="m">2607</span>           36.21
+</span><span class='line'>customer.vps.company.net                        <span class="m">69</span>            <span class="m">2762</span>           40.03
+</span><span class='line'>p1.customer.company.net                         <span class="m">72</span>            <span class="m">3058</span>           42.47
+</span><span class='line'>customer1.dev.company.net                       <span class="m">70</span>            <span class="m">3115</span>           44.51
+</span><span class='line'>customer2.dev.company.net                       <span class="m">71</span>            <span class="m">3325</span>           46.83
+</span><span class='line'>solr.dev.company.net                            <span class="m">71</span>            <span class="m">3348</span>           47.15
+</span><span class='line'>customer3.dev.company.net                       <span class="m">71</span>            <span class="m">3496</span>           49.24
+</span><span class='line'>customer4.dev.company.net                       <span class="m">71</span>            <span class="m">3554</span>           50.06
+</span><span class='line'>customer5.dev.company.net                       <span class="m">71</span>            <span class="m">3558</span>           50.11
+</span><span class='line'>customer6.dev.company.net                       <span class="m">70</span>            <span class="m">3542</span>           50.60
+</span><span class='line'>customer7.dev.company.net                       <span class="m">70</span>            <span class="m">3683</span>           52.62
+</span><span class='line'>agent01.isp.bamboo.company.net                  <span class="m">71</span>            <span class="m">3761</span>           52.98
+</span><span class='line'>solr.customer.nl                                <span class="m">71</span>            <span class="m">3798</span>           53.50
+</span><span class='line'>customer8.dev.company.net                       <span class="m">72</span>            <span class="m">3896</span>           54.11
+</span><span class='line'>v2.isp.dev.company.net                          <span class="m">71</span>            <span class="m">3928</span>           55.32
+</span><span class='line'>net-loc-isp08.company.net                       <span class="m">71</span>            <span class="m">4108</span>           57.86
+</span><span class='line'>puppet.company.net                              <span class="m">70</span>            <span class="m">4092</span>           58.45
+</span><span class='line'>customer9.dev.company.net                       <span class="m">70</span>            <span class="m">4112</span>           58.75
+</span><span class='line'>customer10.dev.company.net                      <span class="m">71</span>            <span class="m">4188</span>           58.98
+</span><span class='line'>customer11.dev.company.net                      <span class="m">70</span>            <span class="m">4139</span>           59.13
+</span><span class='line'>zabbix.vps.company.net                          <span class="m">70</span>            <span class="m">4148</span>           59.26
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Obviously I&rsquo;ve randomized the node names to protect company and customer specific details, but the averages are real.</p>
+
+<p>Looks like I have my work cut out for me to reduce those times, ~60 seconds is just way too long.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Git: The Difference Between Lightweight and Annotated Tags]]></title>
+    <link href="https://rem.co/blog/2015/02/12/git-the-difference-between-lightweight-and-annotated-tags/"/>
+    <updated>2015-02-12T14:05:50+01:00</updated>
+    <id>https://rem.co/blog/2015/02/12/git-the-difference-between-lightweight-and-annotated-tags</id>
+    <content type="html"><![CDATA[<p>I was reviewing some pull requests at work today. One of the PR&rsquo;s had an updated <code>composer.lock</code> file. We usually check if the <code>reference</code> matches the <code>version</code> for this update, to see if that commit is actually released on the module&rsquo;s <code>master</code> branch:</p>
+
+<figure class='code'><figcaption><span>Example of an updated composer.lock</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='diff'><span class='line'>&quot;name&quot;: &quot;company/module_name&quot;,
+</span><span class='line'><span class="gd">- &quot;version&quot;: &quot;0.11.0&quot;,</span>
+</span><span class='line'><span class="gi">+ &quot;version&quot;: &quot;0.12.0&quot;,</span>
+</span><span class='line'>&quot;source&quot;: {
+</span><span class='line'>  &quot;type&quot;: &quot;git&quot;,
+</span><span class='line'>  &quot;url&quot;: &quot;ssh://git@stash.company.net/packages/module_name.git&quot;,
+</span><span class='line'><span class="gd">-    &quot;reference&quot;: &quot;19ecfcb286052457697caad3359d7817e2dfa2f5&quot;</span>
+</span><span class='line'><span class="gi">+    &quot;reference&quot;: &quot;2c539864d72baede7f169f15eec8c3317e26c1bc&quot;</span>
+</span><span class='line'> },
+</span><span class='line'><span class="gd">- &quot;time&quot;: &quot;2014-10-08 11:12:23&quot;</span>
+</span><span class='line'><span class="gi">+ &quot;time&quot;: &quot;2014-11-18 16:47:02&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Usually, this <code>reference</code> matches the hash of the commit we&rsquo;ve tagged as this <code>version</code>. In this particular case however, the hash mentioned in <code>reference</code> was nowhere to be found in the commit log. So what&rsquo;s going on here?</p>
+
+<!-- more -->
+
+
+<p>To investigate, I tried checking out that particular hash:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>git checkout 2c539864d72baede7f169f15eec8c3317e26c1bc
+</span><span class='line'>Note: checking out <span class="s1">&#39;2c539864d72baede7f169f15eec8c3317e26c1bc&#39;</span>.
+</span><span class='line'>
+</span><span class='line'>You are in <span class="s1">&#39;detached HEAD&#39;</span> state. You can look around, make experimental
+</span><span class='line'>changes and commit them, and you can discard any commits you make in this
+</span><span class='line'>state without impacting any branches by performing another checkout.
+</span><span class='line'>
+</span><span class='line'>If you want to create a new branch to retain commits you create, you may
+</span><span class='line'><span class="k">do</span> so <span class="o">(</span>now or later<span class="o">)</span> by using -b with the checkout <span class="nb">command </span>again. Example:
+</span><span class='line'>
+</span><span class='line'>  git checkout -b new_branch_name
+</span><span class='line'>
+</span><span class='line'>HEAD is now at 155ffc0... Merge pull request <span class="c">#3 in packages/module_name from feature/some-feature to master</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>That&rsquo;s funny.. I check out <code>2c53986</code>, but I end up with <code>155ffc0</code>.</p>
+
+<p>If we check the <code>rev-list</code> for that tag, you&rsquo;ll notice that the latest commit is indeed <code>155ffc0</code>:</p>
+
+<figure class='code'><figcaption><span>checking the rev-list for a tag</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>git rev-list 0.12.0  <span class="p">|</span> head -5
+</span><span class='line'>155ffc0169e1c80e029de229d08767d3f7d69adc
+</span><span class='line'>e147d1873da0a66a816ec6578cd6ae9900c4985b
+</span><span class='line'>92471ae1cacf473a45a926a333591fc06750e45f
+</span><span class='line'>19ecfcb286052457697caad3359d7817e2dfa2f5
+</span><span class='line'>38df1fac8d30415fdb2666c1eaaee2d15ff0ae39
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If we check <code>show-ref</code> however, the tag points to a different hash instead:</p>
+
+<figure class='code'><figcaption><span>checking reference for a tag</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>git show-ref --tags <span class="p">|</span> grep 0.12.0
+</span><span class='line'>2c539864d72baede7f169f15eec8c3317e26c1bc refs/tags/0.12.0
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If we do the same for tag <code>0.11.0</code> you&rsquo;ll notice that they both point to the same commit however:</p>
+
+<figure class='code'><figcaption><span>lightweight tags point to the same hash</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>git show-ref --tags <span class="p">|</span> grep 0.11.0
+</span><span class='line'>19ecfcb286052457697caad3359d7817e2dfa2f5 refs/tags/0.11.0
+</span><span class='line'><span class="nv">$ </span>git rev-list 0.11.0  <span class="p">|</span> head -1
+</span><span class='line'>19ecfcb286052457697caad3359d7817e2dfa2f5
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So, what&rsquo;s the difference then? The answer is that there are two distinct types of tags.</p>
+
+<h2>Lightweight and Annotated Tags</h2>
+
+<p><span class='pullquote-right' data-pullquote='So, which one should I use? The short answer is **annotated tags**.'>
+This is all due to the fact that there are two distinct types of tags in git:</p>
+
+<ul>
+<li><strong>Lightweight tags</strong>: A tag that is attached to an existing commit. This merely functions as a pointer to a specific commit, and as such it &lsquo;piggybacks&rsquo; on that commit&rsquo;s hash as identification. This type of tag does not allow you to store any information that specific to the tag.</li>
+<li><strong>Annotated tags</strong>: A tag that has its own commit hash and is, as such, stored as a separate object in git. This tag allows you to store information that is related to this specific tag. You can add a tag message, GPG sign it, and the tagger is stored.</li>
+</ul>
+
+
+<p>So, which one should I use? The short answer is <strong>annotated tags</strong>. <a href="http://stackoverflow.com/questions/4971746/why-should-i-care-about-lightweight-vs-annotated-tags/4971817#4971817">Read this StackOverflow answer to see why</a>, because I can&rsquo;t explain it any clearer than that :)
+</span>
+Creating an annotated tag is easy:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>git tag -s -a -m <span class="s2">&quot;JIRA-11: Include your tag message here&quot;</span> 0.12.0
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li><code>-s</code> will GPG sign your tag. More about this further down.</li>
+<li><code>-a</code> will create an annotated tag.</li>
+<li><code>-m "&lt;message&gt;"</code> will add a tag message.</li>
+<li>If you need to amend / fix / replace an existing tag, you can use the <code>-f</code> parameter to overwrite the current tag.</li>
+</ul>
+
+
+<h2>Why should I care?</h2>
+
+<p>You <em>should</em> care about the advantages of annotated tags. To elaborate, here are three viable use cases:</p>
+
+<h3>Whodunnit</h3>
+
+<p>Take my <code>composer.lock</code> example. We write modules in separate modules, and include those modules using <code>composer</code> in actual projects. If i review a project, I only see the <code>composer.lock</code> file, but don&rsquo;t immediately see the code for the actual module. I need some way to make sure that the code that&rsquo;s being rolled out in the current project is approved and stable. This usually means that I have to dive into the module&rsquo;s code and review that as well. But I&rsquo;m no expert on every single module my company has created, so I&rsquo;m probably not the best reviewer for a (large) number of modules. How do I know that the code has been reviewed and it&rsquo;s all good? I check the <code>tag</code>. If it has been tagged by the module&rsquo;s owner I can rest assured that a proper and thorough review has been done before this release was tagged. Annotated tags make this easy:</p>
+
+<figure class='code'><figcaption><span>Getting information about a tag</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>git show 0.12.0
+</span><span class='line'>
+</span><span class='line'>tag 0.12.0
+</span><span class='line'>Tagger: Remco Overdijk &lt;remco@maxserv.com&gt;
+</span><span class='line'>Date:   Thu Feb <span class="m">12</span> 14:58:11 <span class="m">2015</span> +0100
+</span><span class='line'>
+</span><span class='line'>OPS-227: Release v0.12.0, which includes fixes <span class="k">for</span> OPS-224, PUP-81 and a cherry-pick of 155ffc0
+</span><span class='line'>-----BEGIN PGP SIGNATURE-----
+</span><span class='line'>Version: GnuPG/MacGPG2 v2.0.22 <span class="o">(</span>Darwin<span class="o">)</span>
+</span><span class='line'>Comment: GPGTools - https://gpgtools.org
+</span><span class='line'>
+</span><span class='line'>iQEcBAABCgAGBQJU3LFzAAoJEOmkwfHWjjgAGpkIAJCwZi2gbXHFTPAbaQBvr8gi
+</span><span class='line'>Ds834V02vuMx+dB3rtrYZ4vp+IKxWIYH5hQmgYM7bgQu9yF/3+4xhIP/2n01Mtnu
+</span><span class='line'>C4dWyU5zC/6YciiheOa++4xAg+qLYihXT3uclUJwWBhYNJxV9+lzeGX9RMLAfWAM
+</span><span class='line'>3abcUDCrmIveF9v5SrFu8cEj5/GRGcx8xiVuFiOdvReOZKkkiFq5Jeb+cUkux44q
+</span><span class='line'>yK3tacSVfdPmD9st0WVlOGBB0oaoV/mNd2a/4/fjfn/IUYh+9iMJmvLNtvEmWwEC
+</span><span class='line'><span class="nv">WEj3ehXkuuab9tQ8fDs7ERlzuU1HqPw9b7tX0zfJBnAShEqkpBkCaOXJ3iBlYI0</span><span class="o">=</span>
+</span><span class='line'><span class="o">=</span>dV3m
+</span><span class='line'>-----END PGP SIGNATURE-----
+</span><span class='line'>
+</span><span class='line'>commit 155ffc0169e1c80e029de229d08767d3f7d69adc
+</span><span class='line'>Merge: 19ecfcb e147d18
+</span><span class='line'>Author: Some Developer &lt;devs@company.net&gt;
+</span><span class='line'>Date:   Tue Nov <span class="m">18</span> 17:47:02 <span class="m">2014</span> +0100
+</span><span class='line'>
+</span><span class='line'>    Merge pull request <span class="c">#3 in packages/module_name from feature/some-feature to master</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>As you can see, <code>git show</code> has information about the tag, and specifically <em>who</em> tagged it. Further down, you see the actual commit that this tag is connected to. That commit has a different author, but the tag was done by me, so it should be all good, right? No need to delve into that code any further, so we can move on with our original PR.</p>
+
+<p>In short: Annotated tags give you <em>separation between tagger (reviewer and/or releaser) and author/committer</em>.</p>
+
+<h3>What is contained in this tag?</h3>
+
+<p>Another vital piece of information that is usually contained in the pull request and/or other review docs that may exist is the context of the change set:</p>
+
+<ul>
+<li>Which changes are included in this change set?</li>
+<li>To which JIRA tickets are these changes related?</li>
+<li>Why have we decided to release these changes as a new tag?</li>
+<li>Are any additional actions required to make this release work? (Play-books)</li>
+</ul>
+
+
+<p>As said, we usually document these changes in the PR, which gives a good overview of the entire context. But if you&rsquo;re on the &lsquo;receiving end&rsquo; of the repository, and you don&rsquo;t have access to the review software for instance, that context might not be as clear.</p>
+
+<p>That&rsquo;s why it&rsquo;s a good idea to copy all (or some) details from the PR into the annotated tag message, so a permanent piece of documentation about the how/what/when and why exists in the repository. See the example above for a plausible tag message.</p>
+
+<h3>Whodunnit for paranoid people</h3>
+
+<p>Because, let&rsquo;s face it, everyone should be a bit paranoid these days. How do I know that the tag <em>and/or</em> the repository haven&rsquo;t been tampered with? Everyone can impersonate you in git, as long as they have write access to the <code>origin</code> repository. So let&rsquo;s say that your private key has leaked, a hacker has configured <code>git config user.email</code> with your e-mail address, committed some malware to your repository and moved your tag to a version that includes the malware. <em>That&rsquo;s not good. That&rsquo;s not good at all.</em></p>
+
+<p>Granted, if the above scenario should happen to you, you probably have bigger issues than verifying a tag. But what if you pull in some external changes that you don&rsquo;t quite trust? Or what if one of your enterprise customers wants to ensure that they pull in a verified set of changes onto their platforms?</p>
+
+<p>That&rsquo;s why you GPG sign your tags. Remember that <code>-s</code> parameter we&rsquo;ve added?
+During creation of the tag you&rsquo;ll notice this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>You need a passphrase to unlock the secret key <span class="k">for</span>
+</span><span class='line'>user: <span class="s2">&quot;Remco Overdijk &lt;remco@maxserv.com&gt;&quot;</span>
+</span><span class='line'>2048-bit RSA key, ID D68E3800, created 2013-10-02 <span class="o">(</span>main key ID D90A625D<span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>and in the <code>git show</code> example above you&rsquo;ll notice that a PGP signature was included. We can use this information to verify if the <code>tag</code> was intact (not tampered with), and that it was actually signed by someone we know <strong>and trust</strong>:</p>
+
+<figure class='code'><figcaption><span>verifying a tag</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>git verify-tag 0.12.0
+</span><span class='line'>gpg: Signature made <span class="k">do</span> <span class="m">12</span> feb 14:58:11 <span class="m">2015</span> CET using RSA key ID D68E3800
+</span><span class='line'>gpg: Good signature from <span class="s2">&quot;Remco Overdijk &lt;remco@maxserv.com&gt;&quot;</span>
+</span><span class='line'>gpg:                 aka <span class="s2">&quot;Remco Overdijk &lt;remco@maxserv.nl&gt;&quot;</span>
+</span><span class='line'>gpg:                 aka <span class="s2">&quot;keybase.io/remz &lt;remz@keybase.io&gt;&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Yes, that tag has a good signature, and it was signed by me, whom I explicitly added to my GPG web of trust.</p>
+
+<p>So, now you know how and why. Start using annotated tags!</p>
+
+<blockquote><p>Certain details, messages, addresses and hashes in this article have been altered to protect company specific details.</p></blockquote>
+
+
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Bacula: Cancelling All Jobs That Are Currently Writing]]></title>
+    <link href="https://rem.co/blog/2015/02/09/bacula-cancelling-all-jobs-that-are-currently-writing/"/>
+    <updated>2015-02-09T14:08:07+01:00</updated>
+    <id>https://rem.co/blog/2015/02/09/bacula-cancelling-all-jobs-that-are-currently-writing</id>
+    <content type="html"><![CDATA[<p><em>Just a quick post with the oneliner of the day.</em></p>
+
+<p><strong>Scenario</strong>: after a bacula director restart a couple of jobs were stuck on the FD with message:</p>
+
+<figure class='code'><figcaption><span>Bacula File Director Error</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>Running Jobs:
+</span><span class='line'>Writing: Incremental Backup job node.cluster.company.com <span class="nv">JobId</span><span class="o">=</span><span class="m">8702</span> <span class="nv">Volume</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+</span><span class='line'>    <span class="nv">pool</span><span class="o">=</span><span class="s2">&quot;bacula.director.company.com:pool:default.incremental&quot;</span> <span class="nv">device</span><span class="o">=</span><span class="s2">&quot;DefaultFileStorage&quot;</span> <span class="o">(</span>/mnt/bacula/default<span class="o">)</span>
+</span><span class='line'>    <span class="nv">spooling</span><span class="o">=</span><span class="m">0</span> <span class="nv">despooling</span><span class="o">=</span><span class="m">0</span> <span class="nv">despool_wait</span><span class="o">=</span>0
+</span><span class='line'>    <span class="nv">Files</span><span class="o">=</span><span class="m">0</span> <span class="nv">Bytes</span><span class="o">=</span><span class="m">0</span> AveBytes/sec<span class="o">=</span><span class="m">0</span> LastBytes/sec<span class="o">=</span>0
+</span><span class='line'>FDSocket closed
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<!-- more -->
+
+
+<p>There were a couple of these jobs that were stuck, preventing all other jobs from running, because those were waiting for a free slot on the FD.</p>
+
+<p><strong>Solution?</strong> Well, I <em>could</em> have resumed or fixed those jobs, but I&rsquo;m in a hurry, so I just cancelled them so the rest of the schedule could be processed. And I&rsquo;m lazy too, so I just cancelled all currently writing jobs in one go:</p>
+
+<figure class='code'><figcaption><span>Bacula Oneliner: Cancel all currently writing jobs</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="k">for</span> j in <span class="sb">`</span><span class="nb">echo</span> <span class="s2">&quot;s storage&quot;</span> <span class="p">|</span> bconsole <span class="p">|</span> grep -i writing <span class="p">|</span> awk <span class="s1">&#39;{print $6}&#39;</span><span class="sb">`</span><span class="p">;</span> <span class="k">do</span> <span class="nb">echo</span> <span class="s2">&quot;cancel $j&quot;</span> <span class="p">|</span> bconsole<span class="p">;</span> <span class="k">done</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>After that, the schedule started processing right away. Next issue.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Bacula: Purging and Deleting Old Volumes]]></title>
+    <link href="https://rem.co/blog/2015/01/15/bacula-purging-and-deleting-old-volumes/"/>
+    <updated>2015-01-15T14:08:02+01:00</updated>
+    <id>https://rem.co/blog/2015/01/15/bacula-purging-and-deleting-old-volumes</id>
+    <content type="html"><![CDATA[<p>I&rsquo;ve been using bacula for a couple of months now in conjunction with puppet to
+make automated backups of all servers that are managed by puppet.
+My bacula setup labels a volume for every job it runs with a unique name:</p>
+
+<figure class='code'><figcaption><span>Bacula Label Format</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ini'><span class='line'><span class="na">Label Format</span> <span class="o">=</span> <span class="s">&quot;${Job}.${Year}${Month:p/2/0/r}${Day:p/2/0/r}.${Hour:p/2/0/r}${Minute:p/2/0/r}&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>These volumes are automatically purged once the retention of all files contained on the volume expires (which is
+        configured per-pool). Due to the unique names however, the volumes cannot
+be recycled. The result of this is that the volumes that have been marked as
+purged in the catalog remain as-is on the disk. After some time this ultimately
+resulted in a full disk, thus halting all backups performed on that pool. Not
+good. Not good at all.</p>
+
+<!-- more -->
+
+
+<p>I thought volumes would be truncated at the time they are marked as purged, but
+I probably made some configuration error somewhere along the road or I don&rsquo;t
+quite understand how the truncating process works, because all of my purged
+disks are using their original disk space.</p>
+
+<p>Because I&rsquo;m pressed for time and can&rsquo;t be bothered with old backups anyway,
+                I&rsquo;ve decided to just delete all purged volumes (which were beyond their
+                        retention date anyway). Perhaps the steps I took to delete these
+                volumes can help others (Or others can recommend me a better way to
+                        deal with old volumes), so here goes:</p>
+
+<h2>Pruning all clients</h2>
+
+<p>Before you start cleaning old volumes, it might be wise to ensure that all
+volumes are pruned before cleaning, so you maximize the number of volumes you
+are going to delete.</p>
+
+<figure class='code'><figcaption><span>Pruning all clients</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c">#!/bin/bash</span>
+</span><span class='line'><span class="nv">clients</span><span class="o">=</span><span class="sb">`</span>mysql -e<span class="s1">&#39;select Name from Client ORDER BY Name ASC;&#39;</span> bacula <span class="p">|</span> tail -n+2<span class="sb">`</span>
+</span><span class='line'>  
+</span><span class='line'><span class="k">for</span> client in <span class="sb">`</span><span class="nb">echo</span> <span class="nv">$clients</span><span class="sb">`</span>
+</span><span class='line'><span class="k">do</span>
+</span><span class='line'>  <span class="nb">echo</span> <span class="s2">&quot;prune files client=${client} yes&quot;</span> <span class="p">|</span> bconsole
+</span><span class='line'><span class="k">done</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Checking the number of volumes to be purged</h2>
+
+<p>Using <code>list volumes</code> in <code>bconsole</code> you can check the status of all volumes known to bacula.
+I&rsquo;m merely interested in the number of volumes that are currently marked as purged:</p>
+
+<figure class='code'><figcaption><span>Listing the number of Purged Volumes</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">echo</span> <span class="s2">&quot;list volumes&quot;</span> <span class="p">|</span> bconsole <span class="p">|</span> grep <span class="s2">&quot;Purged&quot;</span> <span class="p">|</span> awk <span class="o">{</span><span class="s1">&#39;print $4&#39;</span><span class="o">}</span> <span class="p">|</span> wc -l
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This resulted in a list of <em>thousands</em> of volumes. (We&rsquo;re running, full, incremental and diff backups, so the numbers stack up). Time to get rid of them.</p>
+
+<h2>Removing purged volumes from the catalog and deleting them</h2>
+
+<p>Using this script I&rsquo;ve removed all purged volumes from the catalog, after which they were physically deleted from the disk, freeing up precious space for more recent backups.</p>
+
+<figure class='code'><figcaption><span>Deleting all Purged Volumes</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c">#!/bin/bash</span>
+</span><span class='line'><span class="k">for</span> f in <span class="sb">`</span><span class="nb">echo</span> <span class="s2">&quot;list volume&quot;</span> <span class="p">|</span> bconsole <span class="p">|</span> grep Purged <span class="p">|</span> cut -d <span class="s1">&#39; &#39;</span> -f6<span class="sb">`</span><span class="p">;</span> <span class="k">do</span>
+</span><span class='line'>  <span class="nb">echo</span> <span class="s2">&quot;delete volume=$f yes&quot;</span> <span class="p">|</span> bconsole<span class="p">;</span>
+</span><span class='line'>  rm -rf /mnt/bacula/default/<span class="nv">$f</span><span class="p">;</span>
+</span><span class='line'><span class="k">done</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Removing volumes that are missing from the catalog</h2>
+
+<p>Somehow I also ended up with some volumes on the disk that were not present in the bacula catalog at all. In my opinion these could be cleaned up as well, hence:</p>
+
+<figure class='code'><figcaption><span>Deleting volumes that are not present in the catalog</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c">#!/bin/bash</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">cd</span> /mnt/bacula/default
+</span><span class='line'><span class="k">for</span> i in <span class="sb">`</span>find . -maxdepth <span class="m">1</span> -type f -printf <span class="s2">&quot;%f\n&quot;</span><span class="sb">`</span><span class="p">;</span> <span class="k">do</span>
+</span><span class='line'>  <span class="nb">echo</span> <span class="s2">&quot;list volume=$i&quot;</span> <span class="p">|</span> bconsole <span class="p">|</span> <span class="k">if</span> grep --quiet <span class="s2">&quot;No results to list&quot;</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>        <span class="nb">echo</span> <span class="s2">&quot;$i is ready to be deleted&quot;</span>
+</span><span class='line'>        rm -f /mnt/bacula/default/<span class="nv">$i</span>
+</span><span class='line'>  <span class="k">fi</span>
+</span><span class='line'><span class="k">done</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Finishing up</h2>
+
+<p>To prevent full disks these tasks should be scheduled using <code>cron</code> and run daily (or at least weekly) to keep your disks and catalog lean &amp; clean.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Music: End of the Year Mix 2014]]></title>
+    <link href="https://rem.co/blog/2015/01/14/music-end-of-the-year-mix-2014/"/>
+    <updated>2015-01-14T16:55:06+01:00</updated>
+    <id>https://rem.co/blog/2015/01/14/music-end-of-the-year-mix-2014</id>
+    <content type="html"><![CDATA[<p>Need some fresh tunes? Enjoy my End Of The Year Mix for 2014.</p>
+
+<iframe src="https://www.mixcloud.com/widget/iframe/?feed=http%3A%2F%2Fwww.mixcloud.com%2Fremco-overdijk%2Fend-of-the-year-mix-2014%2F&amp;embed_uuid=957cd953-9df5-4c64-ad3d-7481cf4be478&amp;replace=0&amp;hide_cover=1&amp;stylecolor=0181EB&amp;embed_type=widget_standard" frameborder="0" height="400" width="100%"></iframe>
+
+
+<div style="clear: both; height: 3px; width: auto;"></div>
+
+
+<p style="display: block; font-size: 11px; font-family: &quot;Open Sans&quot;,Helvetica,Arial,sans-serif; margin: 0px; padding: 3px 4px; color: rgb(153, 153, 153); width: auto;"><a href="http://www.mixcloud.com/remco-overdijk/end-of-the-year-mix-2014/?utm_source=widget&amp;amp;utm_medium=web&amp;amp;utm_campaign=base_links&amp;amp;utm_term=resource_link" target="_blank" style="color: rgb(1, 129, 235); font-weight: bold;">End Of The Year Mix 2014</a><span> by </span><a href="http://www.mixcloud.com/remco-overdijk/?utm_source=widget&amp;amp;utm_medium=web&amp;amp;utm_campaign=base_links&amp;amp;utm_term=profile_link" target="_blank" style="color: rgb(1, 129, 235); font-weight: bold;">Remco Overdijk</a><span> on </span><a href="http://www.mixcloud.com/?utm_source=widget&amp;utm_medium=web&amp;utm_campaign=base_links&amp;utm_term=homepage_link" target="_blank" style="color: rgb(1, 129, 235); font-weight: bold;"> Mixcloud</a></p>
+
+
+<div style="clear: both; height: 3px; width: auto;"></div>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Gentoo: Running a Minecraft 1.8 Server]]></title>
+    <link href="https://rem.co/blog/2014/11/28/gentoo-running-a-minecraft-1-dot-8-server/"/>
+    <updated>2014-11-28T13:36:57+01:00</updated>
+    <id>https://rem.co/blog/2014/11/28/gentoo-running-a-minecraft-1-dot-8-server</id>
+    <content type="html"><![CDATA[<p>Running a dedicated Minecraft server can be a challenging job. You have to find a balance between performance and usability using &ldquo;server software&rdquo; that doesn&rsquo;t seem to be designed to provide for long running, resilient services.</p>
+
+<p>Being a first-time Minecraft server operator I had to tackle various challenges in order to come up with a way to provide a stable and reliable service to my players. The following article is a recollection of the things I implemented and scripts I wrote in order to run a Minecraft 1.8 server. The scripts mentioned are specific to Gentoo Linux, but could also be used on most other Linux flavours, albeit with some modifications to match that platform&rsquo;s <code>init.d</code> scripts.</p>
+
+<!-- more --> 
+
+
+<h2>Preparations</h2>
+
+<h3>Screen</h3>
+
+<p>In the scripts we&rsquo;re going to use we use <code>screen</code> as the means to deamonize the Minecraft process. I&rsquo;ve given this a lot of thought, because using <code>screen</code> as a deamonizer feels very wrong  to me when there are dedicated tools (such as the <code>start-stop-daemon</code>) for that particular job. Furthermore, I&rsquo;m more of a <code>tmux</code> guy myself when it comes to terminal multiplexing.</p>
+
+<p>However, after searching the internet, <code>screen</code> seems to be the most popular way of daemonizing Minecraft by far. I don&rsquo;t dare to speculate on wether this is caused by a lack of knowledge in the Minecraft server scene or based on a sound choice.</p>
+
+<p>I have my own reasons for using <code>screen</code> instead of <code>start-stop-deamon</code> or <code>tmux</code>:
+-  <code>screen</code> (and/or <code>tmux</code>) allows me to interact with the game&rsquo;s console. If I use <code>start-stop-daemon</code> instead, the process will be truly deamonized, and there is no way to bring it to the foreground anymore to allow for interaction. Why do we <em>need</em> console interaction you might ask? Because we do backups for example. In order to have reliable backups, we have to tell the Minecraft server to flush any changes to the disk and stop saving while the backup is running. This is all done using console commands.
+- <code>screen</code> has an awesome command, <code>stuff</code>, that allows us to send commands to a detached (deamonized)  instance. This provides us with the possibility of interacting with a running instance using scripts/services <em>outside</em> of that screen instance.</p>
+
+<p>So, before we continue, make sure <code>screen</code> is installed on your box:</p>
+
+<pre><code># emerge -av app-misc/screen
+</code></pre>
+
+<h3>Java SE 8</h3>
+
+<p>My first attempts on running Minecraft 1.8 used the JDK that was present on my box at that time, being <code>IcedTea JDK 6.1.13.3 [icedtea-bin-6]</code>. You <em>can</em> actually use that JDK (or any other Java SE 6 JDK/JRE for that matter), but my installation was haunted by substantial, noticeable lag while the server process was using 100% CPU non-stop (on one core, the  main Minecraft server process being single-threaded) and the console and logs were spammed with these warnings:</p>
+
+<pre><code>[23:52:10] [Server thread/WARN]: Can't keep up! Did the system time change, or is the server overloaded? Running 19381ms behind, skipping 387 tick(s)
+</code></pre>
+
+<p>Despite all optimisations that you will read about in this article that were already in effect at that time, the lag remained, and would at times get so bad that Minecraft&rsquo;s  internal watchdog would mark the server as crashed:</p>
+
+<pre><code>[21:21:15] [Server Watchdog/FATAL]: A single server tick took 60.00 seconds (should be max 0.05)
+[21:21:15] [Server Watchdog/FATAL]: Considering it to be crashed, server will forcibly shutdown.
+[21:21:15] [Server Watchdog/ERROR]: This crash report has been saved to: /mnt/ramdisk/./crash-reports/crash-2014-11-27_21.21.15-server.txt
+[21:21:15] [Server Shutdown Thread/INFO]: Stopping server
+</code></pre>
+
+<p>After some research on the internet some posts mentioned that upgrading to Java 8 could make all the difference, so I did. And it worked! While CPU usage is still reasonably high (around 70~80% at most times), the lag and warnings are gone, and subsequently, so are the crashes. So, I&rsquo;ll advise to use the same JDK as I did in this article. To install:</p>
+
+<pre><code># emerge -av dev-java/oracle-jdk-bin
+</code></pre>
+
+<p><strong>Read</strong> the error you receive from running that command, resolve the fetch restriction by following the instructions in that error message and continue installing. Afterwards:</p>
+
+<pre><code># java-config --list-available-vms
+The following VMs are available for generation-2:
+1)      IcedTea JDK 6.1.13.3 [icedtea-bin-6]
+*)      Oracle JDK 1.8.0.25 [oracle-jdk-bin-1.8] 
+
+# java-config --set-system-vm 2
+Now using oracle-jdk-bin-1.8 as your generation-2 system JVM
+</code></pre>
+
+<p>The command above marks the newly installed JDK as your system JVM. This might not be a possibility for you if you have other software on your system that is incompatible with Java 8 (or the Oracle JDK). In that case, you can set the installed JDK as the User VM for the user you are using to run Minecraft. To do so:</p>
+
+<pre><code># su &lt;minecraftuser&gt;
+$ java-config --set-user-vm 2
+Now using oracle-jdk-bin-1.8 as your user JVM
+</code></pre>
+
+<h3>RAMDisk</h3>
+
+<p>Being haunted by performance issues, I&rsquo;ve read quite a lot on Minecraft server performance and optimisation. There is one article that stands out from the crowd and is a <em>must</em> read for everyone running Minecraft servers. I encourage you to go and read <a href="http://www.sk89q.com/2013/03/improving-your-minecraft-servers-performance/">sk89q&rsquo;s Improving your Minecraft server’s performance</a> first before continuing this article.</p>
+
+<p>Among other minor optimisations, such as the Java flags that are used in my setup, one of the biggest influences is the use of a RAMDisk to host your Minecraft setup on. This eliminates any delays caused by <code>iowait</code> due to slow disks and speeds up various tasks, such as loading the map. I use a Dell PowerEdge 1950 III Blade server as the hardware platform for my Minecraft server, and although beefy as it may be for this purpose, it is not equipped with SSD&rsquo;s which is a potential cause for performance degradation. The installation/use of a RAMDisk is quite easy, but there are some drawbacks you have to keep in mind, such as that RAMDisks are not permanent storage. In case you suffer a power outage or kernel panic, the data on your RAMDisk is gone. To counter this issue, you&rsquo;ll have to implement some way to synchronise the RAMDisk from/to persistant storage.</p>
+
+<p>The <code>init.d</code> script we&rsquo;ll later discuss takes care of all this hassle, but in order for it to work, we first have to create the RAMDisk.</p>
+
+<p>Edit your <code>/etc/fstab</code> and add a RAMDisk at a mountpoint of your choise:</p>
+
+<pre><code># vim /etc/fstab
+tmpfs                   /mnt/ramdisk    tmpfs           rw,nodev,nosuid,size=2G,uid=1000,gid=1000,mode=1700     0 0
+</code></pre>
+
+<p>Adjust the <code>size=</code> parameter to match the amount of spare (unused) RAM you have available and the size of your actual Minecraft installation. (My installation is only 300MB actually, but I have 36GB RAM in this machine which is mostly vacant so I picked a comfortably large disk size). Adjust the <code>uid=</code> and <code>gid=</code> parameters to the id&rsquo;s of the dedicated user you are using to run your Minecraft server with. (Never run trivial services such as this as <code>root</code>!).</p>
+
+<p>Next, create the mountpoint:</p>
+
+<pre><code># mkdir /mnt/ramdisk
+</code></pre>
+
+<p>And try to mount the RAMDisk and see if it works:</p>
+
+<pre><code># mount /mnt/ramdisk
+# df -h
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sda3        63G   48G   13G  80% /
+udev             10M  4.0K   10M   1% /dev
+tmpfs           7.9G  628K  7.9G   1% /run
+shm             7.9G     0  7.9G   0% /dev/shm
+cgroup_root      10M     0   10M   0% /sys/fs/cgroup
+tmpfs           7.9G   72K  7.9G   1% /tmp
+/dev/sdb1       200G  192G  8.2G  96% /mnt/backups
+tmpfs           2.0G  297M  1.8G  15% /mnt/ramdisk 
+</code></pre>
+
+<h3>Install Minecraft as you normally would</h3>
+
+<p>If you haven&rsquo;t done so already, install a Minecraft like you normally would. For me, that is a directory <code>/home/remco/minecraft</code>  which contains the server <code>.jar</code>, the world and all settings.</p>
+
+<h2>The Scripts</h2>
+
+<p>The <code>init.d</code> script is what makes this setup tick. It does all the heavy lifting. The location for this script is <code>/etc/init.d/minecraft</code></p>
+
+<figure class='code'><figcaption><span> (minecraft-init.d.sh)</span> <a href='https://rem.co/downloads/code/minecraft-init.d.sh'>download</a></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+<span class='line-number'>88</span>
+<span class='line-number'>89</span>
+<span class='line-number'>90</span>
+<span class='line-number'>91</span>
+<span class='line-number'>92</span>
+<span class='line-number'>93</span>
+<span class='line-number'>94</span>
+<span class='line-number'>95</span>
+<span class='line-number'>96</span>
+<span class='line-number'>97</span>
+<span class='line-number'>98</span>
+<span class='line-number'>99</span>
+<span class='line-number'>100</span>
+<span class='line-number'>101</span>
+<span class='line-number'>102</span>
+<span class='line-number'>103</span>
+<span class='line-number'>104</span>
+<span class='line-number'>105</span>
+<span class='line-number'>106</span>
+<span class='line-number'>107</span>
+<span class='line-number'>108</span>
+<span class='line-number'>109</span>
+<span class='line-number'>110</span>
+<span class='line-number'>111</span>
+<span class='line-number'>112</span>
+<span class='line-number'>113</span>
+<span class='line-number'>114</span>
+<span class='line-number'>115</span>
+<span class='line-number'>116</span>
+<span class='line-number'>117</span>
+<span class='line-number'>118</span>
+<span class='line-number'>119</span>
+<span class='line-number'>120</span>
+<span class='line-number'>121</span>
+<span class='line-number'>122</span>
+<span class='line-number'>123</span>
+<span class='line-number'>124</span>
+<span class='line-number'>125</span>
+<span class='line-number'>126</span>
+<span class='line-number'>127</span>
+<span class='line-number'>128</span>
+<span class='line-number'>129</span>
+<span class='line-number'>130</span>
+<span class='line-number'>131</span>
+<span class='line-number'>132</span>
+<span class='line-number'>133</span>
+<span class='line-number'>134</span>
+<span class='line-number'>135</span>
+<span class='line-number'>136</span>
+<span class='line-number'>137</span>
+<span class='line-number'>138</span>
+<span class='line-number'>139</span>
+<span class='line-number'>140</span>
+<span class='line-number'>141</span>
+<span class='line-number'>142</span>
+<span class='line-number'>143</span>
+<span class='line-number'>144</span>
+<span class='line-number'>145</span>
+<span class='line-number'>146</span>
+<span class='line-number'>147</span>
+<span class='line-number'>148</span>
+<span class='line-number'>149</span>
+<span class='line-number'>150</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#!/sbin/runscript</span>
+</span><span class='line'><span class="c"># Copyright 2014 Rem.co Linux Solutions</span>
+</span><span class='line'><span class="c"># Distributed under the terms of the GNU General Public License v2</span>
+</span><span class='line'><span class="c"># $Header: $</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">extra_commands</span><span class="o">=</span><span class="s2">&quot;syncup syncdown backup rotate emptyrestart watch&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">description</span><span class="o">=</span><span class="s2">&quot;Manages a Minecraft installation running under a dedicated user inside a daemonized screen session&quot;</span>
+</span><span class='line'><span class="nv">description_syncdown</span><span class="o">=</span><span class="s2">&quot;Synchronizes the RAMdisk back to the persistant storage&quot;</span>
+</span><span class='line'><span class="nv">description_syncup</span><span class="o">=</span><span class="s2">&quot;Synchronizes the persistant storage to the RAMdisk&quot;</span>
+</span><span class='line'><span class="nv">description_backup</span><span class="o">=</span><span class="s2">&quot;Takes a full backup of the minecraft installation and rotates old backups&quot;</span>
+</span><span class='line'><span class="nv">description_rotate</span><span class="o">=</span><span class="s2">&quot;Rotates old backups&quot;</span>
+</span><span class='line'><span class="nv">description_emptyrestart</span><span class="o">=</span><span class="s2">&quot;Checks if any users are online in minecraft. If not, restarting the service&quot;</span>
+</span><span class='line'><span class="nv">description_watch</span><span class="o">=</span><span class="s2">&quot;Checks if minecraft is still running if it resides in the &#39;started&#39; state. Restarts the service if not.&quot;</span>
+</span><span class='line'>
+</span><span class='line'>depend<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  need net localmount
+</span><span class='line'>  after bootmisc
+</span><span class='line'>  use logger
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>start<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  ebegin <span class="s2">&quot;Starting Minecraft&quot;</span>
+</span><span class='line'>  <span class="k">if</span> ! sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -list <span class="p">|</span> grep -q <span class="s2">&quot;${SCREENNAME}&quot;</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>      launch <span class="o">||</span> <span class="k">return</span> 1
+</span><span class='line'>  <span class="k">else</span>
+</span><span class='line'>      eerror <span class="s2">&quot;Minecraft screen session is already present, not launching new one.&quot;</span>
+</span><span class='line'>  <span class="k">fi</span>
+</span><span class='line'>  eend <span class="nv">$?</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>stop<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  ebegin <span class="s2">&quot;Stopping Minecraft&quot;</span>
+</span><span class='line'>  <span class="k">if</span> ! sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -list <span class="p">|</span> grep -q <span class="s2">&quot;${SCREENNAME}&quot;</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>      eerror <span class="s2">&quot;The Minecraft screen session cannot be found so we can&#39;t stop it&quot;</span>
+</span><span class='line'>  <span class="k">else</span>
+</span><span class='line'>      sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -S <span class="k">${</span><span class="nv">SCREENNAME</span><span class="k">}</span> -p <span class="m">0</span> -X stuff <span class="s2">&quot;stop$(printf \\r)&quot;</span>
+</span><span class='line'>      sleep 5
+</span><span class='line'>      <span class="c">#Check if the screen session closed cleanly, otherwise kill it with fire.</span>
+</span><span class='line'>      <span class="k">if</span> sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -list <span class="p">|</span> grep -q <span class="s2">&quot;${SCREENNAME}&quot;</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>          sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -S <span class="k">${</span><span class="nv">SCREENNAME</span><span class="k">}</span> -X <span class="nb">kill</span>
+</span><span class='line'><span class="nb">     </span><span class="k">fi</span>
+</span><span class='line'>  <span class="k">fi</span>
+</span><span class='line'>  eend <span class="nv">$?</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>reload<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  ebegin <span class="s2">&quot;Reload Minecraft&quot;</span>
+</span><span class='line'>  stop
+</span><span class='line'>  sleep 3
+</span><span class='line'>  start
+</span><span class='line'>  eend <span class="nv">$?</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>launch<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">if</span> ! mountpoint -q <span class="k">${</span><span class="nv">RAMDISK</span><span class="k">}</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>      mount <span class="k">${</span><span class="nv">RAMDISK</span><span class="k">}</span>
+</span><span class='line'>  <span class="k">fi</span>
+</span><span class='line'>  sup <span class="o">||</span> <span class="k">return</span> 1
+</span><span class='line'>  sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -dmS <span class="k">${</span><span class="nv">SCREENNAME</span><span class="k">}</span> bash -c <span class="s2">&quot;cd ${RAMDISK}; java -server -XX:+UseConcMarkSweepGC -Xms2G -Xmx4G -jar ${JARFILE} nogui&quot;</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>sdown<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  rsync --quiet --archive --delete --recursive --force <span class="k">${</span><span class="nv">RAMDISK</span><span class="k">}</span>/ <span class="k">${</span><span class="nv">PERSISTDIR</span><span class="k">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>syncdown<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  ebegin <span class="s2">&quot;Syncing RAMdisk to Persistant Storage&quot;</span>
+</span><span class='line'>  sdown <span class="o">||</span> <span class="k">return</span> 1
+</span><span class='line'>  eend <span class="nv">$?</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>sup<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  rsync --quiet --archive <span class="k">${</span><span class="nv">PERSISTDIR</span><span class="k">}</span>/ <span class="k">${</span><span class="nv">RAMDISK</span><span class="k">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>syncup<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  ebegin <span class="s2">&quot;Syncing Persistant Storage to RAMdisk&quot;</span>
+</span><span class='line'>  sup <span class="o">||</span> <span class="k">return</span> 1
+</span><span class='line'>  eend <span class="nv">$?</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>backup<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  ebegin <span class="s2">&quot;Taking a backup&quot;</span>
+</span><span class='line'>  <span class="k">if</span> ! sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -list <span class="p">|</span> grep -q <span class="s2">&quot;${SCREENNAME}&quot;</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>      eerror <span class="s2">&quot;Minecraft is not running, not taking a live backup&quot;</span>
+</span><span class='line'>  <span class="k">fi</span>
+</span><span class='line'>  <span class="nv">H</span><span class="o">=</span><span class="k">$(</span>date +<span class="s2">&quot;%H&quot;</span><span class="k">)</span>
+</span><span class='line'>  <span class="nv">NOW</span><span class="o">=</span><span class="k">$(</span>date +<span class="s2">&quot;%H:%M&quot;</span><span class="k">)</span>
+</span><span class='line'>  sdown <span class="o">||</span> <span class="k">return</span> 1
+</span><span class='line'>  sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -S <span class="k">${</span><span class="nv">SCREENNAME</span><span class="k">}</span> -p <span class="m">0</span> -X stuff <span class="s2">&quot;say Hourly backup for $NOW is starting. The World is no longer saving...$(printf \\r)&quot;</span>
+</span><span class='line'>  sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -S <span class="k">${</span><span class="nv">SCREENNAME</span><span class="k">}</span> -p <span class="m">0</span> -X stuff <span class="s2">&quot;save-off$(printf \\r)&quot;</span>
+</span><span class='line'>  sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -S <span class="k">${</span><span class="nv">SCREENNAME</span><span class="k">}</span> -p <span class="m">0</span> -X stuff <span class="s2">&quot;save-all$(printf \\r)&quot;</span>
+</span><span class='line'>  sleep 5
+</span><span class='line'>  sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> /usr/bin/time -f <span class="s2">&quot;%e sec at %P CPU&quot;</span> -o /tmp/mctime sh -c <span class="s2">&quot;sync; sleep 5; sudo -u ${RUNAS} nice tar czf ${BACKUPDIR}/${PREFIX}$(date +&quot;</span>%d-%m-%Y-%H<span class="s2">&quot;).tar.gz -C ${RAMDISK} .&quot;</span>
+</span><span class='line'>  sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -S <span class="k">${</span><span class="nv">SCREENNAME</span><span class="k">}</span> -p <span class="m">0</span> -X stuff <span class="s2">&quot;save-on$(printf \\r)&quot;</span>
+</span><span class='line'>  sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -S <span class="k">${</span><span class="nv">SCREENNAME</span><span class="k">}</span> -p <span class="m">0</span> -X stuff <span class="s2">&quot;say Hourly backup for $NOW is complete and ran for $(cat /tmp/mctime). The World is saving once more.$(printf \\r)&quot;</span>
+</span><span class='line'>  rm /tmp/mctime
+</span><span class='line'>  <span class="k">if</span> <span class="o">((</span> <span class="m">19</span> &lt;<span class="o">=</span> 10#<span class="nv">$H</span> <span class="o">&amp;&amp;</span> 10#<span class="nv">$H</span> &lt; <span class="m">23</span> <span class="o">))</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>      rot <span class="o">||</span> <span class="k">return</span> 1
+</span><span class='line'>  <span class="k">fi</span>
+</span><span class='line'>  eend <span class="nv">$?</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>rot<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  <span class="o">[</span> -d <span class="k">${</span><span class="nv">BACKUPDIR</span><span class="k">}</span>/daily-saves <span class="o">]</span> <span class="o">||</span> mkdir -p <span class="k">${</span><span class="nv">BACKUPDIR</span><span class="k">}</span>/daily-saves
+</span><span class='line'>  find <span class="k">${</span><span class="nv">BACKUPDIR</span><span class="k">}</span> -maxdepth <span class="m">1</span> -type f -name <span class="s2">&quot;${PREFIX}$(date -d &quot;</span>yesterday 20:00 <span class="s2">&quot; &#39;+%d-%m-%Y-%H&#39;).tar.gz&quot;</span> <span class="se">\</span>
+</span><span class='line'>      -exec cp <span class="o">{}</span> <span class="k">${</span><span class="nv">BACKUPDIR</span><span class="k">}</span>/daily-saves/daily_<span class="k">$(</span>date -d <span class="s2">&quot;yesterday 20:00 &quot;</span> <span class="s1">&#39;+%d-%m-%Y&#39;</span><span class="k">)</span>.tar.gz <span class="se">\;</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">[</span> -f <span class="k">${</span><span class="nv">BACKUPDIR</span><span class="k">}</span>/daily-saves/daily_<span class="k">$(</span>date -d <span class="s2">&quot;yesterday 20:00 &quot;</span> <span class="s1">&#39;+%d-%m-%Y&#39;</span><span class="k">)</span>.tar.gz <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>      find <span class="k">${</span><span class="nv">BACKUPDIR</span><span class="k">}</span> -maxdepth <span class="m">1</span> -type f -name <span class="s2">&quot;${PREFIX}$(date -d &quot;</span>yesterday 20:00 <span class="s2">&quot; &#39;+%d-%m-%Y&#39;)-*.tar.gz&quot;</span> -exec rm <span class="o">{}</span> <span class="se">\;</span>
+</span><span class='line'>  <span class="k">else</span>
+</span><span class='line'>      ewarn <span class="s2">&quot;Could not locate yesterday&#39;s daily save. Not rotating yesterday&#39;s hourly saves.&quot;</span>
+</span><span class='line'>  <span class="k">fi</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>rotate<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  ebegin <span class="s2">&quot;Starting daily backup rotation&quot;</span>
+</span><span class='line'>  rot <span class="o">||</span> <span class="k">return</span> 1
+</span><span class='line'>  eend <span class="nv">$?</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>emptyrestart<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -S <span class="k">${</span><span class="nv">SCREENNAME</span><span class="k">}</span> -p <span class="m">0</span> -X hardcopy /tmp/<span class="k">${</span><span class="nv">SCREENNAME</span><span class="k">}</span>.dump.1
+</span><span class='line'>  sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -S <span class="k">${</span><span class="nv">SCREENNAME</span><span class="k">}</span> -p <span class="m">0</span> -X stuff <span class="s2">&quot;list$(printf \\r)&quot;</span>
+</span><span class='line'>  <span class="c"># We need to wait for the command to complete, or the diff will we unreliable</span>
+</span><span class='line'>  sleep 1
+</span><span class='line'>  sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -S <span class="k">${</span><span class="nv">SCREENNAME</span><span class="k">}</span> -p <span class="m">0</span> -X hardcopy /tmp/<span class="k">${</span><span class="nv">SCREENNAME</span><span class="k">}</span>.dump.2
+</span><span class='line'>  <span class="nv">NUMP</span><span class="o">=</span><span class="k">$(</span>diff -u /tmp/<span class="k">${</span><span class="nv">SCREENNAME</span><span class="k">}</span>.dump.<span class="o">{</span>1,2<span class="o">}</span> <span class="p">|</span> grep -E <span class="s2">&quot;^\+&quot;</span> <span class="p">|</span> grep -Po <span class="s1">&#39;\d+/\d+&#39;</span> <span class="p">|</span> cut -d<span class="s1">&#39;/&#39;</span> -f1<span class="k">)</span>
+</span><span class='line'>  rm /tmp/<span class="k">${</span><span class="nv">SCREENNAME</span><span class="k">}</span>.dump.<span class="o">{</span>1,2<span class="o">}</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">[</span> <span class="k">${</span><span class="nv">NUMP</span><span class="k">}</span> -eq <span class="m">0</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>      reload <span class="o">||</span> <span class="k">return</span> 1
+</span><span class='line'>  <span class="k">else</span>
+</span><span class='line'>      ewarn <span class="s2">&quot;There are ${NUMP} player(s) online. Not restarting.&quot;</span>
+</span><span class='line'>  <span class="k">fi</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>watch<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">[</span> <span class="k">$(</span>rc-service minecraft status <span class="p">|</span> grep -i <span class="s2">&quot;started&quot;</span> <span class="p">|</span> wc -l<span class="k">)</span> -eq <span class="m">1</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>      einfo <span class="s2">&quot;MC should be running&quot;</span>
+</span><span class='line'>      <span class="k">if</span> ! sudo -u <span class="k">${</span><span class="nv">RUNAS</span><span class="k">}</span> screen -list <span class="p">|</span> grep -q <span class="s2">&quot;${SCREENNAME}&quot;</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>                  ewarn <span class="s2">&quot;But it is not! Restarting service&quot;</span>
+</span><span class='line'>          sdown <span class="o">||</span> <span class="k">return</span> 1
+</span><span class='line'>          launch <span class="o">||</span> <span class="k">return</span> 1
+</span><span class='line'>      <span class="k">else</span>
+</span><span class='line'>          einfo <span class="s2">&quot;And it is. Good.&quot;</span>
+</span><span class='line'>      <span class="k">fi</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">else</span>
+</span><span class='line'>      einfo <span class="s2">&quot;MC is in stopped state. Not doing anything.&quot;</span>
+</span><span class='line'>  <span class="k">fi</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The <code>init.d</code> script loads settings from a <code>conf.d</code> script. The location for
+this script is <code>/etc/conf.d/minecraft</code></p>
+
+<figure class='code'><figcaption><span> (minecraft-conf.d.sh)</span> <a href='https://rem.co/downloads/code/minecraft-conf.d.sh'>download</a></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">BACKUPDIR</span><span class="o">=</span>/mnt/backups/minecraft
+</span><span class='line'><span class="nv">RAMDISK</span><span class="o">=</span>/mnt/ramdisk
+</span><span class='line'><span class="nv">PERSISTDIR</span><span class="o">=</span>/home/remco/minecraft
+</span><span class='line'><span class="nv">PREFIX</span><span class="o">=</span><span class="s2">&quot;mc-backup_&quot;</span>
+</span><span class='line'><span class="nv">RUNAS</span><span class="o">=</span><span class="s2">&quot;remco&quot;</span>
+</span><span class='line'><span class="nv">SCREENNAME</span><span class="o">=</span><span class="s2">&quot;minecraft&quot;</span>
+</span><span class='line'><span class="c">#JARFILE=&quot;minecraft_server.1.8.1.jar&quot;</span>
+</span><span class='line'><span class="c">#JARFILE=&quot;spigot1649.jar&quot;</span>
+</span><span class='line'><span class="nv">JARFILE</span><span class="o">=</span><span class="s2">&quot;spigot-1.8.jar&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Finishing up</h2>
+
+<ul>
+<li>Install cronjobs as <code>root</code>:</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># crontab -e</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>Add these lines:</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>0 * * * *       /etc/init.d/minecraft backup 1&gt; /dev/null
+</span><span class='line'>* * * * *       /sbin/rc-service minecraft watch 1&gt; /dev/null</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>Set service to start automatically:</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>rc-update add minecraft default</span></code></pre></td></tr></table></div></figure>
+
+
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Git: Moving a Repository to a New Server]]></title>
+    <link href="https://rem.co/blog/2014/06/10/git-moving-a-repository-to-a-new-server/"/>
+    <updated>2014-06-10T16:59:56+02:00</updated>
+    <id>https://rem.co/blog/2014/06/10/git-moving-a-repository-to-a-new-server</id>
+    <content type="html"><![CDATA[<p>The quick, easy and complete way:</p>
+
+<ol>
+<li><p>Clone the repo you want to move or skip this step if you already have one set up:</p>
+
+<pre><code> git clone git@oldreposerver:repo/name &lt;insert dir&gt;
+ cd &lt;insert dir&gt;
+</code></pre></li>
+<li><p>Make sure your repo has all the latest news from its current <code>origin</code>:</p>
+
+<pre><code> git fetch --all 
+</code></pre></li>
+<li><p>Add the new <code>origin</code> as a temporary remote whilst keeping the old one for now:<!-- more --></p>
+
+<pre><code> git remote add newrepo ssh://git@newreposerver:newrepo/newname
+</code></pre></li>
+<li><p>Push all <code>refs</code> from <code>origin</code> to their equivalent counterpart on <code>newrepo</code>:</p>
+
+<pre><code> git push newrepo '+refs/remotes/origin/*:refs/heads/*'
+</code></pre></li>
+<li><p>Switch <code>origin</code> around so your new repository becomes default:</p>
+
+<pre><code> git remote rename origin oldrepo
+ git remote rename newrepo origin
+</code></pre></li>
+<li><p>Or get rid of the old <code>origin</code> altogether if you&rsquo;re positive you won&rsquo;t be needing it anymore:</p>
+
+<pre><code> git remote remove origin
+ git remote rename newrepo origin
+</code></pre></li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Fixing 'Error Opening Terminal: Screen-256color.']]></title>
+    <link href="https://rem.co/blog/2013/06/06/fixing-error-opening-terminal-screen-256color-dot/"/>
     <updated>2013-06-06T00:00:00+02:00</updated>
-    <id>http://blog.rem.co/blog/2013/06/06/fixing-error-opening-terminal-screen-256color-dot</id>
+    <id>https://rem.co/blog/2013/06/06/fixing-error-opening-terminal-screen-256color-dot</id>
     <content type="html"><![CDATA[<p>If you&rsquo;re using <code>tmux</code> or <code>screen</code> as a wrapper for your terminal sessions (such as when using the <a href="http://www.drbunsen.org/the-text-triumvirate/">Text Triumvirate</a>), chances are that you are presented with the following error when you invoke a command that uses 256 color mode (such as <code>multitail</code> or <code>htop</code>):</p>
 
 <pre><code>Error opening terminal: screen-256color.
@@ -36,10 +1086,10 @@
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[OnApp: Using PHP to launch a VNC connection]]></title>
-    <link href="http://blog.rem.co/blog/2013/03/01/onapp-using-php-to-launch-a-vnc-connection/"/>
+    <title type="html"><![CDATA[OnApp: Using PHP to Launch a VNC Connection]]></title>
+    <link href="https://rem.co/blog/2013/03/01/onapp-using-php-to-launch-a-vnc-connection/"/>
     <updated>2013-03-01T12:48:00+01:00</updated>
-    <id>http://blog.rem.co/blog/2013/03/01/onapp-using-php-to-launch-a-vnc-connection</id>
+    <id>https://rem.co/blog/2013/03/01/onapp-using-php-to-launch-a-vnc-connection</id>
     <content type="html"><![CDATA[<p>If you&rsquo;re an <a href="http://onapp.com/">OnApp</a> user you probably know you can make a VNC connection to your VM&rsquo;s using the Control Panel.
 This uses a java applet in your browser as the VNC client.</p>
 
@@ -49,16 +1099,18 @@ This uses a java applet in your browser as the VNC client.</p>
 
 <p>According to the <a href="https://onapp.zendesk.com/entries/22068371-use-own-vnc-client-instead-of-the-onapp-console">OnApp Helpdesk</a> you can use these calls to get the required information:</p>
 
-<pre><code>GET /virtual_machines/:virtual_machine_id/console.xml
-GET /virtual_machines/:virtual_machine_id/console.json
-</code></pre>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>GET /virtual_machines/:virtual_machine_id/console.xml
+</span><span class='line'>GET /virtual_machines/:virtual_machine_id/console.json</span></code></pre></td></tr></table></div></figure>
+
 
 <p>As I&rsquo;m lazy I didn&rsquo;t want to do this manually every time, so I devised a little PHP script that can aid in finding the right information:</p>
 
-<!-- more -->
+<!-- more -->  
 
 
-<p></p>
+
 
 <figure class='code'><figcaption><span>OnApp VNC Initiator</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -171,10 +1223,10 @@ GET /virtual_machines/:virtual_machine_id/console.json
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[SELinux: Allowing SSH public key authentication]]></title>
-    <link href="http://blog.rem.co/blog/2013/02/19/selinux-allowing-ssh-public-key-authentication/"/>
+    <title type="html"><![CDATA[SELinux: Allowing SSH Public Key Authentication]]></title>
+    <link href="https://rem.co/blog/2013/02/19/selinux-allowing-ssh-public-key-authentication/"/>
     <updated>2013-02-19T17:03:00+01:00</updated>
-    <id>http://blog.rem.co/blog/2013/02/19/selinux-allowing-ssh-public-key-authentication</id>
+    <id>https://rem.co/blog/2013/02/19/selinux-allowing-ssh-public-key-authentication</id>
     <content type="html"><![CDATA[<h3>The issue</h3>
 
 <p>I experienced a seemingly weird issue with a freshly installed CentOS server today.</p>
@@ -183,11 +1235,10 @@ GET /virtual_machines/:virtual_machine_id/console.json
 
 <p>All attempts to connect to the machine using key authentication silently failed however.</p>
 
-<!-- more -->
+<!-- more -->  
 
 
-<p>
-After debugging the usual <code>sshd</code> stuff i noticed the following entries in <code>/var/log/audit/audit.log</code>:</p>
+<p>After debugging the usual <code>sshd</code> stuff i noticed the following entries in <code>/var/log/audit/audit.log</code>:</p>
 
 <pre><code>type=USER_AUTH msg=audit(1361289386.691:2344): user pid=22997 uid=0 auid=0 ses=99 subj=unconfined_u:system_r:sshd_t:s0-s0:c0.c1023 msg='op=pubkey acct="root" exe="/usr/sbin/sshd" hostname=? addr=81.81.21.231 terminal=ssh res=failed'
 type=USER_AUTH msg=audit(1361289386.700:2347): user pid=22997 uid=0 auid=0 ses=99 subj=unconfined_u:system_r:sshd_t:s0-s0:c0.c1023 msg='op=pubkey acct="root" exe="/usr/sbin/sshd" hostname=? addr=81.81.21.231 terminal=ssh res=failed'
@@ -217,10 +1268,10 @@ type=USER_AUTH msg=audit(1361289715.714:2382): user pid=23033 uid=0 auid=0 ses=9
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[Ubuntu: Automatically selecting a fast mirror]]></title>
-    <link href="http://blog.rem.co/blog/2013/01/22/ubuntu-automatically-selecting-a-fast-mirror/"/>
+    <title type="html"><![CDATA[Ubuntu: Automatically Selecting a Fast Mirror]]></title>
+    <link href="https://rem.co/blog/2013/01/22/ubuntu-automatically-selecting-a-fast-mirror/"/>
     <updated>2013-01-22T12:04:00+01:00</updated>
-    <id>http://blog.rem.co/blog/2013/01/22/ubuntu-automatically-selecting-a-fast-mirror</id>
+    <id>https://rem.co/blog/2013/01/22/ubuntu-automatically-selecting-a-fast-mirror</id>
     <content type="html"><![CDATA[<p>Letting Ubuntu pick the <code>apt-get</code> mirror closest to you is pretty easy.</p>
 
 <p>Just add these mirror directives to the top of <code>/etc/apt/sources.list</code> and you&rsquo;re good to go:</p>
@@ -240,10 +1291,10 @@ type=USER_AUTH msg=audit(1361289715.714:2382): user pid=23033 uid=0 auid=0 ses=9
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[Munin: failing with Storable error]]></title>
-    <link href="http://blog.rem.co/blog/2013/01/21/munin-failing-with-storable-error/"/>
+    <title type="html"><![CDATA[Munin: Failing With Storable Error]]></title>
+    <link href="https://rem.co/blog/2013/01/21/munin-failing-with-storable-error/"/>
     <updated>2013-01-21T17:29:00+01:00</updated>
-    <id>http://blog.rem.co/blog/2013/01/21/munin-failing-with-storable-error</id>
+    <id>https://rem.co/blog/2013/01/21/munin-failing-with-storable-error</id>
     <content type="html"><![CDATA[<p>I suffered from a Munin version 2.0.10 installation that refused to update the majority of the graphs. Only the first two of a long list were being updated, the rest all &lsquo;hung&rsquo; at the same moment.</p>
 
 <p>After a little investigating, the problem surfaced:</p>
@@ -277,7 +1328,7 @@ Execute the script in a similar fashion as you would do with <code>munin-cron</c
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>find /var/lib/munin/ -type f | grep storable
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>find /var/lib/munin/ -type f <span class="p">|</span> grep storable
 </span><span class='line'>/var/lib/munin/datafile.storable
 </span><span class='line'>/var/lib/munin/htmlconf.storable
 </span><span class='line'>/var/lib/munin/limits.storable
@@ -302,16 +1353,21 @@ Execute the script in a similar fashion as you would do with <code>munin-cron</c
   
   <entry>
     <title type="html"><![CDATA[Gentoo: Updating and Cleaning]]></title>
-    <link href="http://blog.rem.co/blog/2013/01/16/updating-and-cleaning-your-gentoo-linux-server/"/>
+    <link href="https://rem.co/blog/2013/01/16/updating-and-cleaning-your-gentoo-linux-server/"/>
     <updated>2013-01-16T23:40:00+01:00</updated>
-    <id>http://blog.rem.co/blog/2013/01/16/updating-and-cleaning-your-gentoo-linux-server</id>
-    <content type="html"><![CDATA[<p><img class="left" src="http://www.gentoo.org/images/gblend.png" width="100" height="100"> Keeping your Gentoo Linux server up to date isn&rsquo;t as straightforward as let&rsquo;s say an Ubuntu box, where you would just run <code>$ apt-get update &amp;&amp; apt-get upgrade &amp;&amp; apt-get clean</code> for example.</p>
+    <id>https://rem.co/blog/2013/01/16/updating-and-cleaning-your-gentoo-linux-server</id>
+    <content type="html"><![CDATA[<p><img class="left" src="https://rem.co/images/gblend.png" width="100" height="100"> Keeping your Gentoo Linux server up to date isn&rsquo;t as straightforward as let&rsquo;s say an Ubuntu box, where you would just run <code>$ apt-get update &amp;&amp; apt-get upgrade &amp;&amp; apt-get clean</code> for example.</p>
 
 <p>Gentoo is far too flexible for a <em>one size fits all</em> approach. The commands outlined below come pretty close for daily use though:</p>
 
-<div><script src='https://gist.github.com/2835011.js'></script>
+<div><script src='https://gist.github.com/2835011.js' async=''></script>
 <noscript><pre><code>emerge --sync &amp;&amp; emerge -uDNav --with-bdeps=y @world
-emerge --depclean &amp;&amp; revdep-rebuild &amp;&amp; eclean-dist</code></pre></noscript></div>
+emerge --depclean &amp;&amp; emerge @preserved-rebuild &amp;&amp; revdep-rebuild &amp;&amp; eclean-dist
+
+genkernel --oldconfig --menuconfig --splash --save-config --makeopts=-j5 --install all
+grub-mkconfig -o /boot/grub/grub.cfg
+
+perl-cleaner --reallyall</code></pre></noscript></div>
 
 
 
@@ -332,7 +1388,7 @@ After which we update the &ldquo;world&rdquo; group (which would entail all pack
 
 <p>-v : Verbose, gives more useful output, including the selected USE flags for packages. (Which enables you to spot obvious errors early on).</p>
 
-<p>&mdash;with-bdeps=y : Includes build time dependencies, and is useful for solving some common merge errors. (This can also be done by setting <code>EMERGE_DEFAULT_OPTS="--with-bdeps=y"</code> in <code>/etc/make.conf</code>)</p>
+<p>&ndash;with-bdeps=y : Includes build time dependencies, and is useful for solving some common merge errors. (This can also be done by setting <code>EMERGE_DEFAULT_OPTS="--with-bdeps=y"</code> in <code>/etc/make.conf</code>)</p>
 
 <p>That should suffice to update about every update-able package on your system.</p>
 
@@ -355,10 +1411,10 @@ This is exactly why the second line is mentioned separately and isn&rsquo;t conc
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[2013: Blogging with Octopress]]></title>
-    <link href="http://blog.rem.co/blog/2013/01/16/2013-blogging-with-octopress/"/>
+    <title type="html"><![CDATA[2013: Blogging With Octopress]]></title>
+    <link href="https://rem.co/blog/2013/01/16/2013-blogging-with-octopress/"/>
     <updated>2013-01-16T20:06:00+01:00</updated>
-    <id>http://blog.rem.co/blog/2013/01/16/2013-blogging-with-octopress</id>
+    <id>https://rem.co/blog/2013/01/16/2013-blogging-with-octopress</id>
     <content type="html"><![CDATA[<p>Well. Here we are!</p>
 
 <p>New year, new approach to blogging.</p>
@@ -372,11 +1428,10 @@ This is exactly why the second line is mentioned separately and isn&rsquo;t conc
 <p><img class="left" src="http://octopress.org/images/logo.png">
 Then <a href="http://octopress.org">Octopress</a> enters the stage, combining a lot of my favorite technologies to provide a somewhat nerdy approach to blogging.</p>
 
-<!-- more -->
+<!-- more -->  
 
 
-<p>
-<em>Why haven&rsquo;t I tried this before?</em></p>
+<p><em>Why haven&rsquo;t I tried this before?</em></p>
 
 <p>It uses <a href="http://git-scm.com/">Git</a> as VCS <strong>and</strong> distribution system, publishes to <a href="https://github.com/Remz-Jay">Github</a> and <a href="http://pages.github.com/">Github Pages</a> and uses <a href="http://daringfireball.net/projects/markdown/syntax">markdown</a> to render my blog post ramblings, which in turn enables me to use the Mac OSX app <a href="http://www.markdownpro.com/">Markdown Pro</a> to quickly type up an article about a brilliant code snippet that I just came up with in an off-line fashion.<br/>
 <em>What can go wrong, right?</em></p>
@@ -388,43 +1443,1055 @@ Then <a href="http://octopress.org">Octopress</a> enters the stage, combining a 
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[MySQL: Boolean substitution]]></title>
-    <link href="http://blog.rem.co/blog/2009/04/27/mysql-boolean-substitution/"/>
-    <updated>2009-04-27T00:00:00+02:00</updated>
-    <id>http://blog.rem.co/blog/2009/04/27/mysql-boolean-substitution</id>
-    <content type="html"><![CDATA[<p>Today I faced a quite interesting problem, that originated from pure laziness.
-I&rsquo;m developing a backend system for a quite complex database structure. Within this backend, an almost limitless amount of table views have to be created for the end user. Because I&rsquo;m extremely lazy, and didn&rsquo;t want to develop the html view code for each table view, I created a PHP html-table-generator-class, which takes a <code>mysql_result_set</code> as parameter, and outputs the html table in string format.</p>
+    <title type="html"><![CDATA[Fail2Ban PhpMyAdmin Script]]></title>
+    <link href="https://rem.co/blog/2009/12/09/fail2ban-phpmyadmin-script/"/>
+    <updated>2009-12-09T16:44:27+02:00</updated>
+    <id>https://rem.co/blog/2009/12/09/fail2ban-phpmyadmin-script</id>
+    <content type="html"><![CDATA[<p>While examining my webserver statistics, I noticed that quite a lot 404&rsquo;s are being served on most of my domains to scan bots that are trying to find exploits in possible running PHPMyAdmin configurations.
+ Though harmless if you keep a clean ship with a decently configured PHPMyAdmin and the latest updates like I do, I still decided I couldn&rsquo;t let this behaviour unanswered. So I took action, and wrote a small fail2ban filter that permanently drops all traffic from the IP addresses these scans originate from, like I do with every address that misbehaves in any way.</p>
 
-<p>This method works great, unless for some cases, where a value in the query has to be substituted by a user readable value. A boolean is a good example of such a value.</p>
+<p> The regex used won&rsquo;t capture all attempts, but with my configuration only 1 hit is enough to get you banned (the scripts these scans call are <code>main.php</code> and <code>config.inc.php</code>, which aren&rsquo;t to be called directly, especially not when they fail with a 404 like these), and all scanning attempts I&rsquo;ve seen so far cycle through at least 20 different combinations.</p>
 
-<!-- more -->
+<p> Well, enough talk, here is the <code>filter.d</code> file:</p>
 
-
-<h3>Booleans in MySQL</h3>
-
-<p>Since MySQL doesn&rsquo;t natively support boolean values, there are various methods of saving booleans to a database. Common practices include fields of the format <code>CHAR(1)</code>, <code>TINYINT(1)</code> and <code>ENUM('Y','N')</code>. Recent versions of MySQL also include the <code>BIT</code> field format, which in fact boils down to using <code>TINYINT(1)</code>, when it comes to boolean values.</p>
-
-<p>I always use the <code>TINYINT(1)</code> field format for my boolean columns. This works perfectly, since you can <code>INSERT</code> true/false values, which are automatically transformed to 1/0. When you <code>SELECT</code> a boolean column in PHP, this also works, since you can compare true/false to 1/0 within PHP. (Whether this loose type handling is preferable is a discussion for another time).</p>
-
-<p>However.. when you <code>SELECT</code> a boolean column, and run it through a generic html table generator class such as mine, you&rsquo;ll end up with a nice table showing 1&rsquo;s and 0&rsquo;s, which aren&rsquo;t very user friendly (Having in mind that most backend users aren&rsquo;t quite as computer savvy as you are!). Replacing all 1&rsquo;s and 0&rsquo;s within the PHP code was not an option, since it would be a generic measure, and would also transform ID&rsquo;s and Prices and such. So I had to come up with a solution to substitute the boolean values within the MySQL result by human readable values.</p>
-
-<h2>Substituting boolean values within a MySQL SELECT query</h2>
-
-<p>The solution is in fact, as they usually are, quite simple. MySQL supports the use of the <code>REPLACE()</code> SQL command. Usually this command is used to <code>UPDATE</code> tables with replacement values, but it also works within a <code>SELECT</code> query to alter results. Having this in mind I started out replacing one value in the result:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span> <span class="k">REPLACE</span><span class="p">(</span><span class="n">boolColumn</span><span class="p">,</span><span class="s1">&#39;1&#39;</span><span class="p">,</span><span class="s1">&#39;true&#39;</span><span class="p">)</span> <span class="k">AS</span> <span class="n">booleanValue</span> <span class="k">FROM</span> <span class="n">tableName</span><span class="p">;</span>
+<figure class='code'><figcaption><span>filter.d</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class='ini'><span class='line'> <span class="c1"># Fail2Ban configuration file</span>
+</span><span class='line'> <span class="c1">#</span>
+</span><span class='line'> <span class="c1"># Author: Remco Overdijk</span>
+</span><span class='line'> <span class="c1">#</span>
+</span><span class='line'> <span class="c1"># $Revision: 4 $</span>
+</span><span class='line'> <span class="c1">#</span>
+</span><span class='line'>
+</span><span class='line'> <span class="k">[Definition]</span>
+</span><span class='line'>
+</span><span class='line'> <span class="c1"># Option:  failregex</span>
+</span><span class='line'> <span class="c1"># Notes.:  regex to match the 404&#39;ed PMA file in the logfile. The</span>
+</span><span class='line'> <span class="c1">#          host must be matched by a group named &#39;host&#39;. The tag &#39;&lt;HOST&gt;&#39; can</span>
+</span><span class='line'> <span class="c1">#          be used for standard IP/hostname matching and is only an alias for</span>
+</span><span class='line'> <span class="c1">#          (?:::f{4,6}:)?(?P&lt;host&gt;\S+)</span>
+</span><span class='line'> <span class="c1"># Values:  TEXT</span>
+</span><span class='line'> <span class="c1">#</span>
+</span><span class='line'> <span class="na">failregex</span> <span class="o">=</span> <span class="s">&lt;HOST&gt; -.*&#39;GET .*(php|pma|PMA|p/m/a|db|sql|admin).*/(config/config\.inc|main)\.php.*&#39;.*404.*</span>
+</span><span class='line'>
+</span><span class='line'> <span class="c1"># Option:  ignoreregex</span>
+</span><span class='line'> <span class="c1"># Notes.:  regex to ignore. If this regex matches, the line is ignored.</span>
+</span><span class='line'> <span class="c1"># Values:  TEXT</span>
+</span><span class='line'> <span class="c1">#</span>
+</span><span class='line'> <span class="na">ignoreregex</span> <span class="o">=</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>This works! There&rsquo;s a slight catch though, since &lsquo;false&rsquo; values also have to be substituted. After some fiddling with <code>IF</code> and <code>AND</code> constructions, the solutions was of course a lot easier:</p>
+<p>And this is of course accompanied by a bit in <code>jail.conf</code>:</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span> <span class="k">REPLACE</span><span class="p">(</span><span class="k">REPLACE</span><span class="p">(</span><span class="n">boolColumn</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;false&#39;</span><span class="p">),</span><span class="s1">&#39;1&#39;</span><span class="p">,</span><span class="s1">&#39;true&#39;</span><span class="p">)</span> <span class="k">AS</span> <span class="n">booleanValue</span> <span class="k">FROM</span> <span class="n">tableName</span><span class="p">;</span>
+<figure class='code'><figcaption><span>jail.conf</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='ini'><span class='line'><span class="k">[apache-pma]</span>
+</span><span class='line'>
+</span><span class='line'> <span class="na">enabled</span> <span class="o">=</span> <span class="s">true</span>
+</span><span class='line'><span class="s"> filter = apache-pma</span>
+</span><span class='line'><span class="s"> action = iptables-allports[name=pma]</span>
+</span><span class='line'><span class="s"> mail-whois[name=pma, dest=&lt;YOURADDRHERE&gt;]</span>
+</span><span class='line'><span class="s"> logpath = /var/log/apache2/access_log</span>
+</span><span class='line'><span class="s"> bantime = -1</span>
+</span><span class='line'><span class="s"> maxretry = 1</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>And there you have it.. value substitution 101 in MySQL. This method also works for your other substitution needs!</p>
+<p>Works for me, another 20 additional IPs/day onto the shitlist!</p>
+
+<h4>Update:</h4>
+
+<p> It seems another variation of these scans are hitting the NIC&rsquo;s quite often; One for Zen Cart to be more precise.
+ You can easily add support countering this scanner as well, simply by expanding the failregex with this line:</p>
+
+<p><code>^&lt;HOST&gt; -.*'GET .*(cart|boutique|catalog|butik|shop|zen|store).*/install\.txt.*'.*404.*</code></p>
+
+<p> You can put multiple regexes within one failregex, just put each one on a new line.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[IPMI Graphs in Munin]]></title>
+    <link href="https://rem.co/blog/2009/09/20/impi-graphs-in-munin/"/>
+    <updated>2009-09-20T17:22:59+02:00</updated>
+    <id>https://rem.co/blog/2009/09/20/impi-graphs-in-munin</id>
+    <content type="html"><![CDATA[<p>It is possible to monitor fan speeds and temperatures on Dell Poweredge servers under Linux. You can achieve this by reading out the IPMI data that is available on the system.</p>
+
+<p>I used the steps on <a href="https://hep.pa.msu.edu/twiki/bin/view/AGLT2/DellCactiSetup">this website</a> to buffer the data gathered by IPMI to use in Cacti.</p>
+
+<p>However, in addition to Cacti I also use Munin to monitor various system parameters. Wouldn&rsquo;t it be nice to incorporate graphs for fan speeds and temperatures in Munin? I thought so, so I developed a way to do this.</p>
+
+<p>In this case the solution consists out of 2 munin plugins and a PHP script that formats the IPMI values for graphing use. This could also be done directly in the plugins, but since I&rsquo;m not such an <code>awk</code> and <code>sed</code> expert I chose to let a PHP script handle the transformation, so I&rsquo;d be done sooner (time is money my friends!).</p>
+
+<p> First up, the PHP script:</p>
+
+<figure class='code'><figcaption><span>/usr/bin/ipmi.php</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="c1">#!/usr/bin/php</span>
+</span><span class='line'> <span class="o">&lt;?</span><span class="nx">php</span>
+</span><span class='line'> <span class="nv">$handle</span> <span class="o">=</span> <span class="nb">fopen</span><span class="p">(</span><span class="s1">&#39;/dev/shm/dell.ipmi&#39;</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">);</span>
+</span><span class='line'> <span class="k">while</span><span class="p">(</span><span class="o">!</span><span class="nb">feof</span><span class="p">(</span><span class="nv">$handle</span><span class="p">))</span> <span class="p">{</span>
+</span><span class='line'> <span class="nv">$line</span> <span class="o">=</span> <span class="nb">fgets</span><span class="p">(</span><span class="nv">$handle</span><span class="p">);</span>
+</span><span class='line'> <span class="k">if</span><span class="p">(</span><span class="nb">preg_match</span><span class="p">(</span><span class="s1">&#39;/AmbientTemp/&#39;</span><span class="p">,</span><span class="nv">$line</span><span class="p">))</span> <span class="k">echo</span> <span class="s1">&#39;tambi.value &#39;</span><span class="o">.</span><span class="nb">fgets</span><span class="p">(</span><span class="nv">$handle</span><span class="p">);</span>
+</span><span class='line'> <span class="k">if</span><span class="p">(</span><span class="nb">preg_match</span><span class="p">(</span><span class="s1">&#39;/CPU1Temp/&#39;</span><span class="p">,</span><span class="nv">$line</span><span class="p">))</span> <span class="k">echo</span> <span class="s1">&#39;tcpu1.value &#39;</span><span class="o">.</span><span class="nb">fgets</span><span class="p">(</span><span class="nv">$handle</span><span class="p">);</span>
+</span><span class='line'> <span class="k">if</span><span class="p">(</span><span class="nb">preg_match</span><span class="p">(</span><span class="s1">&#39;/CPU2Temp/&#39;</span><span class="p">,</span><span class="nv">$line</span><span class="p">))</span> <span class="k">echo</span> <span class="s1">&#39;tcpu2.value &#39;</span><span class="o">.</span><span class="nb">fgets</span><span class="p">(</span><span class="nv">$handle</span><span class="p">);</span>
+</span><span class='line'> <span class="k">if</span><span class="p">(</span><span class="nb">preg_match</span><span class="p">(</span><span class="s1">&#39;/Fan1/&#39;</span><span class="p">,</span><span class="nv">$line</span><span class="p">))</span> <span class="k">echo</span> <span class="s1">&#39;fan1.value &#39;</span><span class="o">.</span><span class="nb">fgets</span><span class="p">(</span><span class="nv">$handle</span><span class="p">);</span>
+</span><span class='line'> <span class="k">if</span><span class="p">(</span><span class="nb">preg_match</span><span class="p">(</span><span class="s1">&#39;/Fan2/&#39;</span><span class="p">,</span><span class="nv">$line</span><span class="p">))</span> <span class="k">echo</span> <span class="s1">&#39;fan2.value &#39;</span><span class="o">.</span><span class="nb">fgets</span><span class="p">(</span><span class="nv">$handle</span><span class="p">);</span>
+</span><span class='line'> <span class="k">if</span><span class="p">(</span><span class="nb">preg_match</span><span class="p">(</span><span class="s1">&#39;/Fan3/&#39;</span><span class="p">,</span><span class="nv">$line</span><span class="p">))</span> <span class="k">echo</span> <span class="s1">&#39;fan3.value &#39;</span><span class="o">.</span><span class="nb">fgets</span><span class="p">(</span><span class="nv">$handle</span><span class="p">);</span>
+</span><span class='line'> <span class="k">if</span><span class="p">(</span><span class="nb">preg_match</span><span class="p">(</span><span class="s1">&#39;/Fan4/&#39;</span><span class="p">,</span><span class="nv">$line</span><span class="p">))</span> <span class="k">echo</span> <span class="s1">&#39;fan4.value &#39;</span><span class="o">.</span><span class="nb">fgets</span><span class="p">(</span><span class="nv">$handle</span><span class="p">);</span>
+</span><span class='line'> <span class="k">if</span><span class="p">(</span><span class="nb">preg_match</span><span class="p">(</span><span class="s1">&#39;/Fan5/&#39;</span><span class="p">,</span><span class="nv">$line</span><span class="p">))</span> <span class="k">echo</span> <span class="s1">&#39;fan5.value &#39;</span><span class="o">.</span><span class="nb">fgets</span><span class="p">(</span><span class="nv">$handle</span><span class="p">);</span>
+</span><span class='line'> <span class="k">if</span><span class="p">(</span><span class="nb">preg_match</span><span class="p">(</span><span class="s1">&#39;/Fan6/&#39;</span><span class="p">,</span><span class="nv">$line</span><span class="p">))</span> <span class="k">echo</span> <span class="s1">&#39;fan6.value &#39;</span><span class="o">.</span><span class="nb">fgets</span><span class="p">(</span><span class="nv">$handle</span><span class="p">);</span>
+</span><span class='line'> <span class="k">if</span><span class="p">(</span><span class="nb">preg_match</span><span class="p">(</span><span class="s1">&#39;/PlanarTemp/&#39;</span><span class="p">,</span><span class="nv">$line</span><span class="p">))</span> <span class="k">echo</span> <span class="s1">&#39;tplan.value &#39;</span><span class="o">.</span><span class="nb">fgets</span><span class="p">(</span><span class="nv">$handle</span><span class="p">);</span>
+</span><span class='line'> <span class="k">if</span><span class="p">(</span><span class="nb">preg_match</span><span class="p">(</span><span class="s1">&#39;/RiserTemp/&#39;</span><span class="p">,</span><span class="nv">$line</span><span class="p">))</span> <span class="k">echo</span> <span class="s1">&#39;trise.value &#39;</span><span class="o">.</span><span class="nb">fgets</span><span class="p">(</span><span class="nv">$handle</span><span class="p">);</span>
+</span><span class='line'> <span class="p">}</span>
+</span><span class='line'> <span class="nb">fclose</span><span class="p">(</span><span class="nv">$handle</span><span class="p">);</span>
+</span><span class='line'> <span class="cp">?&gt;</span><span class="x"></span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p> With the SHM values now being prefixed with matching Munin values, we can graph them in 2 plugins:</p>
+
+<figure class='code'><figcaption><span>/etc/munin/plugins/ipmitemps</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c">#!/bin/sh</span>
+</span><span class='line'> <span class="k">if</span> <span class="o">[</span> <span class="s1">&#39;$1&#39;</span> <span class="o">=</span> <span class="s1">&#39;autoconf&#39;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'> <span class="k">if</span> <span class="o">[</span> -r /dev/shm/dell.ipmi <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'> <span class="nb">echo </span>yes
+</span><span class='line'> <span class="nb">exit </span>0
+</span><span class='line'> <span class="k">else</span>
+</span><span class='line'> <span class="nb">echo </span>no
+</span><span class='line'> <span class="nb">exit </span>1
+</span><span class='line'> <span class="k">fi</span>
+</span><span class='line'> <span class="k">fi</span>
+</span><span class='line'>
+</span><span class='line'> <span class="k">if</span> <span class="o">[</span> <span class="s1">&#39;$1&#39;</span> <span class="o">=</span> <span class="s1">&#39;config&#39;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;graph_title Dell 2850 IPMI Temperatures&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;graph_order tcpu1 tcpu2 tambi tplan trise&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;graph_vlabel Temperature (Deg C)&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;graph_scale yes&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;graph_info This graph shows sensor temperatures&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;graph_category system&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;tcpu1.label CPU1&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;tcpu1.warning 80&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;tcpu1.critical 90&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;tcpu1.info XEON CPU 1 Temperature&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;tcpu2.label CPU2&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;tcpu2.warning 80&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;tcpu2.critical 90&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;tcpu2.info XEON CPU 2 Temperature&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;tambi.label Ambient&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;tambi.warning 80&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;tambi.critical 90&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;tambi.info Ambient Temperature&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;tplan.label Planar&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;tplan.warning 80&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;tplan.critical 90&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;tplan.info Planar Temperature&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;trise.label Riser&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;trise.warning 80&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;trise.critical 90&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;trise.info Riser Temperature&#39;</span>
+</span><span class='line'> <span class="nb">exit </span>0
+</span><span class='line'> <span class="k">fi</span>
+</span><span class='line'> /usr/bin/ipmi.php
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p> and</p>
+
+<figure class='code'><figcaption><span>/etc/munin/plugins/ipmifans</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'> <span class="c">#!/bin/sh</span>
+</span><span class='line'>
+</span><span class='line'> <span class="k">if</span> <span class="o">[</span> <span class="s1">&#39;$1&#39;</span> <span class="o">=</span> <span class="s1">&#39;autoconf&#39;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'> <span class="k">if</span> <span class="o">[</span> -r /dev/shm/dell.ipmi <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'> <span class="nb">echo </span>yes
+</span><span class='line'> <span class="nb">exit </span>0
+</span><span class='line'> <span class="k">else</span>
+</span><span class='line'> <span class="nb">echo </span>no
+</span><span class='line'> <span class="nb">exit </span>1
+</span><span class='line'> <span class="k">fi</span>
+</span><span class='line'> <span class="k">fi</span>
+</span><span class='line'>
+</span><span class='line'> <span class="k">if</span> <span class="o">[</span> <span class="s1">&#39;$1&#39;</span> <span class="o">=</span> <span class="s1">&#39;config&#39;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;graph_title Dell 2850 IPMI Fanspeeds&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;graph_order fan1 fan2 fan3 fan4 fan5 fan6&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;graph_vlabel Fanspeed (RPM)&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;graph_scale yes&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;graph_info This graph shows fanspeeds&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;graph_category system&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;fan1.label Fan1&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;fan1.info Fan1 speed&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;fan2.label Fan2&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;fan2.info Fan2 speed&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;fan3.label Fan3&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;fan3.info Fan3 speed&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;fan4.label Fan4&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;fan4.info Fan4 speed&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;fan5.label Fan5&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;fan5.info Fan5 speed&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;fan6.label Fan6&#39;</span>
+</span><span class='line'> <span class="nb">echo</span> <span class="s1">&#39;fan6.info Fan6 speed&#39;</span>
+</span><span class='line'> <span class="nb">exit </span>0
+</span><span class='line'> <span class="k">fi</span>
+</span><span class='line'> /usr/bin/ipmi.php
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Restart your <code>munin-node</code>, run the munin crons, and voila, graphs!
+ With these settings they will look like this:</p>
+
+<p><em>insert image</em></p>
+
+<p>You can modify the params to change the graphs ofcourse.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Cisco VoIP Oplossing Voor Ziggo Telefonie]]></title>
+    <link href="https://rem.co/blog/2009/09/04/cisco-voip-oplossing-voor-ziggo-telefonie/"/>
+    <updated>2009-09-04T11:39:48+02:00</updated>
+    <id>https://rem.co/blog/2009/09/04/cisco-voip-oplossing-voor-ziggo-telefonie</id>
+    <content type="html"><![CDATA[<blockquote><p>This article is only available in Dutch.</p></blockquote>
+
+
+<p>Sinds een recente verhuizing beschik ik thuis over een Ziggo Alles-in-1 Plus pakket, met internet, tv, én telefonie.</p>
+
+<p>Daarvoor maakte ik gebruik van een Cisco VoIP netwerk op basis van een externe SIP provider. Natuurlijk wilde ik mijn Cisco netwerk blijven gebruiken, maar dan wel op basis van de Ziggo telefonie aansluiting.</p>
+
+<p>Helaas maakt Ziggo gebruik van het <a href="http://en.wikipedia.org/wiki/PacketCable">PacketCable</a> protocol over <a href="http://en.wikipedia.org/wiki/DOCSIS">EuroDocsis</a>, in plaats van <a href="http://en.wikipedia.org/wiki/Session_Initiation_Protocol">SIP</a>.
+Daarnaast heeft het Motorola SurfBoard modem dat bij het Ziggo abonnement geleverd wordt geen SIP interface voor het LAN, maar beschikt over 2 <a href="http://en.wikipedia.org/wiki/Plain_old_telephone_service">POTS</a> poorten op <a href="http://en.wikipedia.org/wiki/RJ11,_RJ14,_RJ25">RJ11</a> connectoren.</p>
+
+<p>Alsof dat nog niet genoeg ellende is maakt Ziggo <em>geen</em> gebruik van <a href="http://en.wikipedia.org/wiki/Dual-tone_multi-frequency">DTMF ETSI</a> signalering voor onder andere nummerweergave, maar in plaats daarvan het veel minder bekende <a href="http://en.wikipedia.org/wiki/FSK_standards_for_use_in_Caller_ID_and_remote_metering">Bellcore FSK</a>.</p>
+
+<p>Goed, tot zover de met technische termen bezaaide probleemvorming. Tijd voor een oplossing om je mooie VoIP apparatuur aan de gang te krijgen! Er zijn naar mijn ervaring bijzonder weinig how-to&rsquo;s / handleidingen of tutorials te vinden op het internet om een dergelijke setup te maken, en de informatie over het Ziggo netwerk is zo mogelijk nog beperkter, vandaar deze uitgebreide uitleg om voor eens en altijd van dat probleem af te zijn!</p>
+
+<h3>De basis</h3>
+
+<p> Als basis voor deze tutorial gebruik ik de volgende hardware:</p>
+
+<ul>
+<li><a href="http://www.cisco.com/en/US/products/hw/routers/ps221/products_data_sheet09186a00800920f2.html">Cisco 1760-V Modular Access Router</a></li>
+<li><a href="http://www.cisco.com/en/US/products/hw/phones/ps379/ps1854/">Cisco 7940 IP-Phones</a></li>
+<li><a href="http://www.cisco.com/en/US/products/ps5946/">Cisco 7971GE IP-Phones</a></li>
+<li><a href="http://www.motorola.com/staticfiles/Business/Products/Modems%20and%20Gateways/Modems/Digital%20Voice%20Modems/SBV5121/_Documents/Static%20Files/SBV5121e-data-sheet-534281-001-a.pdf">Motorola SBV5121e VoIP Cable Modem</a></li>
+</ul>
+
+
+<p>Naast deze hardware heb ik nog een tweede router (voor o.a. Wireless) en de nodige switching apparatuur draaien, maar dat maakt voor het doel van deze tutorial weinig uit.</p>
+
+<p>Een schematische weergave van de aan elkaar geknoopte hardware:</p>
+
+<p><em>insert image</em></p>
+
+<h3>Stap 1: De hardware verbindingen</h3>
+
+<p> De meest ideale situatie zou zijn om de (digitale) VoIP toestellen digitaal via SIP of een ander protocol met Ziggo te verbinden om zo de beste gesprekskwaliteit en de laagste latency te krijgen. Helaas is dit dus niet mogelijk in combinatie met het Motorola modem, en zijn we veroordeeld tot het gebruik van analoge lijnen.
+ Gelukkig beschikt de Cisco 1760 router over de mogelijkheid om aangesloten te worden op PSTN lijnen doormiddel van een Voice Interface Card.
+ Om van deze mogelijkheid gebruik te maken moet je router over een aantal zaken beschikken:</p>
+
+<ul>
+<li>De mogelijkheid om VIC&rsquo;s te plaatsen</li>
+<li>Een PVDM kaart waarop een DSP chip aanwezig is om van je router een Voice Gateway te maken. (In dit voorbeeld wordt een <code>PVDM-256k-4=</code> gebruikt)</li>
+<li>De IOS versie op de router dient over het <code>IP Voice feature pack</code> te beschikken. (In dit voorbeeld wordt <code>IOS (C1700-ADVENTERPRISEK9-M) Version 12.4(15)T5 (fc4)</code> gebruikt, die daar naast Cisco Unified Call Manager ook over beschikt)</li>
+</ul>
+
+
+<p> De VIC die je vervolgens nodig hebt is van het Foreign Exchange Office (<code>FXO</code>) type. Andere typen als Ear&amp;Mouth (<code>E/M</code>) en Foreign Exchange Subscriber (<code>FXS</code>) zijn voor dit doeleinde <em>NIET</em> geschikt, en kunnen tevens niet gelijktijdig op dezelfde router gebruikt worden. Maak dus niet dezelfde fout als ik door een <code>VIC-2E/M</code> aan te schaffen omdat deze vrij goedkoop zijn, in de hoop dat het werkt.. want het werkt niet! Helaas is de <code>FXO</code> kaart de duurste van de collectie, zeker als je nummerweergave wilt. Een overzicht van alle beschikbare FXO kaarten kun je vinden bij <a href="http://www.cisco.com/en/US/products/hw/routers/ps274/products_tech_note09186a00800b53c7.shtml">Cisco</a>. Mijn advies is om de <code>VIC2-2FXO</code> te nemen, aangezien deze over alle benodigde opties beschikt (helaas wel de duurste kaart met 2 poorten).</p>
+
+<p> Goed, <code>PVDM</code> en <code>VIC</code> in de router, opstarten, en de analoge telefoonlijnen met RJ11 pluggen van de 2 <code>VIC</code> poorten naar de 2 poorten op het modem verbinden en we zijn klaar om te configureren!</p>
+
+<h3>Stap 2: Router configuratie</h3>
+
+<p> Gebruik je favoriete protocol om in te loggen op je router (RS232, ssh of telnet), zet de router in enable mode, en check of je PVDM en VIC actief zijn en werken en check gelijk op welke poorten ze zitten. De VIC2-2FXO zit in dit voorbeeld in slot 2, en beschikt over voice-ports 2/0 en 2/1.
+ Ga vervolgens verder met de configuratie van het geheel via <code>conf t</code>. Ik ga er van uit dat de basis van je router goed is ingesteld, en ga dus alleen in op de voice settings.</p>
+
+<h4>voice card</h4>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>trunk group pots
+</span><span class='line'> hunt-scheme round-robin
+</span><span class='line'> !</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We maken een hunt group aan voor de analoge lijnen, zodat de router zelf bepaalt welke lijn vrij is en deze voor inkomende/uitgaande oproepen gebruikt.</p>
+
+<h4>voice ports</h4>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>voice-port 2/0
+</span><span class='line'> trunk-group pots
+</span><span class='line'> cptone JP
+</span><span class='line'> connection plar 1337
+</span><span class='line'> caller-id enable
+</span><span class='line'> !
+</span><span class='line'> voice-port 2/1
+</span><span class='line'> trunk-group pots
+</span><span class='line'> cptone JP
+</span><span class='line'> connection plar 1337
+</span><span class='line'> caller-id enable
+</span><span class='line'> !</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Configureer beide voice-ports, en voeg ze aan de trunk group toe. Zet caller-id aan. De cptone parameter geeft aan wat voor landinstellingen de PSTN lijn gebruikt. Normaal gesproken zou dit NL zijn voor gebruik in Nederland, maar aangezien normale PSTN lijnen hier DTMF ETSI gebruiken werkt dat niet voor onze doeleinden. Daarom gebruiken we JP (Japan), aangezien daar FSK gebruikt wordt. Het klinkt wat vreemd, maar werkt perfect. Tenslotte voegen we een &quot;private line automatic ringdown&quot; (PLAR) toe op de lijnen. Hiermee zorgen we dat wanneer een oproep binnenkomt op de lijn, deze automatisch wordt doorgeschakeld naar de opgegeven PLAR lijn. De opgegeven PLAR lijn is in dit geval een Overlay voor de ephone DN&rsquo;s die we later zullen configureren. In het kort komt het erop neer dat zodra de lijn gebeld wordt de Overlay wordt aangeroepen, en alle toestellen die gekoppeld zijn aan de DN zullen overgaan.</p>
+
+<h4>codecs</h4>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>voice class codec 1
+</span><span class='line'> codec preference 1 g711ulaw
+</span><span class='line'> codec preference 2 g711alaw
+</span><span class='line'> !</span></code></pre></td></tr></table></div></figure>
+
+
+<p> Niet zo belangrijk voor dit voorbeeld, maar toch is het handig om in te stellen welke codecs gebruikt worden binnen het VoIP netwerk (bellen tussen de toestellen onderling). de PVDM DSP handelt verder de codecs voor de analoge lijnen af.</p>
+
+<h4>dial-peers</h4>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>dial-peer voice 1 pots
+</span><span class='line'> trunkgroup pots
+</span><span class='line'> preference 7
+</span><span class='line'> destination-pattern 0[1-9]........
+</span><span class='line'> incoming called-number .
+</span><span class='line'> no digit-strip
+</span><span class='line'> forward-digits all
+</span><span class='line'> !
+</span><span class='line'> dial-peer voice 2 pots
+</span><span class='line'> trunkgroup pots
+</span><span class='line'> destination-pattern 00[1-9]..........
+</span><span class='line'> incoming called-number .
+</span><span class='line'> no digit-strip
+</span><span class='line'> forward-digits all
+</span><span class='line'> !
+</span><span class='line'> dial-peer voice 3 pots
+</span><span class='line'> trunkgroup pots
+</span><span class='line'> destination-pattern 1233
+</span><span class='line'> incoming called-number .
+</span><span class='line'> no digit-strip
+</span><span class='line'> forward-digits all
+</span><span class='line'> !</span></code></pre></td></tr></table></div></figure>
+
+
+<p> Voeg dial-peers toe voor alle inkomende en uitgaande belpatronen. Voor het gemak gebruiken alle dial-peers hier hetzelfde inkomende patroon (.), om het binnenkomende gesprek rechtstreeks zonder modificatie door te zetten naar de PLAR. De dial-peers dienen uiteraard net als de lijnen gekoppeld te worden aan de trunk group.
+ De destination-patterns geven aan welke telefoonnummers geldig zijn, en indien een gedraaid nummer voldoet aan één van de patterns wordt het gesprek doorgezet naar de trunk, en zal dus gebruik maken van één van de PSTN lijnen. De opgegeven patterns zijn alles behalve compleet, maar dekken in ieder geval de volgende situaties:</p>
+
+<ul>
+<li>Een 10 cijferig telefoonnummer, beginnend met een 0, gevolgd door een 1 tot 9 en vervolgens nog 8 random cijfers. (Bijv. 0131212121)</li>
+<li>Een 13 cijferig internationaal telefoonnummer, beginnend met 00, gevolgd door een 1 tot 9 en nog 10 random cijfers. (Bijv. 0031131212121)</li>
+<li>Het nummer van de Ziggo voicemail, 1233.</li>
+</ul>
+
+
+<p>Standaard stript de dial-peer opgegeven dialpatterns van het nummer af alvorens deze door te geven, dus gebruiken we no digit-strip om dit te voorkomen. Tenslotte zorgen we dat alle overige gedraaide nummers (right-justified) worden doorgezet naar de PSTN lijn.</p>
+
+<h4>telephony service</h4>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>telephony-service
+</span><span class='line'> load 7960-7940 P000308000400
+</span><span class='line'> load 7971 SCCP70.8-2-2SR1S
+</span><span class='line'> load 7970 SCCP70.8-2-2SR1S
+</span><span class='line'> max-ephones 5
+</span><span class='line'> max-dn 5
+</span><span class='line'> ip source-address 10.0.0.5 port 2000
+</span><span class='line'> auto assign 1 to 5
+</span><span class='line'> calling-number initiator
+</span><span class='line'> system message ccme1 ready..
+</span><span class='line'> url services http://10.0.0.35:8080/CSFEnterprise-war/
+</span><span class='line'> cnf-file perphone
+</span><span class='line'> network-locale NL
+</span><span class='line'> time-zone 28
+</span><span class='line'> time-format 24
+</span><span class='line'> date-format dd-mm-yy
+</span><span class='line'> voicemail 1233
+</span><span class='line'> max-conferences 4 gain -6
+</span><span class='line'> moh rick.au
+</span><span class='line'> transfer-system full-consult dss
+</span><span class='line'> create cnf-files version-stamp 7960 Apr 17 2009 09:02:53
+</span><span class='line'> !</span></code></pre></td></tr></table></div></figure>
+
+
+<p> Configureer je VoIP telephony service naar eigen inzicht. Bovenstaande configuratie is slechts een voorbeeld van mijn eigen configuratie. Zaken waar je op moet letten zijn of je loads goed gespecificeerd zijn (denk ook aan de tftp statements), het voicemail nummer (in dit geval extern naar Ziggo) voor wanneer op de Berichten knop op de telefoon wordt gedrukt, en de land instellingen.</p>
+
+<h4>DN&rsquo;s</h4>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>ephone-dn 1
+</span><span class='line'> number 1234
+</span><span class='line'> label Woonkamer
+</span><span class='line'> description 013xxxxxxx
+</span><span class='line'> name Woonkamer
+</span><span class='line'> call-forward busy 1235
+</span><span class='line'> call-forward noan 1235 timeout 120
+</span><span class='line'> ephone-hunt login
+</span><span class='line'> !
+</span><span class='line'> ephone-dn 2
+</span><span class='line'> number 1235
+</span><span class='line'> label Kantoor
+</span><span class='line'> description 013xxxxxxx
+</span><span class='line'> name Kantoor
+</span><span class='line'> call-forward busy 1234
+</span><span class='line'> call-forward noan 1234 timeout 120
+</span><span class='line'> ephone-hunt login
+</span><span class='line'> !
+</span><span class='line'> ephone-dn 3
+</span><span class='line'> number 1337
+</span><span class='line'> label Extern
+</span><span class='line'> description Extern Overlay
+</span><span class='line'> name Extern
+</span><span class='line'> !</span></code></pre></td></tr></table></div></figure>
+
+
+<p> Voeg een ephone DN toe voor ieder toestel dat je aan gaat sluiten, met een eigen nummer (dit nummer en label is zichtbaar op het toestel, en wordt gebruikt om onderling met elkaar te bellen). Ik heb de DN&rsquo;s zo ingesteld dat wanneer ze niet beantwoord worden/bezet zijn automatisch de andere DN wordt aangeroepen. Voeg tenslotte de Overlay DN toe die in de voice-ports is gespecificeerd, en geef het een label zodat je op je telefoons kunt zien dat een oproep van de Externe lijn afkomstig is.</p>
+
+<h4>ephones</h4>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>ephone 3
+</span><span class='line'> mac-address 000D.EDAB.5055
+</span><span class='line'> speed-dial 1 xxxxxxxxxx label &quot;xxxx&quot;
+</span><span class='line'> type 7940
+</span><span class='line'> button 1o2,3
+</span><span class='line'> pin 1235
+</span><span class='line'> !
+</span><span class='line'> ephone 4
+</span><span class='line'> conference admin
+</span><span class='line'> mac-address 0015.2BD2.01C7
+</span><span class='line'> username &quot;remco&quot; password xxxxxxxx
+</span><span class='line'> speed-dial 1 xxxxxxxxxx label &quot;xxxx&quot;
+</span><span class='line'> speed-dial 2 xxxxxxxxxx label &quot;xxxx&quot;
+</span><span class='line'> speed-dial 3 xxxxxxxxxx label &quot;xxxx&quot;
+</span><span class='line'> type 7971
+</span><span class='line'> button 1o1,3
+</span><span class='line'> pin 1234
+</span><span class='line'> !</span></code></pre></td></tr></table></div></figure>
+
+
+<p> Voeg ephones toe voor ieder toestel dat je hebt. Configuratie hangt natuurlijk af van het toestel dat je hebt en hoe je wil dat hij reageert. Voeg users en speeddials toe naar wens. De enige cruciale data is het MAC adres (anders weet de router niet welk toestel aan de ephone te koppelen), en de button configuratie.</p>
+
+<p> De button configuratie zorgt er namelijk voor dat een lijn aan het toestel gekoppeld wordt, inclusief de Overlay DN. zo heeft ephone 3 een button <code>1o2,3</code> . Dit houdt in dat DN&rsquo;s 2 en 3 in overlay mode onder button 1 van dit toestel zitten. De router zoekt automatisch de meest unieke lijn uit, en presenteert deze DN onder de knop. Aangezien Overlay DN 3 op meerdere toestellen wordt gebruikt is deze het minst uniek, en zal enkel op de achtergrond aanwezig zijn. ephone 4 maakt op button 1 gebruik van DN&rsquo;s 1 en 3. Op deze manier presenteren beide toestellen hun eigen nummer, maar luisteren op de achtergrond wel mee naar de Overlay DN, en zullen dus gelijktijdig overgaan zodra een gesprek binnenkomt op de trunk en deze wordt doorgezet naar de Overlay DN.</p>
+
+<h3>Stap 3: klaar!</h3>
+
+<p> Save je configuratie door een <code>copy run start</code> te doen, en je zou aan de gang moeten kunnen!</p>
+
+<ul>
+<li>Onderling bellen kan door de unieke DN van een ephone te bellen (1234 en 1235 in dit geval)</li>
+<li>Extern bellen kan door een telefoonnummer te draaien dat gespecificeerd is in één van de dial-peers</li>
+<li>Voicemail is gekoppeld onder de berichtenknop van een toestel.</li>
+<li>Binnenkomende gesprekken zullen op alle toestellen die gebruik maken van de Overlay DN overgaan, inclusief nummerweergave!</li>
+</ul>
+
+
+<p><em>Veel succes!</em></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Iptables: Creating Persistent Bans From Fail2Ban]]></title>
+    <link href="https://rem.co/blog/2009/08/18/iptables-creating-persistent-bans-from-fail2ban/"/>
+    <updated>2009-08-18T15:53:10+02:00</updated>
+    <id>https://rem.co/blog/2009/08/18/iptables-creating-persistent-bans-from-fail2ban</id>
+    <content type="html"><![CDATA[<p>On my servers I use the nifty program <a href="http://www.fail2ban.org/wiki/index.php/Main_Page">Fail2Ban</a> to perform logbased automatic firewalling of &lsquo;bad&rsquo; ip&rsquo;s.</p>
+
+<p>The idea behind this is easy: Some IP performs an action I don&rsquo;t approve of. This can be any number of things, e.g. requesting pages in Apache that are commonly accessed by bots and/or scanners, or trying to log in to SSH with accounts that do not exist on the system. This bad behavior gets logged, and Fail2Ban keeps tabs on those logs, and using a number of rules it determines if a host is &lsquo;bad&rsquo; enough to temporarily or permanently ban all access to the server. It does so by adding a few chains to Iptables (one for each thing it checks for), and dynamically adding/removing IP&rsquo;s to/from these chains.</p>
+
+<p>This all works perfectly. However, there&rsquo;s one issue; When Iptables gets reloaded, it restores its default rules, removing the Fail2Ban chains and all the rules they contain, even if the ip&rsquo;s in the chain were marked as permanent.</p>
+
+<p>I created a workaround for this problem, consisting of two simple steps:</p>
+
+<ul>
+<li><p>When a &lsquo;bad&rsquo; ip gets banned, it&rsquo;s added to the Iptables chain, but also written to a file, containing all collected &lsquo;bad&rsquo; ip&rsquo;s. (I use <code>/etc/shitlist</code> for this purpose).</p></li>
+<li><p>Whenever Iptables gets reloaded, I run a PHP script that checks the <code>/etc/shitlist</code> file for &lsquo;safe&rsquo; and duplicate ip&rsquo;s, and writes all other ip&rsquo;s to the permanent Blocklist chain. (The checking for &lsquo;safe&rsquo; ip&rsquo;s might be a bit unneeded, but with my Fail2Ban rules it&rsquo;s possible that one of my own ip&rsquo;s gets banned for 10 minutes if a SSH login attempt fails for 5 times. Though it&rsquo;s a temporary ban, the ip will still get written to the shitlist, and would end up in the permanent Blocklist).</p></li>
+</ul>
+
+
+<p>To make this work, I made the following changes:</p>
+
+<p>Every <code>jail</code> in Fail2Ban uses an <code>action.d</code> script to perform (un)banning. I defaulted all actions to an action script called <code>iptables-allports.conf</code>. Basically this action drops everything in Iptables if a package originates from the &lsquo;bad&rsquo; IP.</p>
+
+<p>I updated the ban action such that:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>actionban = iptables -I fail2ban-&lt;name&gt; 1 -s &lt;ip&gt; -j DROP
+</span><span class='line'>echo &lt;ip&gt; &gt;&gt; /etc/shitlist</span></code></pre></td></tr></table></div></figure>
+
+
+<p>After that I created a PHP script that updates Iptables with the ip&rsquo;s contained in the shitlist:</p>
+
+<figure class='code'><figcaption><span>shitlist.php</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span class='line'><span class="sd">/** script that loads a shitlist file into iptables */</span>
+</span><span class='line'><span class="c1">//CONFIG </span>
+</span><span class='line'><span class="nv">$shitlists</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s2">&quot;/root/list.txt&quot;</span><span class="p">,</span><span class="s2">&quot;/etc/shitlist&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$chain</span> <span class="o">=</span> <span class="s2">&quot;Blocklist&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$safelist</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s2">&quot;x.x.x.x&quot;</span><span class="p">,</span> <span class="s2">&quot;y.y.y.y&quot;</span><span class="p">,</span> <span class="s2">&quot;z.z.z.z&quot;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">echo</span> <span class="s2">&quot;Reading current IPTABLES state</span><span class="se">\r\n</span><span class="s2">&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$data</span> <span class="o">=</span> <span class="nb">shell_exec</span><span class="p">(</span><span class="s1">&#39;iptables -S &#39;</span><span class="o">.</span><span class="nv">$chain</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$iparr</span> <span class="o">=</span> <span class="nb">explode</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="nv">$data</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$ref</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+</span><span class='line'><span class="k">for</span><span class="p">(</span><span class="nv">$i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="nv">$i</span><span class="o">&lt;</span><span class="nb">sizeof</span><span class="p">(</span><span class="nv">$iparr</span><span class="p">);</span><span class="nv">$i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="nb">substr_count</span><span class="p">(</span><span class="nv">$iparr</span><span class="p">[</span><span class="nv">$i</span><span class="p">],</span><span class="s2">&quot;.&quot;</span><span class="p">)</span><span class="o">==</span><span class="mi">3</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nv">$ref</span><span class="p">[</span><span class="nv">$j</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$iparr</span><span class="p">[</span><span class="nv">$i</span><span class="p">];</span>
+</span><span class='line'>       <span class="nv">$j</span><span class="o">++</span><span class="p">;</span>
+</span><span class='line'>   <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="nb">sort</span><span class="p">(</span><span class="nv">$ref</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$total</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="k">foreach</span><span class="p">(</span><span class="nv">$shitlists</span> <span class="k">as</span> <span class="nv">$shitlist</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">echo</span> <span class="s2">&quot;Reading shitlist at </span><span class="si">$shitlist\r\n</span><span class="s2">&quot;</span><span class="p">;</span>
+</span><span class='line'>  <span class="c1">//READ FILE</span>
+</span><span class='line'>  <span class="nv">$fh</span> <span class="o">=</span> <span class="nb">fopen</span><span class="p">(</span><span class="nv">$shitlist</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="nv">$fh</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nv">$itt</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>      <span class="nv">$iparr</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+</span><span class='line'>      <span class="k">while</span><span class="p">(</span><span class="o">!</span><span class="nb">feof</span><span class="p">(</span><span class="nv">$fh</span><span class="p">))</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nv">$ip</span> <span class="o">=</span> <span class="nb">trim</span><span class="p">(</span><span class="nb">fgets</span><span class="p">(</span><span class="nv">$fh</span><span class="p">));</span>
+</span><span class='line'>          <span class="k">if</span><span class="p">(</span><span class="nb">strlen</span><span class="p">(</span><span class="nv">$ip</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">6</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>              <span class="k">if</span><span class="p">(</span><span class="nb">array_search</span><span class="p">(</span><span class="nv">$ip</span><span class="p">,</span><span class="nv">$iparr</span><span class="p">)</span><span class="o">===</span><span class="k">false</span><span class="o">&amp;&amp;</span><span class="nb">array_search</span><span class="p">(</span><span class="nv">$ip</span><span class="p">,</span><span class="nv">$safelist</span><span class="p">)</span><span class="o">===</span><span class="k">false</span><span class="o">&amp;&amp;</span><span class="nb">array_search</span><span class="p">(</span><span class="nv">$ip</span><span class="o">.</span><span class="s2">&quot;/32&quot;</span><span class="p">,</span><span class="nv">$ref</span><span class="p">)</span><span class="o">===</span><span class="k">false</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                  <span class="nv">$iparr</span><span class="p">[]</span> <span class="o">=</span> <span class="nv">$ip</span><span class="p">;</span>
+</span><span class='line'>                  <span class="k">echo</span> <span class="s2">&quot;Now adding </span><span class="si">$ip</span><span class="s2"> to </span><span class="si">$chain\r\n</span><span class="s2">&quot;</span><span class="p">;</span>
+</span><span class='line'>                  <span class="nv">$ins</span> <span class="o">=</span> <span class="mi">18</span><span class="o">+</span><span class="nv">$itt</span><span class="p">;</span>
+</span><span class='line'>                  <span class="nb">shell_exec</span><span class="p">(</span><span class="s2">&quot;iptables -I &quot;</span><span class="o">.</span><span class="nv">$chain</span><span class="o">.</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="nv">$ins</span><span class="o">.</span><span class="s2">&quot; -s &quot;</span><span class="o">.</span><span class="nv">$ip</span><span class="o">.</span><span class="s2">&quot;/32 -j DROP&quot;</span><span class="p">);</span>
+</span><span class='line'>                  <span class="nv">$itt</span><span class="o">++</span><span class="p">;</span>
+</span><span class='line'>              <span class="p">}</span>
+</span><span class='line'>          <span class="p">}</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>      <span class="nb">fclose</span><span class="p">(</span><span class="nv">$fh</span><span class="p">);</span>
+</span><span class='line'>      <span class="k">echo</span> <span class="s2">&quot;Finished adding </span><span class="si">$itt</span><span class="s2"> ip&#39;s from list </span><span class="si">$shitlist</span><span class="s2"> to chain </span><span class="si">$chain</span><span class="s2"> . Bye!</span><span class="se">\r\n</span><span class="s2">&quot;</span><span class="p">;</span>
+</span><span class='line'>      <span class="nv">$total</span> <span class="o">=</span> <span class="nv">$total</span> <span class="o">+</span> <span class="nv">$itt</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">echo</span> <span class="s2">&quot;Could not open shitlist file </span><span class="si">$shitlist</span><span class="s2"> . Skipping this list</span><span class="se">\r\n</span><span class="s2">&quot;</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="k">echo</span> <span class="s2">&quot;Finished adding </span><span class="si">$total</span><span class="s2"> ip&#39;s to chain </span><span class="si">$chain</span><span class="s2"> from &quot;</span><span class="o">.</span><span class="nb">sizeof</span><span class="p">(</span><span class="nv">$shitlists</span><span class="p">)</span><span class="o">.</span><span class="s2">&quot; shitlists.</span><span class="se">\r\n</span><span class="s2">&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="cp">?&gt;</span><span class="x"> </span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You can run the script from the commandline (as root!) simply by stating <code>php shitlist.php</code>, or add it to the startup script of your Iptables installation.</p>
+
+<p>Hope this helps keeping your NIC&rsquo;s available for VALID traffic!</p>
+
+<h3>Update:</h3>
+
+<p>Made some changes to the script to check for already existing bans, to keep your chains clean!</p>
+
+<h3>Update 2:</h3>
+
+<p>Little tweak to the script so it now loads an array of lists, in case you have various sources.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[CSS: Overlapping Flash Content With CSS]]></title>
+    <link href="https://rem.co/blog/2009/05/29/css-overlapping-flash-content-with-css/"/>
+    <updated>2009-05-29T19:06:33+02:00</updated>
+    <id>https://rem.co/blog/2009/05/29/css-overlapping-flash-content-with-css</id>
+    <content type="html"><![CDATA[<p>By default, flash movies are always shown on the top-level of a display tree.</p>
+
+<p>However, it can be very useful to be able to move the flash content to the background, and having it overlapped by other content;
+e.g. You have a flash movie in the header of your website, but there&rsquo;s a sidebar menu which should be displayed over the header.</p>
+
+<p>This is easily achieved by following these steps:</p>
+
+<ol>
+<li>Add <code>wmode="transparent"</code> to your object and embed tags which include the flash movie</li>
+<li>Wrap the <code>object</code> and <code>embed</code> tags by a <code>div</code> and assign a CSS class to it.</li>
+<li>Define a <code>z-index</code> for this class in your stylesheet.</li>
+<li>Assign a higher <code>z-index</code> for all items that should overlay the flash movie.</li>
+<li>Refresh and enjoy.</li>
+</ol>
+
+
+<h4>Example:</h4>
+
+<figure class='code'><figcaption><span>HTML Flash Include</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;flashheader&quot;</span><span class="nt">&gt;</span> <span class="nt">&lt;object</span> <span class="na">id=</span><span class="s">&quot;header&quot;</span> <span class="na">classid=</span><span class="s">&quot;clsid:d27cdb6e-ae6d-11cf-96b8-444553540000&quot;</span> <span class="na">width=</span><span class="s">&quot;1024&quot;</span> <span class="na">height=</span><span class="s">&quot;202&quot;</span> <span class="na">codebase=</span><span class="s">&quot;http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,40,0&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'> <span class="nt">&lt;param</span> <span class="na">name=</span><span class="s">&quot;data&quot;</span> <span class="na">value=</span><span class="s">&quot;fileadmin/template/header.swf&quot;</span> <span class="nt">/&gt;</span> <span class="nt">&lt;param</span> <span class="na">name=</span><span class="s">&quot;wmode&quot;</span> <span class="na">value=</span><span class="s">&quot;transparent&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'> <span class="nt">&lt;param</span> <span class="na">name=</span><span class="s">&quot;allowScriptAccess&quot;</span> <span class="na">value=</span><span class="s">&quot;sameDomain&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'> <span class="nt">&lt;param</span> <span class="na">name=</span><span class="s">&quot;allowFullScreen&quot;</span> <span class="na">value=</span><span class="s">&quot;false&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'> <span class="nt">&lt;param</span> <span class="na">name=</span><span class="s">&quot;quality&quot;</span> <span class="na">value=</span><span class="s">&quot;high&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'> <span class="nt">&lt;param</span> <span class="na">name=</span><span class="s">&quot;bgcolor&quot;</span> <span class="na">value=</span><span class="s">&quot;#ffffff&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'> <span class="nt">&lt;param</span> <span class="na">name=</span><span class="s">&quot;src&quot;</span> <span class="na">value=</span><span class="s">&quot;fileadmin/template/header.swf&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'> <span class="nt">&lt;param</span> <span class="na">name=</span><span class="s">&quot;name&quot;</span> <span class="na">value=</span><span class="s">&quot;header&quot;</span> <span class="nt">/&gt;&lt;param</span> <span class="na">name=</span><span class="s">&quot;allowfullscreen&quot;</span> <span class="na">value=</span><span class="s">&quot;false&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'> <span class="nt">&lt;embed</span> <span class="na">id=</span><span class="s">&quot;header&quot;</span> <span class="na">type=</span><span class="s">&quot;application/x-shockwave-flash&quot;</span> <span class="na">width=</span><span class="s">&quot;1024&quot;</span> <span class="na">height=</span><span class="s">&quot;202&quot;</span> <span class="na">src=</span><span class="s">&quot;fileadmin/template/header.swf&quot;</span> <span class="na">name=</span><span class="s">&quot;header&quot;</span> <span class="na">bgcolor=</span><span class="s">&quot;#ffffff&quot;</span> <span class="na">quality=</span><span class="s">&quot;high&quot;</span> <span class="na">allowfullscreen=</span><span class="s">&quot;false&quot;</span> <span class="na">allowscriptaccess=</span><span class="s">&quot;sameDomain&quot;</span> <span class="na">wmode=</span><span class="s">&quot;transparent&quot;</span> <span class="na">data=</span><span class="s">&quot;fileadmin/template/header.swf&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'> <span class="nt">&lt;/embed&gt;</span>
+</span><span class='line'> <span class="nt">&lt;/object&gt;</span>
+</span><span class='line'><span class="nt">&lt;/div&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>CSS for Flash</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nt">div</span><span class="nc">.flashheader</span> <span class="p">{</span>
+</span><span class='line'> <span class="k">display</span><span class="o">:</span> <span class="k">block</span><span class="p">;</span>
+</span><span class='line'> <span class="k">width</span><span class="o">:</span> <span class="m">1024px</span><span class="p">;</span>
+</span><span class='line'> <span class="k">left</span><span class="o">:</span><span class="m">0</span><span class="p">;</span>
+</span><span class='line'> <span class="k">margin-top</span><span class="o">:-</span><span class="m">260px</span><span class="p">;</span>
+</span><span class='line'> <span class="k">position</span><span class="o">:</span> <span class="k">relative</span><span class="p">;</span>
+</span><span class='line'> <span class="k">z-index</span><span class="o">:</span> <span class="m">1</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>CSS for Overlap</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nt">div</span><span class="nc">.side</span><span class="p">{</span>
+</span><span class='line'> <span class="k">height</span><span class="o">:</span><span class="m">578px</span><span class="p">;</span>
+</span><span class='line'> <span class="k">width</span><span class="o">:</span><span class="m">372px</span><span class="p">;</span>
+</span><span class='line'> <span class="k">float</span><span class="o">:</span><span class="k">left</span><span class="p">;</span>
+</span><span class='line'> <span class="k">background-image</span><span class="o">:</span><span class="sx">url(&#39;../img/rightbar.png&#39;)</span><span class="p">;</span>
+</span><span class='line'> <span class="k">position</span><span class="o">:</span> <span class="k">absolute</span><span class="p">;</span>
+</span><span class='line'> <span class="k">top</span><span class="o">:</span><span class="m">114px</span><span class="p">;</span>
+</span><span class='line'> <span class="k">left</span><span class="o">:</span> <span class="m">612px</span><span class="p">;</span>
+</span><span class='line'> <span class="k">z-index</span><span class="o">:</span> <span class="m">100</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[PHP: Testing the Pseudo Random Number Generator]]></title>
+    <link href="https://rem.co/blog/2009/05/26/php-testing-the-pseudo-random-number-generator/"/>
+    <updated>2009-05-26T18:44:44+02:00</updated>
+    <id>https://rem.co/blog/2009/05/26/php-testing-the-pseudo-random-number-generator</id>
+    <content type="html"><![CDATA[<p>Every programmer uses them.. <code>PRNG</code>&rsquo;s, better known as <em>Pseudo-Random Number Generators</em>; in PHP represented by the <a href="http://nl1.php.net/manual/en/function.rand.php"><code>rand(min,max)</code></a> function.</p>
+
+<p>Unlike <em>True Random Number Generators</em> (<code>TRNG</code>&rsquo;s) that use true random data like atmospheric noise to create their numbers, <code>PRNG</code>&rsquo;s rely on software algorithms to come up with seemingly random numbers.. <em>but are they</em>?</p>
+
+<p>And is there a difference between Linux and Windows <code>PRNG</code> results?
+ <!-- more --></p>
+
+<p>I decided to give it a little try, and came up with the following, very simple but yet quite test:</p>
+
+<figure class='code'><figcaption><span>Pseudo Random Number Generator Test </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span class='line'><span class="c1">//init</span>
+</span><span class='line'><span class="nv">$h</span> <span class="o">=</span> <span class="mi">500</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$w</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$colors</span> <span class="o">=</span> <span class="nb">hexdec</span><span class="p">(</span><span class="s2">&quot;FFFFFF&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$col</span> <span class="o">=</span> <span class="nv">$colors</span><span class="o">/</span><span class="mi">10</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$img</span> <span class="o">=</span> <span class="nb">imagecreatetruecolor</span><span class="p">(</span><span class="nv">$w</span><span class="p">,</span><span class="nv">$h</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$nul</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$een</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$twee</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$drie</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$vier</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$vijf</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$zes</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$zeven</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$acht</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$negen</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$tien</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$tp</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//cols</span>
+</span><span class='line'><span class="k">for</span><span class="p">(</span><span class="nv">$i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="nv">$i</span><span class="o">&lt;</span><span class="nv">$h</span><span class="p">;</span><span class="nv">$i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'> <span class="c1">//rows</span>
+</span><span class='line'> <span class="k">for</span><span class="p">(</span><span class="nv">$j</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="nv">$j</span><span class="o">&lt;</span><span class="nv">$w</span><span class="p">;</span><span class="nv">$j</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>         
+</span><span class='line'> <span class="nv">$k</span> <span class="o">=</span> <span class="nb">rand</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">);</span>         
+</span><span class='line'> <span class="nb">imagesetpixel</span><span class="p">(</span><span class="nv">$img</span><span class="p">,</span><span class="nv">$j</span><span class="p">,</span><span class="nv">$i</span><span class="p">,(</span><span class="nv">$col</span><span class="o">*</span><span class="nv">$k</span><span class="p">));</span>       
+</span><span class='line'> <span class="nv">$tp</span><span class="o">++</span><span class="p">;</span>         
+</span><span class='line'> <span class="k">switch</span><span class="p">(</span><span class="nv">$k</span><span class="p">)</span> <span class="p">{</span>             
+</span><span class='line'> <span class="k">case</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">:</span> <span class="nv">$nul</span><span class="o">++</span><span class="p">;</span> <span class="k">break</span><span class="p">;</span>          
+</span><span class='line'> <span class="k">case</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">:</span> <span class="nv">$een</span><span class="o">++</span><span class="p">;</span> <span class="k">break</span><span class="p">;</span>          
+</span><span class='line'> <span class="k">case</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">:</span> <span class="nv">$twee</span><span class="o">++</span><span class="p">;</span> <span class="k">break</span><span class="p">;</span>             
+</span><span class='line'> <span class="k">case</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">:</span> <span class="nv">$drie</span><span class="o">++</span><span class="p">;</span> <span class="k">break</span><span class="p">;</span>             
+</span><span class='line'> <span class="k">case</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">:</span> <span class="nv">$vier</span><span class="o">++</span><span class="p">;</span> <span class="k">break</span><span class="p">;</span>             
+</span><span class='line'> <span class="k">case</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">:</span> <span class="nv">$vijf</span><span class="o">++</span><span class="p">;</span> <span class="k">break</span><span class="p">;</span>             
+</span><span class='line'> <span class="k">case</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">:</span> <span class="nv">$zes</span><span class="o">++</span><span class="p">;</span> <span class="k">break</span><span class="p">;</span>          
+</span><span class='line'> <span class="k">case</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span><span class="o">:</span> <span class="nv">$zeven</span><span class="o">++</span><span class="p">;</span> <span class="k">break</span><span class="p">;</span>            
+</span><span class='line'> <span class="k">case</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span><span class="o">:</span> <span class="nv">$acht</span><span class="o">++</span><span class="p">;</span> <span class="k">break</span><span class="p">;</span>             
+</span><span class='line'> <span class="k">case</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span><span class="o">:</span> <span class="nv">$negen</span><span class="o">++</span><span class="p">;</span> <span class="k">break</span><span class="p">;</span>
+</span><span class='line'> <span class="k">case</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">:</span> <span class="nv">$tien</span><span class="o">++</span><span class="p">;</span> <span class="k">break</span><span class="p">;</span>        
+</span><span class='line'> <span class="p">}</span>     
+</span><span class='line'> <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="nv">$bl</span> <span class="o">=</span> <span class="nb">imagecolorallocate</span><span class="p">(</span><span class="nv">$img</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$or</span> <span class="o">=</span> <span class="nb">imagecolorallocate</span><span class="p">(</span><span class="nv">$img</span><span class="p">,</span><span class="mi">220</span><span class="p">,</span><span class="mi">210</span><span class="p">,</span><span class="mi">60</span><span class="p">);</span>
+</span><span class='line'><span class="nb">imagefilledrectangle</span><span class="p">(</span><span class="nv">$img</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">150</span><span class="p">,</span><span class="mi">230</span><span class="p">,</span><span class="nv">$bl</span><span class="p">);</span>
+</span><span class='line'><span class="nb">imagestring</span><span class="p">(</span><span class="nv">$img</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="s2">&quot;Nul: </span><span class="si">$nul</span><span class="s2"> (&quot;</span><span class="o">.</span><span class="nb">round</span><span class="p">((</span><span class="nv">$nul</span><span class="o">/</span><span class="p">(</span><span class="nv">$tp</span><span class="o">/</span><span class="mi">100</span><span class="p">)),</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="s2">&quot;%)&quot;</span><span class="p">,</span><span class="nv">$or</span><span class="p">);</span>
+</span><span class='line'><span class="nb">imagestring</span><span class="p">(</span><span class="nv">$img</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">30</span><span class="p">,</span><span class="s2">&quot;Een: </span><span class="si">$een</span><span class="s2"> (&quot;</span><span class="o">.</span><span class="nb">round</span><span class="p">((</span><span class="nv">$een</span><span class="o">/</span><span class="p">(</span><span class="nv">$tp</span><span class="o">/</span><span class="mi">100</span><span class="p">)),</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="s2">&quot;%)&quot;</span><span class="p">,</span><span class="nv">$or</span><span class="p">);</span>
+</span><span class='line'><span class="nb">imagestring</span><span class="p">(</span><span class="nv">$img</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">50</span><span class="p">,</span><span class="s2">&quot;Twee: </span><span class="si">$twee</span><span class="s2"> (&quot;</span><span class="o">.</span><span class="nb">round</span><span class="p">((</span><span class="nv">$twee</span><span class="o">/</span><span class="p">(</span><span class="nv">$tp</span><span class="o">/</span><span class="mi">100</span><span class="p">)),</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="s2">&quot;%)&quot;</span><span class="p">,</span><span class="nv">$or</span><span class="p">);</span>
+</span><span class='line'><span class="nb">imagestring</span><span class="p">(</span><span class="nv">$img</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">70</span><span class="p">,</span><span class="s2">&quot;Drie: </span><span class="si">$drie</span><span class="s2"> (&quot;</span><span class="o">.</span><span class="nb">round</span><span class="p">((</span><span class="nv">$drie</span><span class="o">/</span><span class="p">(</span><span class="nv">$tp</span><span class="o">/</span><span class="mi">100</span><span class="p">)),</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="s2">&quot;%)&quot;</span><span class="p">,</span><span class="nv">$or</span><span class="p">);</span>
+</span><span class='line'><span class="nb">imagestring</span><span class="p">(</span><span class="nv">$img</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">90</span><span class="p">,</span><span class="s2">&quot;Vier: </span><span class="si">$vier</span><span class="s2"> (&quot;</span><span class="o">.</span><span class="nb">round</span><span class="p">((</span><span class="nv">$vier</span><span class="o">/</span><span class="p">(</span><span class="nv">$tp</span><span class="o">/</span><span class="mi">100</span><span class="p">)),</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="s2">&quot;%)&quot;</span><span class="p">,</span><span class="nv">$or</span><span class="p">);</span>
+</span><span class='line'><span class="nb">imagestring</span><span class="p">(</span><span class="nv">$img</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">110</span><span class="p">,</span><span class="s2">&quot;Vijf: </span><span class="si">$vijf</span><span class="s2"> (&quot;</span><span class="o">.</span><span class="nb">round</span><span class="p">((</span><span class="nv">$vijf</span><span class="o">/</span><span class="p">(</span><span class="nv">$tp</span><span class="o">/</span><span class="mi">100</span><span class="p">)),</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="s2">&quot;%)&quot;</span><span class="p">,</span><span class="nv">$or</span><span class="p">);</span>
+</span><span class='line'><span class="nb">imagestring</span><span class="p">(</span><span class="nv">$img</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">130</span><span class="p">,</span><span class="s2">&quot;Zes: </span><span class="si">$zes</span><span class="s2"> (&quot;</span><span class="o">.</span><span class="nb">round</span><span class="p">((</span><span class="nv">$zes</span><span class="o">/</span><span class="p">(</span><span class="nv">$tp</span><span class="o">/</span><span class="mi">100</span><span class="p">)),</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="s2">&quot;%)&quot;</span><span class="p">,</span><span class="nv">$or</span><span class="p">);</span>
+</span><span class='line'><span class="nb">imagestring</span><span class="p">(</span><span class="nv">$img</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">150</span><span class="p">,</span><span class="s2">&quot;Zeven: </span><span class="si">$zeven</span><span class="s2"> (&quot;</span><span class="o">.</span><span class="nb">round</span><span class="p">((</span><span class="nv">$zeven</span><span class="o">/</span><span class="p">(</span><span class="nv">$tp</span><span class="o">/</span><span class="mi">100</span><span class="p">)),</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="s2">&quot;%)&quot;</span><span class="p">,</span><span class="nv">$or</span><span class="p">);</span>
+</span><span class='line'><span class="nb">imagestring</span><span class="p">(</span><span class="nv">$img</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">170</span><span class="p">,</span><span class="s2">&quot;Acht: </span><span class="si">$acht</span><span class="s2"> (&quot;</span><span class="o">.</span><span class="nb">round</span><span class="p">((</span><span class="nv">$acht</span><span class="o">/</span><span class="p">(</span><span class="nv">$tp</span><span class="o">/</span><span class="mi">100</span><span class="p">)),</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="s2">&quot;%)&quot;</span><span class="p">,</span><span class="nv">$or</span><span class="p">);</span>
+</span><span class='line'><span class="nb">imagestring</span><span class="p">(</span><span class="nv">$img</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">190</span><span class="p">,</span><span class="s2">&quot;Negen: </span><span class="si">$negen</span><span class="s2"> (&quot;</span><span class="o">.</span><span class="nb">round</span><span class="p">((</span><span class="nv">$negen</span><span class="o">/</span><span class="p">(</span><span class="nv">$tp</span><span class="o">/</span><span class="mi">100</span><span class="p">)),</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="s2">&quot;%)&quot;</span><span class="p">,</span><span class="nv">$or</span><span class="p">);</span>
+</span><span class='line'><span class="nb">imagestring</span><span class="p">(</span><span class="nv">$img</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">210</span><span class="p">,</span><span class="s2">&quot;Tien: </span><span class="si">$tien</span><span class="s2"> (&quot;</span><span class="o">.</span><span class="nb">round</span><span class="p">((</span><span class="nv">$tien</span><span class="o">/</span><span class="p">(</span><span class="nv">$tp</span><span class="o">/</span><span class="mi">100</span><span class="p">)),</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="s2">&quot;%)&quot;</span><span class="p">,</span><span class="nv">$or</span><span class="p">);</span>
+</span><span class='line'><span class="nb">header</span><span class="p">(</span><span class="s2">&quot;Content-type: image/png&quot;</span><span class="p">);</span> <span class="nb">imagepng</span><span class="p">(</span><span class="nv">$img</span><span class="p">);</span> <span class="nb">imagedestroy</span><span class="p">(</span><span class="nv">$img</span><span class="p">);</span>
+</span><span class='line'><span class="cp">?&gt;</span><span class="x"></span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Running this script will result in a noisy image, which when everything goes well, should be patternless (otherwise the results wouldn&rsquo;t be as random as they should be!).
+For convenience I added a few counters, to display the spread of the numbers.</p>
+
+<p>In my test results <strong>on both Windows and Linux</strong>, the results came up about equal each time:
+There are no patterns in the images, significantly decreasing the chance of predicting the next number the <code>PRNG</code> will produce. (Which is important for various obvious matters).
+Though there are no visible patterns, the number spread seems to be about equal each run.. <strong><em>9% for each of the 11 possibilities..</em></strong></p>
+
+<p><img src="https://rem.co/images/prngtest-output.png"></p>
+
+<p>I have my doubts about the randomness of such an equal spread.. but I&rsquo;m not drawing any conclusions just yet.. perhaps when I feel like investigating this further ;-)</p>
 ]]></content>
   </entry>
   
