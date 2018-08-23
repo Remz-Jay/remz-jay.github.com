@@ -179,22 +179,4 @@ body#cv {
 		}
 	}
 }
-#content article #picturepage 
-{
-	img.aside-flickr {
-		width: 350px;
-		clip: rect(0, 350px, 200px, 0);
-		position: absolute;
-	}
 
-	li {
-		float: left;
-		width: 45%;
-		list-style-type: none;
-		padding-right: 10px;
-		position: relative;
-	}
-	h2 {
-		margin-top: 200px;
-	}
-}
