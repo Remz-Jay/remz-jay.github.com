@@ -70,10 +70,10 @@ function showTwitterFeed(tweets, twitter_user) {
 function getTwitterFeed(user, count, replies) {
   count = parseInt(count, 10);
   $.ajax({
-     url: '/timeline.json',
+     url: 'https://storage.googleapis.com/rem-co/timeline.json',
      type: 'GET',
      dataType: 'json',
-     jsonp: false
+     jsonp: true
   }).fail(function(err,textStatus,errorThrown) { 
     console.log(err); 
     console.log(textStatus);
